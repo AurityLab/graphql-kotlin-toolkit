@@ -7,8 +7,6 @@
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm")
-    id("maven-publish")
-
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
@@ -23,27 +21,9 @@ repositories {
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    implementation("com.graphql-java:graphql-java:13.0")
-    implementation("com.squareup:kotlinpoet:1.4.4")
-
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
-}
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+    implementation("com.graphql-java:graphql-java:13.0")
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "com.auritylab.graphql.kotlin.toolkit"
-            artifactId = "poet"
-            version = "1.0.0"
-
-            from(components["java"])
-        }
-    }
 }
