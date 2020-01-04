@@ -4,13 +4,11 @@ import com.auritylab.graphql.kotlin.codegen.generator.EnumGenerator
 import com.auritylab.graphql.kotlin.codegen.generator.FieldResolverGenerator
 import com.auritylab.graphql.kotlin.codegen.generator.InputObjectGenerator
 import com.auritylab.graphql.kotlin.codegen.generator.ValueWrapperGenerator
+import com.auritylab.graphql.kotlin.codegen.helper.KotlinGenerateHelper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mock.WiringFactoryMock
-import graphql.schema.GraphQLEnumType
-import graphql.schema.GraphQLInputObjectType
-import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLSchema
+import graphql.schema.*
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
@@ -59,9 +57,24 @@ class Codegen(
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
                 .forEach { objectType ->
+                    val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
+
                     objectType.fieldDefinitions.forEach { fieldDefinition ->
-                        fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
-                                .writeTo(outputDirectory)
+                        if (generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                            fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
+                                    .writeTo(outputDirectory)
+                    }
+                }
+
+        // Will create code for all interface types.
+        allTypes.filterIsInstance<GraphQLInterfaceType>()
+                .forEach {interfaceType ->
+                    val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
+
+                    interfaceType.fieldDefinitions.forEach { fieldDefinition ->
+                        if (generatedForInterface || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                            fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition)
+                                    .writeTo(outputDirectory)
                     }
                 }
 
