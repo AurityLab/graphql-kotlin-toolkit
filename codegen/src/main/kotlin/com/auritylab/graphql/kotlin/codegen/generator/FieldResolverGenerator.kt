@@ -1,8 +1,9 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
 import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import graphql.schema.GraphQLArgument
@@ -11,22 +12,22 @@ import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
 
 class FieldResolverGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val nameMapper: NameMapper
-) : AbstractGenerator(options, kotlinTypeMapper, nameMapper) {
+        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     val inputMapType = ClassName("kotlin.collections", "Map")
             .parameterizedBy(
                     ClassName("kotlin", "String"),
                     ClassName("kotlin", "Any"))
 
     fun getFieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FileSpec {
-        val fieldResolverName = nameMapper.getFieldResolverName(container, field)
+        val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
 
-        return getFileSpecBuilder(fieldResolverName.className)
+        return getFileSpecBuilder(fieldResolverClassName)
                 .addType(buildFieldResolverClass(container, field)).build()
     }
 
     private fun buildFieldResolverClass(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): TypeSpec {
-        val fieldResolverClassName = getFieldResolverName(container, field)
+        val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
         val fieldOutputTypeName = getKotlinType(field.type)
 
         return TypeSpec.classBuilder(fieldResolverClassName)
@@ -51,7 +52,14 @@ class FieldResolverGenerator(
                                     getFunSpec.addStatement(stmt.statement, *stmt.args.toTypedArray())
                                 }
 
-                                getFunSpec.addStatement("return resolve(${field.arguments.joinToString(", ") { it.name + "Arg" }}, env)")
+                                val resolveArgs = field.arguments.let { args ->
+                                    if (args.isEmpty())
+                                       return@let ""
+
+                                    return@let args.joinToString(", ") { it.name + "Arg" } + ", "
+                                }
+
+                                getFunSpec.addStatement("return resolve(${resolveArgs}env)")
                             }
                             .build())
                 }
@@ -66,11 +74,11 @@ class FieldResolverGenerator(
 
     private fun createArgumentParserStatement(argument: GraphQLArgument): Statement {
         val argName = argument.name
-        val argType = argument.type
-        val kType = getKotlinType(argType)
+        val argType = GraphQLTypeHelper.unwrapTypeFull(argument.type)
+        val kType = getKotlinType(argument.type)
 
         return if (argType is GraphQLInputObjectType) {
-            val inputObjectParser = nameMapper.getInputObjectParser(argType)
+            val inputObjectParser = generatedMapper.getInputObjectBuilderMemberName(argType)
 
             if (kType.isNullable)
                 Statement(

@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.codegen.mapper
 
 import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -12,7 +13,7 @@ import java.math.BigInteger
 
 class KotlinTypeMapper(
         private val options: CodegenOptions,
-        private val generateClassName: NameMapper,
+        private val generatedMapper: GeneratedMapper,
         private val schema: GraphQLSchema
 ) {
     fun getKotlinType(type: GraphQLType): TypeName {
@@ -20,15 +21,15 @@ class KotlinTypeMapper(
 
         // Check if the unwrapped type is registered in the type definition registry.
         // Check if the TypeDefinition is a scalar.
-        val kType = when (val unwrappedType = if (type is GraphQLModifiedType) unwrapTypeFull(type) else type) {
+        val kType = when (val unwrappedType = if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type) {
             is GraphQLScalarType -> {
                 getScalarKotlinType(unwrappedType)
             }
             is GraphQLInputObjectType -> {
-                getGeneratedClassName(unwrappedType)
+                generatedMapper.getGeneratedTypeClassName(unwrappedType)
             }
             is GraphQLEnumType -> {
-                getGeneratedClassName(unwrappedType)
+                generatedMapper.getGeneratedTypeClassName(unwrappedType)
             }
             is GraphQLObjectType -> {
                 getObjectKotlinType(unwrappedType)
@@ -37,30 +38,6 @@ class KotlinTypeMapper(
         }
 
         return applyWrapping(type, null, kType)
-    }
-
-    /**
-     * Will unwrap the given [type] to the actual type. This is necessary because a incoming type can be wrapped in a
-     * [ListType] or a [NonNullType].
-     */
-    private fun unwrapType(type: GraphQLModifiedType): GraphQLType {
-        return when (type) {
-            is GraphQLList -> type.wrappedType
-            is GraphQLNonNull -> type.wrappedType
-            else -> type
-        }
-    }
-
-    /**
-     * Will recursively unwrap the given [type] using [unwrapType]. A type can be wrapped multiple types.
-     */
-    private fun unwrapTypeFull(type: GraphQLModifiedType): GraphQLType {
-        var t: GraphQLType = type
-        // Will unwrap until the Type is TypeName.ø
-        while (t is GraphQLModifiedType)
-            t = unwrapType(t)
-
-        return t
     }
 
     private fun applyWrapping(thisType: GraphQLType, parentType: GraphQLType?, kType: TypeName): TypeName {
@@ -121,16 +98,6 @@ class KotlinTypeMapper(
     private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
         return KotlinRepresentationHelper.getClassName(type)
                 ?: getDefaultClassName()
-    }
-
-    /**
-     * Will fetch the [ClassName] for the generated class of the given [typeDefinition].
-     */
-    private fun getGeneratedClassName(typeDefinition: GraphQLType): ClassName {
-        val fullName = generateClassName.getTypeName(typeDefinition)
-                ?: return getDefaultClassName()
-
-        return ClassName(fullName.packageName, fullName.className)
     }
 
     /**

@@ -2,7 +2,7 @@ package com.auritylab.graphql.kotlin.codegen.type
 
 import com.auritylab.graphql.kotlin.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType
@@ -16,7 +16,7 @@ internal class KotlinTypeMapperTest : StringSpec({
 
 
         val schema = GraphQLSchema.newSchema().query(testObjectType).build()
-        val generatedClassNaming = NameMapper(CodegenOptions())
+        val generatedClassNaming = GeneratedMapper(CodegenOptions())
 
         val mapper = KotlinTypeMapper(CodegenOptions(), generatedClassNaming, schema)
 

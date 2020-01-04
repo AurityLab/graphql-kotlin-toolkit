@@ -1,7 +1,7 @@
 package com.auritylab.graphql.kotlin.codegen
 
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import graphql.Scalars.*
 import graphql.schema.*
 
@@ -69,7 +69,7 @@ internal object _TestObjects {
     val schema = GraphQLSchema.newSchema().query(queryType).build()
 
 
-    val nameMapper = NameMapper(CodegenOptions())
+    val nameMapper = GeneratedMapper(CodegenOptions())
     val kotlinTypeMapper = KotlinTypeMapper(CodegenOptions(), nameMapper, schema)
 
 }

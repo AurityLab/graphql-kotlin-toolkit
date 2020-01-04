@@ -1,34 +1,41 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
 import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLEnumType
 
+/**
+ * Implements a [AbstractGenerator] which will generate the source code for a [GraphQLEnumType].
+ * This will generate the actual `enum` which an additional [String] value.
+ */
 class EnumGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val nameMapper: NameMapper
-) : AbstractGenerator(options, kotlinTypeMapper, nameMapper) {
+        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     fun getEnum(enum: GraphQLEnumType): FileSpec {
-        val fieldResolverName = nameMapper.getTypeName(enum)
+        val fieldResolverClassName = generatedMapper.getGeneratedTypeClassName(enum)
 
-        return getFileSpecBuilder(fieldResolverName.className)
+        return getFileSpecBuilder(fieldResolverClassName)
                 .addType(buildEnumClass(enum))
                 .build()
     }
 
-    fun buildEnumClass(enum: GraphQLEnumType): TypeSpec {
-        return TypeSpec.enumBuilder(getTypeName(enum))
+    private fun buildEnumClass(enum: GraphQLEnumType): TypeSpec {
+        return TypeSpec.enumBuilder(getGeneratedTypeClassName(enum))
+                // Create the primary constructor with a "stringValue" parameter.
                 .primaryConstructor(FunSpec.constructorBuilder()
                         .addParameter("stringValue", String::class)
                         .build())
+                // Create the "stringValue" property which will be initialized by the previously created primary constructor.
                 .addProperty(PropertySpec.builder("stringValue", String::class)
                         .initializer("stringValue")
                         .build())
                 .also {
+                    // Go through all enum values and create enum constants within this enum.
                     enum.values.forEach { enum ->
                         it.addEnumConstant(enum.name.toUpperCase(), TypeSpec.anonymousClassBuilder()
                                 .addSuperclassConstructorParameter("%S", enum.name.toUpperCase())

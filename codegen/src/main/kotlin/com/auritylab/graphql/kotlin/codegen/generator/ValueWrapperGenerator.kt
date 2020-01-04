@@ -1,26 +1,31 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
 import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import com.squareup.kotlinpoet.*
 
 class ValueWrapperGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val nameMapper: NameMapper
-) : AbstractGenerator(options, kotlinTypeMapper, nameMapper) {
+        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     fun getValueWrapper(): FileSpec {
-        val name = nameMapper.getValueWrapperName()
+        val className = generatedMapper.getValueWrapperName()
 
-        val classType = TypeVariableName("T", Any::class)
+        // Create the Type Variable with Any as bound.
+        val parameterType = TypeVariableName("T", ClassName("kotlin", "Any").copy(true))
 
-        return getFileSpecBuilder(name.className)
+        return getFileSpecBuilder(className)
                 .addType(TypeSpec
-                        .classBuilder(ClassName(name.packageName, name.className))
-                        .addTypeVariable(classType)
+                        .classBuilder(className)
+                        .addTypeVariable(parameterType)
+                        // Create the primary constructor with a "value" parameter.
                         .primaryConstructor(FunSpec.constructorBuilder()
-                                .addParameter("value", classType)
+                                .addParameter("value", parameterType)
                                 .build())
-                        .addProperty(PropertySpec.builder("value", classType).initializer("value").build())
+                        // Create the "value" property which will be initialized by the previously created primary constructor.
+                        .addProperty(PropertySpec.builder("value", parameterType)
+                                .initializer("value")
+                                .build())
                         .build())
                 .build()
     }

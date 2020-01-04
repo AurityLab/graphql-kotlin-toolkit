@@ -2,7 +2,7 @@ package com.auritylab.graphql.kotlin.codegen
 
 import com.auritylab.graphql.kotlin.codegen.generator.*
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mock.WiringFactoryMock
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
@@ -23,14 +23,13 @@ class Codegen(
         schemas: List<Path>
 ) {
     private val schema = parseSchemas(schemas)
-    private val nameMapper = NameMapper(options)
+    private val nameMapper = GeneratedMapper(options)
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, schema)
     private val output = CodegenOutput(options)
 
     val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
     val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
     val inputObjectGenerator = InputObjectGenerator(options, kotlinTypeMapper, nameMapper)
-    val inputObjectParserGenerator = InputObjectParserGenerator(options, kotlinTypeMapper, nameMapper)
     val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 
     init {
@@ -39,9 +38,7 @@ class Codegen(
         // Create the enums.
         allTypes.filterIsInstance<GraphQLEnumType>().forEach { enumGenerator.getEnum(it).writeTo(output.getOutputPath()) }
 
-        allTypes.filterIsInstance<GraphQLInputObjectType>().also {
-            inputObjectParserGenerator.getInputObjectParsers(it).writeTo(output.getOutputPath())
-        }.forEach {
+        allTypes.filterIsInstance<GraphQLInputObjectType>().forEach {
             inputObjectGenerator.getInputObject(it).writeTo(output.getOutputPath())
         }
 
