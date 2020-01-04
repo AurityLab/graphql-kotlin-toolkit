@@ -2,14 +2,11 @@ package com.auritylab.graphql.kotlin.codegen.generator
 
 import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
-import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import graphql.schema.GraphQLArgument
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLFieldsContainer
-import graphql.schema.GraphQLInputObjectType
+import graphql.schema.*
 
 internal class FieldResolverGenerator(
         options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
@@ -54,7 +51,7 @@ internal class FieldResolverGenerator(
 
                                 val resolveArgs = field.arguments.let { args ->
                                     if (args.isEmpty())
-                                       return@let ""
+                                        return@let ""
 
                                     return@let args.joinToString(", ") { it.name + "Arg" } + ", "
                                 }
@@ -88,6 +85,17 @@ internal class FieldResolverGenerator(
                 Statement(
                         "val ${argName}Arg = %M(env.getArgument<%T>(\"$argName\"))",
                         listOf(inputObjectParser, inputMapType))
+        } else if (argType is GraphQLEnumType) {
+            val enum = generatedMapper.getGeneratedTypeClassName(argType)
+
+            if (kType.isNullable)
+                Statement(
+                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %T.valueOf(env.getArgument<%T>(\"$argName\")) else null",
+                        listOf(enum, STRING))
+            else
+                Statement(
+                        "val ${argName}Arg = %T.valueOf(env.getArgument<%T>(\"$argName\"))",
+                        listOf(enum, STRING))
         } else {
             if (kType.isNullable)
                 Statement(

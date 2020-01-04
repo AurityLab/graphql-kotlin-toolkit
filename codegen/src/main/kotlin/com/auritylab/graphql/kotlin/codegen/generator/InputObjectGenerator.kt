@@ -1,10 +1,12 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
 import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 
 
@@ -46,7 +48,7 @@ internal class InputObjectGenerator(
                 .build()
     }
 
-    private fun buildInputObjectTypeCompanionObject (inputObject: GraphQLInputObjectType): TypeSpec {
+    private fun buildInputObjectTypeCompanionObject(inputObject: GraphQLInputObjectType): TypeSpec {
         return TypeSpec.companionObjectBuilder()
                 .addFunction(createBuilderFun(inputObject))
                 .build()
@@ -99,8 +101,8 @@ internal class InputObjectGenerator(
                 .also { spec ->
                     // Go through each input object field and create the according parser statement
                     inputObject.fields.forEach { field ->
-                        val gType = field.type
-                        val kType = getKotlinType(gType)
+                        val gType = GraphQLTypeHelper.unwrapTypeFull(field.type)
+                        val kType = getKotlinType(field.type)
 
                         if (gType is GraphQLInputObjectType) {
                             // Type is a InputObject -> Delegate to builder fun.
@@ -114,6 +116,17 @@ internal class InputObjectGenerator(
                                         field.name, valueWrapper, fieldTypeBuilder, MAP_STRING_ANY_TYPE)
                             else
                                 spec.addStatement("val %LArg = %T(%M(map[\"${field.name}\"] as %T))", valueWrapper, fieldTypeBuilder)
+                        } else if (gType is GraphQLEnumType) {
+                            val enum = generatedMapper.getGeneratedTypeClassName(gType)
+
+                            if (kType.isNullable)
+                                spec.addStatement(
+                                        "val %LArg = if(map.containsKey(\"${field.name}\")) %T(%T.valueOf(map[\"${field.name}\"] as %T)) else null",
+                                        field.name, valueWrapper, enum, STRING)
+                            else
+                                spec.addStatement(
+                                        "val %LArg = %T.valueOf(map[\"${field.name}\"] as %T)",
+                                        field.name, enum, STRING)
                         } else {
                             if (kType.isNullable)
                                 spec.addStatement(
