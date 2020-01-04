@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
@@ -11,8 +11,8 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
 
-class FieldResolverGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+internal class FieldResolverGenerator(
+        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     val inputMapType = ClassName("kotlin.collections", "Map")
             .parameterizedBy(

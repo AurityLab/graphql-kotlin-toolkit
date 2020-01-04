@@ -1,12 +1,12 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.*
 
-class ValueWrapperGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+internal class ValueWrapperGenerator(
+        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     fun getValueWrapper(): FileSpec {
         val className = generatedMapper.getValueWrapperName()

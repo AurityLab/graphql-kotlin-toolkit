@@ -1,13 +1,13 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen._TestObjects
 import graphql.schema.GraphQLEnumType
 import io.kotlintest.specs.StringSpec
 
 internal class EnumGeneratorTest : StringSpec({
     "should generate file spec correctly" {
-        val generator = EnumGenerator(CodegenOptions(), _TestObjects.kotlinTypeMapper, _TestObjects.nameMapper)
+        val generator = EnumGenerator(_TestObjects.mockOptions, _TestObjects.kotlinTypeMapper, _TestObjects.nameMapper)
 
         val schema = _TestObjects.schema
 

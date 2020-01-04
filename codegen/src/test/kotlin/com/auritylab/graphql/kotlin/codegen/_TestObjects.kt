@@ -1,9 +1,10 @@
 package com.auritylab.graphql.kotlin.codegen
 
-import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import graphql.Scalars.*
 import graphql.schema.*
+import java.nio.file.Path
 
 internal object _TestObjects {
     val kotlinRepresentationDirective = { value: String ->
@@ -67,9 +68,9 @@ internal object _TestObjects {
             }.build()
 
     val schema = GraphQLSchema.newSchema().query(queryType).build()
+    val mockOptions = CodegenInternalOptions(listOf(), Path.of(""), null, "com.generated")
 
-
-    val nameMapper = GeneratedMapper(CodegenOptions())
-    val kotlinTypeMapper = KotlinTypeMapper(CodegenOptions(), nameMapper, schema)
+    val nameMapper = GeneratedMapper(mockOptions)
+    val kotlinTypeMapper = KotlinTypeMapper(mockOptions, nameMapper)
 
 }

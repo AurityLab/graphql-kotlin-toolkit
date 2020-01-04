@@ -25,18 +25,18 @@ import java.nio.file.Path
  * directive @kotlinGenerate on FIELD_DEFINITION | ENUM
  */
 class Codegen(
-        private val options: CodegenOptions = CodegenOptions(),
-        schemas: List<Path>
+        inputOptions: CodegenOptions = CodegenOptions()
 ) {
-    private val schema = parseSchemas(schemas)
-    private val nameMapper = GeneratedMapper(options)
-    private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, schema)
-    private val outputDirectory = getOutputDirectory()
+    internal val options = mapOptions(inputOptions)
+    internal val schema = parseSchemas(options.schemas)
+    internal val nameMapper = GeneratedMapper(options)
+    internal val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
+    internal val outputDirectory = getOutputDirectory()
 
-    private val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
-    private val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
-    private val inputObjectGenerator = InputObjectGenerator(options, kotlinTypeMapper, nameMapper)
-    private val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val inputObjectGenerator = InputObjectGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 
     /**
      * Will generate code for the types of the [schema].
@@ -74,7 +74,7 @@ class Codegen(
      * Will parse the given [schemaFiles] and return a [GraphQLSchema] which contains all
      * registered definitions from the given schemas.
      */
-    private fun parseSchemas(schemaFiles: List<Path>): GraphQLSchema {
+    private fun parseSchemas(schemaFiles: Collection<Path>): GraphQLSchema {
         val parser = SchemaParser()
         val generator = SchemaGenerator()
 
@@ -102,6 +102,16 @@ class Codegen(
         Files.createDirectories(directory)
 
         return directory
+    }
 
+    private fun mapOptions(inputOptions: CodegenOptions): CodegenInternalOptions {
+        val schemaFiles = inputOptions.schemas
+                ?: throw IllegalArgumentException("'schemaFiles' not set")
+        val outputDirectory = inputOptions.outputDirectory
+                ?: throw IllegalArgumentException("'outputDirectory' not set")
+        val generatedGlobalPrefix = inputOptions.generatedGlobalPrefix
+        val generatedBasePackage = inputOptions.generatedBasePackage ?: "graphql.kotlin.toolkit.codegen"
+
+        return CodegenInternalOptions(schemaFiles, outputDirectory, generatedGlobalPrefix, generatedBasePackage)
     }
 }

@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.*
@@ -12,8 +12,8 @@ import graphql.schema.GraphQLInputObjectType
  * Implements a [AbstractGenerator] which will generate the source code for a [GraphQLInputObjectType].
  * It will generate the actual `data class` and a method which can parse a map to the `data class`
  */
-class InputObjectGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+internal class InputObjectGenerator(
+        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     companion object {
         private val MAP_STRING_ANY_TYPE = ClassName("kotlin.collections", "Map")

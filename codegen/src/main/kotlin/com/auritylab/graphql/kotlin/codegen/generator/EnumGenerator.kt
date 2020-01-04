@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.FileSpec
@@ -13,8 +13,8 @@ import graphql.schema.GraphQLEnumType
  * Implements a [AbstractGenerator] which will generate the source code for a [GraphQLEnumType].
  * This will generate the actual `enum` which an additional [String] value.
  */
-class EnumGenerator(
-        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+internal class EnumGenerator(
+        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     fun getEnum(enum: GraphQLEnumType): FileSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedTypeClassName(enum)

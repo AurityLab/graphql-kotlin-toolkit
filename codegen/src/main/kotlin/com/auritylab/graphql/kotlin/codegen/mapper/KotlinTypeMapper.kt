@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.mapper
 
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ClassName
@@ -11,10 +11,9 @@ import graphql.schema.*
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class KotlinTypeMapper(
-        private val options: CodegenOptions,
-        private val generatedMapper: GeneratedMapper,
-        private val schema: GraphQLSchema
+internal class KotlinTypeMapper(
+        private val options: CodegenInternalOptions,
+        private val generatedMapper: GeneratedMapper
 ) {
     fun getKotlinType(type: GraphQLType): TypeName {
         // Unwrap the given type for the actual object/scalar/etc.
