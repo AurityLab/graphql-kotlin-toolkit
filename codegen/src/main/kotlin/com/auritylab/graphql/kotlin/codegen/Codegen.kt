@@ -60,7 +60,7 @@ class Codegen(
                     val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
 
                     objectType.fieldDefinitions.forEach { fieldDefinition ->
-                        if (generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                        if (options.generateAll || generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
                             fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
                                     .writeTo(outputDirectory)
                     }
@@ -72,7 +72,7 @@ class Codegen(
                     val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
 
                     interfaceType.fieldDefinitions.forEach { fieldDefinition ->
-                        if (generatedForInterface || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                        if (options.generateAll || generatedForInterface || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
                             fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition)
                                     .writeTo(outputDirectory)
                     }
