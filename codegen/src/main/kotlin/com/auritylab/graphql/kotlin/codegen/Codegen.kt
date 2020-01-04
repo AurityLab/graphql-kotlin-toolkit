@@ -68,7 +68,7 @@ class Codegen(
 
         // Will create code for all interface types.
         allTypes.filterIsInstance<GraphQLInterfaceType>()
-                .forEach {interfaceType ->
+                .forEach { interfaceType ->
                     val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
 
                     interfaceType.fieldDefinitions.forEach { fieldDefinition ->
@@ -124,7 +124,8 @@ class Codegen(
                 ?: throw IllegalArgumentException("'outputDirectory' not set")
         val generatedGlobalPrefix = inputOptions.generatedGlobalPrefix
         val generatedBasePackage = inputOptions.generatedBasePackage ?: "graphql.kotlin.toolkit.codegen"
+        val generateAll = inputOptions.generateAll ?: true
 
-        return CodegenInternalOptions(schemaFiles, outputDirectory, generatedGlobalPrefix, generatedBasePackage)
+        return CodegenInternalOptions(schemaFiles, outputDirectory, generatedGlobalPrefix, generatedBasePackage, generateAll)
     }
 }

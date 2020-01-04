@@ -6,5 +6,6 @@ internal data class CodegenInternalOptions(
         val schemas: Collection<Path>,
         val outputDirectory: Path,
         val generatedGlobalPrefix: String?,
-        val generatedBasePackage: String
+        val generatedBasePackage: String,
+        val generateAll: Boolean
 )
