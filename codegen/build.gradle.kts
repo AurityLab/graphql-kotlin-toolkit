@@ -34,7 +34,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.auritylab.graphql.kotlin.toolkit"
+            groupId = "com.auritylab.graphql.kotlin.codegen"
             artifactId = "codegen"
             version = "1.0.0"
 
