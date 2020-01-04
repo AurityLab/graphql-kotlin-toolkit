@@ -13,16 +13,16 @@ class PoetGradlePlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.run {
-            val generateExtension = extensions.create<GenerateExtension>("graphqlKotlinGenerate", project)
+            val generateExtension = extensions.create<GenerateExtension>("graphqlKotlinGenerate")
 
-            generateExtension.outputDir.set("${buildDir}/generate-resources/main")
+            generateExtension.outputDirectory.set(project.layout.buildDirectory.dir("generate-resources/main"))
 
             tasks.apply {
                 create("graphqlKotlinGenerate", GenerateTask::class) {
                     group = PLUGIN_GROUP
 
-                    inputSchemas.set(generateExtension.inputSchemas)
-                    outputDir.set(generateExtension.outputDir)
+                    schemas.setFrom(generateExtension.schemas)
+                    outputDirectory.set(generateExtension.outputDirectory)
                 }
 
             }

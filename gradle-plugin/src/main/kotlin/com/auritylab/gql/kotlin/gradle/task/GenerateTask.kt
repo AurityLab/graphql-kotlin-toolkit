@@ -1,14 +1,29 @@
 package com.auritylab.gql.kotlin.gradle.task
 
+import com.auritylab.graphql.kotlin.codegen.Codegen
+import com.auritylab.graphql.kotlin.codegen.CodegenOptions
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Input
-import org.gradle.kotlin.dsl.listProperty
-import org.gradle.kotlin.dsl.property
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 
-open class GenerateTask: DefaultTask() {
-    @Input
-    val inputSchemas = project.objects.listProperty<String>()
+open class GenerateTask : DefaultTask() {
+    @InputFiles
+    val schemas = project.objects.fileCollection()
 
-    @Input
-    val outputDir = project.objects.property<String>()
+    @OutputDirectory
+    val outputDirectory = project.objects.directoryProperty()
+
+    @TaskAction
+    fun doGenerate() {
+        val inputSchemaFiles = schemas.files.map { it.toPath() }
+        val outputDirectoryPath = outputDirectory.asFile.get().toPath()
+
+        println(inputSchemaFiles)
+        println(outputDirectoryPath)
+
+        val options = CodegenOptions(outputDirectory = outputDirectoryPath)
+
+        Codegen(options, inputSchemaFiles)
+    }
 }

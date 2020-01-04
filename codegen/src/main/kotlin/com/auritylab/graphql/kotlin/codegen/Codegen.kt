@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.codegen
 import com.auritylab.graphql.kotlin.codegen.generator.*
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
@@ -18,9 +19,10 @@ class Codegen(
         options: CodegenOptions = CodegenOptions(),
         schemas: List<Path>
 ) {
-    val schema = parseSchemas(schemas)
-    val nameMapper = NameMapper(options)
-    val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, schema)
+    private val schema = parseSchemas(schemas)
+    private val nameMapper = NameMapper(options)
+    private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, schema)
+    private val output = CodegenOutput(options)
 
     val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
     val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
@@ -29,6 +31,9 @@ class Codegen(
     val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 
     init {
+        val allTypes = schema.allTypesAsList
+
+    allTypes.filterIsInstance<GraphQLEnumType>().forEach {enumGenerator.getEnum(it).writeTo(output.getOutputPath())}
     }
 
     /**
