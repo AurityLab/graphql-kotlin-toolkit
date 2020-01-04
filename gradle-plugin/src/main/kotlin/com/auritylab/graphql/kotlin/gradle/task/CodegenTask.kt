@@ -21,6 +21,10 @@ open class CodegenTask : DefaultTask() {
     @Optional
     val generatedBasePackage = project.objects.property<String>()
 
+    @Input
+    @Optional
+    val generateAll = project.objects.property<Boolean>()
+
     @TaskAction
     fun doGenerate() {
         val schemas =
@@ -34,7 +38,8 @@ open class CodegenTask : DefaultTask() {
                 schemas,
                 outputDirectory,
                 generatedGlobalPrefix.orNull,
-                generatedBasePackage.orNull)
+                generatedBasePackage.orNull,
+                generateAll.orNull)
 
         val codegen = Codegen(options)
 

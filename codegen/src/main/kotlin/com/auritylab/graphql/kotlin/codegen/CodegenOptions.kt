@@ -8,6 +8,4 @@ data class CodegenOptions(
         val generatedGlobalPrefix: String? = null,
         val generatedBasePackage: String? = null,
         val generateAll: Boolean? = null
-
-
 )

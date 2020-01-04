@@ -41,6 +41,7 @@ class CodegenGradlePlugin : Plugin<Project> {
                 outputDirectory.set(generateExtension.outputDirectory)
                 generatedGlobalPrefix.set(generateExtension.generatedGlobalPrefix)
                 generatedBasePackage.set(generateExtension.generatedBasePackage)
+                generateAll.set(generateExtension.generateAll)
             }
 
             tasks.withType<KotlinCompile>() {

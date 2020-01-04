@@ -10,5 +10,7 @@ open class CodegenExtension(objects: ObjectFactory) {
 
     val generatedGlobalPrefix = objects.property<String?>()
 
-    val generatedBasePackage = objects.property<String?>()
+    val generatedBasePackage = objects.property<String>()
+
+    val generateAll = objects.property<Boolean>()
 }
