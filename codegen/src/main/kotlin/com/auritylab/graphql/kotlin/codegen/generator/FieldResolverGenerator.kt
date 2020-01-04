@@ -26,6 +26,8 @@ internal class FieldResolverGenerator(
     private fun buildFieldResolverClass(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): TypeSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
         val fieldOutputTypeName = getKotlinType(field.type)
+        val parentType = getKotlinType(container).copy(false)
+        val environmentWrapperClassName = generatedMapper.getEnvironmentWrapperClassName().parameterizedBy(parentType)
 
         return TypeSpec.classBuilder(fieldResolverClassName)
                 .addModifiers(KModifier.ABSTRACT)
@@ -34,7 +36,7 @@ internal class FieldResolverGenerator(
                     it.modifiers.add(KModifier.ABSTRACT)
 
                     it.addParameters(buildResolverFunArguments(field))
-                    it.addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
+                    it.addParameter("env", environmentWrapperClassName)
 
                     it.returns(getKotlinType(field.type))
                 }.build())
@@ -56,7 +58,7 @@ internal class FieldResolverGenerator(
                                     return@let args.joinToString(", ") { it.name + "Arg" } + ", "
                                 }
 
-                                getFunSpec.addStatement("return resolve(${resolveArgs}env)")
+                                getFunSpec.addStatement("return resolve(${resolveArgs}%T(env))", environmentWrapperClassName)
                             }
                             .build())
                 }
