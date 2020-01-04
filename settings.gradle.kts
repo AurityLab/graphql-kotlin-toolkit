@@ -9,6 +9,5 @@
 
 rootProject.name = "graphql-kotlin-toolkit"
 
-include(":codegen:poet")
-include(":codegen:runtime")
-include(":codegen:gradle-plugin")
+include(":codegen")
+include(":gradle-plugin")

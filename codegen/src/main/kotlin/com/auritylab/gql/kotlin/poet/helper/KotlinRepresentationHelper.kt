@@ -1,7 +1,6 @@
 package com.auritylab.gql.kotlin.poet.helper
 
 import com.squareup.kotlinpoet.ClassName
-import graphql.language.StringValue
 import graphql.schema.GraphQLDirectiveContainer
 
 internal object KotlinRepresentationHelper {
