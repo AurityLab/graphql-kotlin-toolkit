@@ -14,8 +14,8 @@ import java.nio.file.Path
  * directive @kotlinRepresentation(class: String!) on OBJECT | SCALAR
  * directive @kotlinGenerate on FIELD_DEFINITION | ENUM
  */
-class Poet(
-        options: PoetOptions = PoetOptions(),
+class Codegen(
+        options: CodegenOptions = CodegenOptions(),
         schemas: List<Path>
 ) {
     val schema = parseSchemas(schemas)

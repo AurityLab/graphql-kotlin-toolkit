@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.PoetOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import com.squareup.kotlinpoet.ClassName
@@ -11,7 +11,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLInputObjectType
 
 class InputObjectParserGenerator(
-        options: PoetOptions, kotlinTypeMapper: KotlinTypeMapper, private val nameMapper: NameMapper
+        options: CodegenOptions, kotlinTypeMapper: KotlinTypeMapper, private val nameMapper: NameMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, nameMapper) {
     private val mapType = ClassName("kotlin.collections", "Map")
             .parameterizedBy(

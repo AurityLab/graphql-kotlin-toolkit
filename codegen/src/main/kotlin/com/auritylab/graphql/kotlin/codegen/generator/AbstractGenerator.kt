@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.PoetOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import com.squareup.kotlinpoet.ClassName
@@ -11,7 +11,7 @@ import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLType
 
 abstract class AbstractGenerator(
-        private val options: PoetOptions,
+        private val options: CodegenOptions,
         private val kotlinTypeMapper: KotlinTypeMapper,
         private val nameMapper: NameMapper
 ) {

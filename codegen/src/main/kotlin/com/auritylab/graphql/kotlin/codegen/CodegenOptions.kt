@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen
 
-data class PoetOptions(
+data class CodegenOptions(
         val generatedFilesPrefix: String? = null,
         val generatedFilesPackage: String = "graphql.kotlin.toolkit.generated",
         val generatedEnumPrefix: String? = "E",

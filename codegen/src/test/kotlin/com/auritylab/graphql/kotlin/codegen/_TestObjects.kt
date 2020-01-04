@@ -69,7 +69,7 @@ internal object _TestObjects {
     val schema = GraphQLSchema.newSchema().query(queryType).build()
 
 
-    val nameMapper = NameMapper(PoetOptions())
-    val kotlinTypeMapper = KotlinTypeMapper(PoetOptions(), nameMapper, schema)
+    val nameMapper = NameMapper(CodegenOptions())
+    val kotlinTypeMapper = KotlinTypeMapper(CodegenOptions(), nameMapper, schema)
 
 }

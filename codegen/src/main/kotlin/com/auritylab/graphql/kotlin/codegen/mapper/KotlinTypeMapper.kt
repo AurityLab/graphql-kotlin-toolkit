@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen.mapper
 
-import com.auritylab.graphql.kotlin.codegen.PoetOptions
+import com.auritylab.graphql.kotlin.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -11,7 +11,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class KotlinTypeMapper(
-        private val options: PoetOptions,
+        private val options: CodegenOptions,
         private val generateClassName: NameMapper,
         private val schema: GraphQLSchema
 ) {
