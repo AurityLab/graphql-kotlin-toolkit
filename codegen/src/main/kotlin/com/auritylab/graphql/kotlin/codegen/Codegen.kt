@@ -1,9 +1,6 @@
 package com.auritylab.graphql.kotlin.codegen
 
-import com.auritylab.graphql.kotlin.codegen.generator.EnumGenerator
-import com.auritylab.graphql.kotlin.codegen.generator.FieldResolverGenerator
-import com.auritylab.graphql.kotlin.codegen.generator.InputObjectGenerator
-import com.auritylab.graphql.kotlin.codegen.generator.ValueWrapperGenerator
+import com.auritylab.graphql.kotlin.codegen.generator.*
 import com.auritylab.graphql.kotlin.codegen.helper.KotlinGenerateHelper
 import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
@@ -35,6 +32,7 @@ class Codegen(
     internal val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
     internal val inputObjectGenerator = InputObjectGenerator(options, kotlinTypeMapper, nameMapper)
     internal val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val environmentWrapperGenerator = EnvironmentWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 
     /**
      * Will generate code for the types of the [schema].
@@ -80,6 +78,10 @@ class Codegen(
 
         // Will create code for the value wrapper.
         valueWrapperGenerator.getValueWrapper()
+                .writeTo(outputDirectory)
+
+        // Will create code for the environment wrapper.
+        environmentWrapperGenerator.getEnvironmentWrapper()
                 .writeTo(outputDirectory)
     }
 
