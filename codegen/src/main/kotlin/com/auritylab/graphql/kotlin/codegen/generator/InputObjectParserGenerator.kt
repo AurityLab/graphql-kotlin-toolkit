@@ -38,10 +38,19 @@ class InputObjectParserGenerator(
 
         val namedArgs = inputObjectType.fields.map { field ->
             val t = field.type
+            val kType = getKotlinType(field.type)
             if (t is GraphQLInputObjectType)
-                "${field.name} = if (map.containsKey(\"${field.name}\")) ${nameMapper.getInputObjectParser(t).simpleName}(map.get(\"${field.name}\")) as %T else null"
+                if (kType.isNullable) {
+                    "${field.name} = if (map.containsKey(\"${field.name}\")) ${nameMapper.getInputObjectParser(t).simpleName}(map.get(\"${field.name}\")) as %T else null"
+                } else {
+                    "${field.name} = ${nameMapper.getInputObjectParser(t).simpleName}(map.get(\"${field.name}\")) as %T"
+                }
             else
-                "${field.name} = if (map.containsKey(\"${field.name}\")) map.get(\"${field.name}\") as %T else null"
+                if (kType.isNullable) {
+                    "${field.name} = if (map.containsKey(\"${field.name}\")) map.get(\"${field.name}\") as %T else null"
+                } else {
+                    "${field.name} = map.get(\"${field.name}\") as %T"
+                }
         }
 
         return FunSpec.builder(parserName.simpleName)

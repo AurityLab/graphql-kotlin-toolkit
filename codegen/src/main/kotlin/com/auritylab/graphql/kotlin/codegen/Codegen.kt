@@ -3,7 +3,10 @@ package com.auritylab.graphql.kotlin.codegen
 import com.auritylab.graphql.kotlin.codegen.generator.*
 import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mock.WiringFactoryMock
 import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
@@ -33,7 +36,22 @@ class Codegen(
     init {
         val allTypes = schema.allTypesAsList
 
-    allTypes.filterIsInstance<GraphQLEnumType>().forEach {enumGenerator.getEnum(it).writeTo(output.getOutputPath())}
+        // Create the enums.
+        allTypes.filterIsInstance<GraphQLEnumType>().forEach { enumGenerator.getEnum(it).writeTo(output.getOutputPath()) }
+
+        allTypes.filterIsInstance<GraphQLInputObjectType>().also {
+            inputObjectParserGenerator.getInputObjectParsers(it).writeTo(output.getOutputPath())
+        }.forEach {
+            inputObjectGenerator.getInputObject(it).writeTo(output.getOutputPath())
+        }
+
+        allTypes.filterIsInstance<GraphQLObjectType>().forEach { objectType ->
+            objectType.fieldDefinitions.forEach { fieldDefinition ->
+                fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition).writeTo(output.getOutputPath())
+            }
+        }
+
+        valueWrapperGenerator.getValueWrapper().writeTo(output.getOutputPath())
     }
 
     /**
@@ -52,6 +70,8 @@ class Codegen(
             baseRegistry.merge(parser.parse(it.toFile()))
         }
 
-        return generator.makeExecutableSchema(baseRegistry, RuntimeWiring.newRuntimeWiring().build())
+        val genOptions = SchemaGenerator.Options.defaultOptions().enforceSchemaDirectives(false)
+
+        return generator.makeExecutableSchema(genOptions, baseRegistry, RuntimeWiring.newRuntimeWiring().wiringFactory(WiringFactoryMock()).build())
     }
 }

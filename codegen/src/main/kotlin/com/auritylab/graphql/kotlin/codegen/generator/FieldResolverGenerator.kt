@@ -51,7 +51,7 @@ class FieldResolverGenerator(
                                     getFunSpec.addStatement(stmt.statement, *stmt.args.toTypedArray())
                                 }
 
-                                getFunSpec.addStatement("return resolve(${field.arguments.joinToString(", ") { it.name }}, env)")
+                                getFunSpec.addStatement("return resolve(${field.arguments.joinToString(", ") { it.name + "Arg" }}, env)")
                             }
                             .build())
                 }
@@ -67,17 +67,28 @@ class FieldResolverGenerator(
     private fun createArgumentParserStatement(argument: GraphQLArgument): Statement {
         val argName = argument.name
         val argType = argument.type
+        val kType = getKotlinType(argType)
 
         return if (argType is GraphQLInputObjectType) {
             val inputObjectParser = nameMapper.getInputObjectParser(argType)
 
-            Statement(
-                    "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %M(env.getArgument<%T>(\"$argName\")) else null",
-                    listOf(inputObjectParser, inputMapType))
+            if (kType.isNullable)
+                Statement(
+                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %M(env.getArgument<%T>(\"$argName\")) else null",
+                        listOf(inputObjectParser, inputMapType))
+            else
+                Statement(
+                        "val ${argName}Arg = %M(env.getArgument<%T>(\"$argName\"))",
+                        listOf(inputObjectParser, inputMapType))
         } else {
-            Statement(
-                    "val ${argName}Arg = if (env.containsArgument(\"$argName\")) env.getArgument<%T>(\"$argName\") else null",
-                    listOf(getKotlinType(argument.type)))
+            if (kType.isNullable)
+                Statement(
+                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) env.getArgument<%T>(\"$argName\") else null",
+                        listOf(getKotlinType(argument.type)))
+            else
+                Statement(
+                        "val ${argName}Arg = env.getArgument<%T>(\"$argName\")",
+                        listOf(getKotlinType(argument.type)))
         }
     }
 

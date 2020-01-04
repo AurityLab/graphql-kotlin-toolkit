@@ -25,6 +25,7 @@ class InputObjectGenerator(
                 .primaryConstructor(FunSpec.constructorBuilder()
                         .addParameters(buildParameters(inputObject))
                         .build())
+                .addProperties(buildProperties(inputObject))
                 .build()
     }
 
@@ -34,6 +35,17 @@ class InputObjectGenerator(
                     .let { if (it.isNullable) createWrappedValue(it) else it }
 
             ParameterSpec(field.name, kType)
+        }
+    }
+
+    private fun buildProperties(inputObject: GraphQLInputObjectType): Collection<PropertySpec> {
+        return inputObject.fields.map { field ->
+            val kType = getKotlinType(field.type)
+                    .let { if (it.isNullable) createWrappedValue(it) else it }
+
+            PropertySpec.builder(field.name, kType)
+                    .initializer(field.name)
+                    .build()
         }
     }
 

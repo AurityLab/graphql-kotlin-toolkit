@@ -41,6 +41,6 @@ internal class CodegenOutput(
     private fun packageToPath(`package`: String): Path {
         val stringPath = `package`.replace(".", "/")
 
-        return Path.of(URI(stringPath))
+        return Path.of(stringPath)
     }
 }
