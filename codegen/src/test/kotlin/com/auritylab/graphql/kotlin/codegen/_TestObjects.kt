@@ -1,7 +1,7 @@
-package com.auritylab.gql.kotlin.poet
+package com.auritylab.graphql.kotlin.codegen
 
-import com.auritylab.gql.kotlin.poet.mapper.KotlinTypeMapper
-import com.auritylab.gql.kotlin.poet.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import graphql.Scalars.*
 import graphql.schema.*
 

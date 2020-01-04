@@ -1,4 +1,4 @@
-package com.auritylab.gql.kotlin.poet
+package com.auritylab.graphql.kotlin.codegen
 
 data class PoetOptions(
         val generatedFilesPrefix: String? = null,

@@ -1,8 +1,8 @@
-package com.auritylab.gql.kotlin.poet.type
+package com.auritylab.graphql.kotlin.codegen.type
 
-import com.auritylab.gql.kotlin.poet.PoetOptions
-import com.auritylab.gql.kotlin.poet.mapper.KotlinTypeMapper
-import com.auritylab.gql.kotlin.poet.mapper.NameMapper
+import com.auritylab.graphql.kotlin.codegen.PoetOptions
+import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.codegen.mapper.NameMapper
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType

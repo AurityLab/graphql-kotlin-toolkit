@@ -1,7 +1,7 @@
-package com.auritylab.gql.kotlin.poet.generator
+package com.auritylab.graphql.kotlin.codegen.generator
 
-import com.auritylab.gql.kotlin.poet.PoetOptions
-import com.auritylab.gql.kotlin.poet._TestObjects
+import com.auritylab.graphql.kotlin.codegen.PoetOptions
+import com.auritylab.graphql.kotlin.codegen._TestObjects
 import io.kotlintest.specs.StringSpec
 
 internal class FieldResolverGeneratorTest : StringSpec({
