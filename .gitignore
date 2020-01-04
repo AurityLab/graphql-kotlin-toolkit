@@ -34,3 +34,4 @@ out/
 
 ### Additional
 .local/
+spec_failures
