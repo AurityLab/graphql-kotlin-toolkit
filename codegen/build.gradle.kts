@@ -56,8 +56,10 @@ publishing {
                 maven {
                     url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
                     credentials {
-                        username = project.property("ossrhUsername") as String
-                        password = project.property("ossrhPassword") as String
+                        username = if (project.hasProperty("ossrhUsername"))
+                            project.property("ossrhUsername") as String else null
+                        password = if (project.hasProperty("ossrhPassword"))
+                            project.property("ossrhPassword") as String else null
                     }
                 }
             }
@@ -77,7 +79,7 @@ publishing {
                     url.set("https://github.com/AurityLab/graphql-kotlin-toolkit/issues")
                 }
 
-                licenses{
+                licenses {
                     license {
                         name.set("Apache License 2.0")
                         url.set("https://github.com/AurityLab/graphql-kotlin-toolkit/blob/master/LICENSE")
