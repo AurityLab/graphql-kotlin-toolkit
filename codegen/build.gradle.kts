@@ -1,6 +1,8 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("maven-publish")
+    id("signing")
+    id("org.jetbrains.dokka") version "0.10.0"
 }
 
 dependencies {
@@ -15,6 +17,11 @@ dependencies {
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
 }
 
+tasks.dokka {
+    outputFormat = "html"
+    outputDirectory = "$buildDir/javadoc"
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -25,12 +32,75 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     }
 }
 
+tasks.create("sourceJar", Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+tasks.create("javadocJar", Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Assembles Kotlin docs with Dokka"
+    archiveClassifier.set("javadoc")
+    from(tasks.dokka)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             artifactId = "codegen"
-
             from(components["java"])
+            artifact(tasks.getByName("sourceJar"))
+            artifact(tasks.getByName("javadocJar"))
+
+            repositories {
+                maven {
+                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                    credentials {
+                        username = project.property("ossrhUsername") as String
+                        password = project.property("ossrhPassword") as String
+                    }
+                }
+            }
+
+            pom {
+                name.set("GraphQL Kotlin Toolkit: Codegen")
+                description.set("GraphQL Code generator for Kotlin")
+                url.set("https://github.com/AurityLab/graphql-kotlin-toolkit")
+
+                organization {
+                    name.set("AurityLab UG (haftungsbeschraenkt)")
+                    url.set("https://github.com/AurityLab")
+                }
+
+                issueManagement {
+                    system.set("GitHub")
+                    url.set("https://github.com/AurityLab/graphql-kotlin-toolkit/issues")
+                }
+
+                licenses{
+                    license {
+                        name.set("Apache License 2.0")
+                        url.set("https://github.com/AurityLab/graphql-kotlin-toolkit/blob/master/LICENSE")
+                        distribution.set("repo")
+                    }
+                }
+
+                scm {
+                    url.set("https://github.com/AurityLab/graphql-kotlin-toolkit")
+                    connection.set("scm:git:git://github.com/AurityLab/graphql-kotlin-toolkit.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:AurityLab/graphql-kotlin-toolkit.git")
+                }
+
+                developers {
+                    developer {
+                        id.set("WipeAir")
+                    }
+                }
+            }
         }
     }
+}
+
+signing {
+    sign(publishing.publications.getByName("maven"))
 }
