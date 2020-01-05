@@ -5,27 +5,30 @@ import graphql.schema.Coercing
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.TypeResolver
-import graphql.schema.idl.*
+import graphql.schema.idl.InterfaceWiringEnvironment
+import graphql.schema.idl.ScalarInfo
+import graphql.schema.idl.ScalarWiringEnvironment
+import graphql.schema.idl.UnionWiringEnvironment
+import graphql.schema.idl.WiringFactory
 
-class WiringFactoryMock: WiringFactory {
+class WiringFactoryMock : WiringFactory {
     override fun getScalar(environment: ScalarWiringEnvironment): GraphQLScalarType? {
         return GraphQLScalarType.newScalar()
-                .name(environment.scalarTypeDefinition.name)
-                .coercing(object: Coercing<String, String> {
-                    override fun parseValue(input: Any?): String {
-                        return ""
-                    }
+            .name(environment.scalarTypeDefinition.name)
+            .coercing(object : Coercing<String, String> {
+                override fun parseValue(input: Any?): String {
+                    return ""
+                }
 
-                    override fun parseLiteral(input: Any?): String {
-                        return ""
-                    }
+                override fun parseLiteral(input: Any?): String {
+                    return ""
+                }
 
-                    override fun serialize(dataFetcherResult: Any?): String {
-                        return ""
-                    }
-
-                })
-                .build()
+                override fun serialize(dataFetcherResult: Any?): String {
+                    return ""
+                }
+            })
+            .build()
     }
 
     override fun providesScalar(environment: ScalarWiringEnvironment): Boolean {
@@ -45,7 +48,8 @@ class WiringFactoryMock: WiringFactory {
             override fun getType(env: TypeResolutionEnvironment?): GraphQLObjectType? {
                 return null
             }
-        }    }
+        }
+    }
 
     override fun providesTypeResolver(environment: InterfaceWiringEnvironment?): Boolean {
         return true

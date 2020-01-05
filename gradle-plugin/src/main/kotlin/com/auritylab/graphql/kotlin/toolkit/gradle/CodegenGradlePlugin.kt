@@ -22,8 +22,6 @@ class CodegenGradlePlugin : Plugin<Project> {
 
         generateExtension.outputDirectory.set(defaultOutputDirectory)
 
-
-
         project.afterEvaluate {
             val kotlinProjectExtension = this.extensions.findByType<KotlinProjectExtension>()
                     ?: throw IllegalStateException("Plugin 'org.jetbrains.kotlin.jvm' not applied.")

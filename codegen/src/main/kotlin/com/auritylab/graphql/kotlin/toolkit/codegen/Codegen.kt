@@ -1,6 +1,5 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.generator.*
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnumGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnvironmentWrapperGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FieldResolverGenerator
@@ -10,7 +9,11 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
-import graphql.schema.*
+import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLInterfaceType
+import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
@@ -25,7 +28,7 @@ import java.nio.file.Path
  * directive @kotlinGenerate on FIELD_DEFINITION | ENUM
  */
 class Codegen(
-        inputOptions: CodegenOptions = CodegenOptions()
+    inputOptions: CodegenOptions = CodegenOptions()
 ) {
     internal val options = mapOptions(inputOptions)
     internal val schema = parseSchemas(options.schemas)
@@ -48,46 +51,49 @@ class Codegen(
 
         // Create code for all enum types.
         allTypes.filterIsInstance<GraphQLEnumType>()
-                .forEach { enumGenerator.getEnum(it).writeTo(outputDirectory) }
+            .forEach { enumGenerator.getEnum(it).writeTo(outputDirectory) }
 
         // Will create code for all input object types.
         allTypes.filterIsInstance<GraphQLInputObjectType>()
-                .forEach {
-                    inputObjectGenerator.getInputObject(it)
-                            .writeTo(outputDirectory)
-                }
+            .forEach {
+                inputObjectGenerator.getInputObject(it)
+                    .writeTo(outputDirectory)
+            }
 
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
-                .forEach { objectType ->
-                    val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
+            .forEach { objectType ->
+                val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
 
-                    objectType.fieldDefinitions.forEach { fieldDefinition ->
-                        if (options.generateAll || generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
-                            fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
-                                    .writeTo(outputDirectory)
-                    }
+                objectType.fieldDefinitions.forEach { fieldDefinition ->
+                    if (options.generateAll || generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                        fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
+                            .writeTo(outputDirectory)
                 }
+            }
 
         // Will create code for all interface types.
         allTypes.filterIsInstance<GraphQLInterfaceType>()
-                .forEach { interfaceType ->
-                    val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
+            .forEach { interfaceType ->
+                val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
 
-                    interfaceType.fieldDefinitions.forEach { fieldDefinition ->
-                        if (options.generateAll || generatedForInterface || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
-                            fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition)
-                                    .writeTo(outputDirectory)
-                    }
+                interfaceType.fieldDefinitions.forEach { fieldDefinition ->
+                    if (options.generateAll || generatedForInterface || KotlinGenerateHelper.shouldGenerate(
+                            fieldDefinition
+                        )
+                    )
+                        fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition)
+                            .writeTo(outputDirectory)
                 }
+            }
 
         // Will create code for the value wrapper.
         valueWrapperGenerator.getValueWrapper()
-                .writeTo(outputDirectory)
+            .writeTo(outputDirectory)
 
         // Will create code for the environment wrapper.
         environmentWrapperGenerator.getEnvironmentWrapper()
-                .writeTo(outputDirectory)
+            .writeTo(outputDirectory)
     }
 
     /**
@@ -108,7 +114,11 @@ class Codegen(
 
         val genOptions = SchemaGenerator.Options.defaultOptions().enforceSchemaDirectives(false)
 
-        return generator.makeExecutableSchema(genOptions, baseRegistry, RuntimeWiring.newRuntimeWiring().wiringFactory(WiringFactoryMock()).build())
+        return generator.makeExecutableSchema(
+            genOptions,
+            baseRegistry,
+            RuntimeWiring.newRuntimeWiring().wiringFactory(WiringFactoryMock()).build()
+        )
     }
 
     /**
@@ -126,13 +136,19 @@ class Codegen(
 
     private fun mapOptions(inputOptions: CodegenOptions): CodegenInternalOptions {
         val schemaFiles = inputOptions.schemas
-                ?: throw IllegalArgumentException("'schemaFiles' not set")
+            ?: throw IllegalArgumentException("'schemaFiles' not set")
         val outputDirectory = inputOptions.outputDirectory
-                ?: throw IllegalArgumentException("'outputDirectory' not set")
+            ?: throw IllegalArgumentException("'outputDirectory' not set")
         val generatedGlobalPrefix = inputOptions.generatedGlobalPrefix
         val generatedBasePackage = inputOptions.generatedBasePackage ?: "graphql.kotlin.toolkit.codegen"
         val generateAll = inputOptions.generateAll ?: true
 
-        return CodegenInternalOptions(schemaFiles, outputDirectory, generatedGlobalPrefix, generatedBasePackage, generateAll)
+        return CodegenInternalOptions(
+            schemaFiles,
+            outputDirectory,
+            generatedGlobalPrefix,
+            generatedBasePackage,
+            generateAll
+        )
     }
 }

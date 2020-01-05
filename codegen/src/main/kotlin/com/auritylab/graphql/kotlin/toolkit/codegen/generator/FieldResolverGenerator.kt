@@ -4,23 +4,36 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import graphql.schema.*
+import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.TypeSpec
+import graphql.schema.GraphQLArgument
+import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLInputObjectType
 
 internal class FieldResolverGenerator(
-        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+    options: CodegenInternalOptions,
+    kotlinTypeMapper: KotlinTypeMapper,
+    private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     val inputMapType = ClassName("kotlin.collections", "Map")
-            .parameterizedBy(
-                    ClassName("kotlin", "String"),
-                    ClassName("kotlin", "Any"))
+        .parameterizedBy(
+            ClassName("kotlin", "String"),
+            ClassName("kotlin", "Any")
+        )
 
     fun getFieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FileSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
 
         return getFileSpecBuilder(fieldResolverClassName)
-                .addType(buildFieldResolverClass(container, field)).build()
+            .addType(buildFieldResolverClass(container, field)).build()
     }
 
     private fun buildFieldResolverClass(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): TypeSpec {
@@ -30,39 +43,39 @@ internal class FieldResolverGenerator(
         val environmentWrapperClassName = generatedMapper.getEnvironmentWrapperClassName().parameterizedBy(parentType)
 
         return TypeSpec.classBuilder(fieldResolverClassName)
-                .addModifiers(KModifier.ABSTRACT)
-                .addSuperinterface(ClassName("graphql.schema", "DataFetcher").parameterizedBy(fieldOutputTypeName))
-                .addFunction(FunSpec.builder("resolve").also {
-                    it.modifiers.add(KModifier.ABSTRACT)
+            .addModifiers(KModifier.ABSTRACT)
+            .addSuperinterface(ClassName("graphql.schema", "DataFetcher").parameterizedBy(fieldOutputTypeName))
+            .addFunction(FunSpec.builder("resolve").also {
+                it.modifiers.add(KModifier.ABSTRACT)
 
-                    it.addParameters(buildResolverFunArguments(field))
-                    it.addParameter("env", environmentWrapperClassName)
+                it.addParameters(buildResolverFunArguments(field))
+                it.addParameter("env", environmentWrapperClassName)
 
-                    it.returns(getKotlinType(field.type))
-                }.build())
-                .also { typeSpec ->
-                    typeSpec.addFunction(FunSpec.builder("get")
-                            .addModifiers(KModifier.OVERRIDE)
-                            .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
-                            .returns(getKotlinType(field.type))
-                            .also { getFunSpec ->
-                                field.arguments.forEach { arg ->
-                                    val stmt = createArgumentParserStatement(arg)
-                                    getFunSpec.addStatement(stmt.statement, *stmt.args.toTypedArray())
-                                }
+                it.returns(getKotlinType(field.type))
+            }.build())
+            .also { typeSpec ->
+                typeSpec.addFunction(FunSpec.builder("get")
+                    .addModifiers(KModifier.OVERRIDE)
+                    .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
+                    .returns(getKotlinType(field.type))
+                    .also { getFunSpec ->
+                        field.arguments.forEach { arg ->
+                            val stmt = createArgumentParserStatement(arg)
+                            getFunSpec.addStatement(stmt.statement, *stmt.args.toTypedArray())
+                        }
 
-                                val resolveArgs = field.arguments.let { args ->
-                                    if (args.isEmpty())
-                                        return@let ""
+                        val resolveArgs = field.arguments.let { args ->
+                            if (args.isEmpty())
+                                return@let ""
 
-                                    return@let args.joinToString(", ") { it.name + "Arg" } + ", "
-                                }
+                            return@let args.joinToString(", ") { it.name + "Arg" } + ", "
+                        }
 
-                                getFunSpec.addStatement("return resolve(${resolveArgs}%T(env))", environmentWrapperClassName)
-                            }
-                            .build())
-                }
-                .build()
+                        getFunSpec.addStatement("return resolve($resolveArgs%T(env))", environmentWrapperClassName)
+                    }
+                    .build())
+            }
+            .build()
     }
 
     private fun buildResolverFunArguments(field: GraphQLFieldDefinition): Collection<ParameterSpec> {
@@ -81,32 +94,38 @@ internal class FieldResolverGenerator(
 
             if (kType.isNullable)
                 Statement(
-                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %M(env.getArgument<%T>(\"$argName\")) else null",
-                        listOf(inputObjectParser, inputMapType))
+                    "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %M(env.getArgument<%T>(\"$argName\")) else null",
+                    listOf(inputObjectParser, inputMapType)
+                )
             else
                 Statement(
-                        "val ${argName}Arg = %M(env.getArgument<%T>(\"$argName\"))",
-                        listOf(inputObjectParser, inputMapType))
+                    "val ${argName}Arg = %M(env.getArgument<%T>(\"$argName\"))",
+                    listOf(inputObjectParser, inputMapType)
+                )
         } else if (argType is GraphQLEnumType) {
             val enum = generatedMapper.getGeneratedTypeClassName(argType)
 
             if (kType.isNullable)
                 Statement(
-                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %T.valueOf(env.getArgument<%T>(\"$argName\")) else null",
-                        listOf(enum, STRING))
+                    "val ${argName}Arg = if (env.containsArgument(\"$argName\")) %T.valueOf(env.getArgument<%T>(\"$argName\")) else null",
+                    listOf(enum, STRING)
+                )
             else
                 Statement(
-                        "val ${argName}Arg = %T.valueOf(env.getArgument<%T>(\"$argName\"))",
-                        listOf(enum, STRING))
+                    "val ${argName}Arg = %T.valueOf(env.getArgument<%T>(\"$argName\"))",
+                    listOf(enum, STRING)
+                )
         } else {
             if (kType.isNullable)
                 Statement(
-                        "val ${argName}Arg = if (env.containsArgument(\"$argName\")) env.getArgument<%T>(\"$argName\") else null",
-                        listOf(getKotlinType(argument.type)))
+                    "val ${argName}Arg = if (env.containsArgument(\"$argName\")) env.getArgument<%T>(\"$argName\") else null",
+                    listOf(getKotlinType(argument.type))
+                )
             else
                 Statement(
-                        "val ${argName}Arg = env.getArgument<%T>(\"$argName\")",
-                        listOf(getKotlinType(argument.type)))
+                    "val ${argName}Arg = env.getArgument<%T>(\"$argName\")",
+                    listOf(getKotlinType(argument.type))
+                )
         }
     }
 

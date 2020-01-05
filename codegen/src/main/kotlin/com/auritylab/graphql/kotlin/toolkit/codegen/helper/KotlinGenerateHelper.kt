@@ -1,6 +1,5 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
-import graphql.language.DirectivesContainer
 import graphql.schema.GraphQLDirectiveContainer
 
 internal object KotlinGenerateHelper {

@@ -1,6 +1,5 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen._TestObjects
 import io.kotlintest.specs.StringSpec
 
@@ -9,7 +8,6 @@ internal class FieldResolverGeneratorTest : StringSpec({
         val fieldResolverGenerator = FieldResolverGenerator(_TestObjects.mockOptions, _TestObjects.kotlinTypeMapper, _TestObjects.nameMapper)
 
         val schema = _TestObjects.schema
-
 
         val spec = fieldResolverGenerator.getFieldResolver(schema.queryType, schema.queryType.getFieldDefinition("getUser"))
 

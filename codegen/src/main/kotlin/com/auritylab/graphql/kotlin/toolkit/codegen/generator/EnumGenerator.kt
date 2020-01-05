@@ -14,7 +14,9 @@ import graphql.schema.GraphQLEnumType
  * This will generate the actual `enum` which an additional [String] value.
  */
 internal class EnumGenerator(
-        options: CodegenInternalOptions, kotlinTypeMapper: KotlinTypeMapper, private val generatedMapper: GeneratedMapper
+    options: CodegenInternalOptions,
+    kotlinTypeMapper: KotlinTypeMapper,
+    private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     fun getEnum(enum: GraphQLEnumType): FileSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedTypeClassName(enum)

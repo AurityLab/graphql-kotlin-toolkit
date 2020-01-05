@@ -4,13 +4,17 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
-import graphql.schema.*
+import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLType
 
 /**
  * Describes a central place in which all components can access the naming for generated classes.
  */
 internal class GeneratedMapper(
-        private val options: CodegenInternalOptions
+    private val options: CodegenInternalOptions
 ) {
     /**
      * Will return the [ClassName] for the given [graphQLType].
@@ -35,7 +39,10 @@ internal class GeneratedMapper(
     /**
      * Will return the [ClassName] for the given [field] in the [container].
      */
-    fun getGeneratedFieldResolverClassName(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): ClassName {
+    fun getGeneratedFieldResolverClassName(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): ClassName {
         // Uppercase all parts of the name.
         val containerName = NamingHelper.uppercaseFirstLetter(container.name)
         val fieldName = NamingHelper.uppercaseFirstLetter(field.name)
@@ -70,15 +77,20 @@ internal class GeneratedMapper(
      * Will build a new [ClassName] with the given [className] as identifier for the class.
      * Additional package tags will be joined with dots (.) and appended to the base package.
      */
-    private fun buildClassName(className: String, appendCompanion: Boolean = false, vararg additionalPackageTags: String): ClassName {
+    private fun buildClassName(
+        className: String,
+        appendCompanion: Boolean = false,
+        vararg additionalPackageTags: String
+    ): ClassName {
         val fullPackage = options.generatedBasePackage +
-                additionalPackageTags.joinToString(
-                        separator = ".",
-                        prefix = if (additionalPackageTags.isNotEmpty()) "." else "")
+            additionalPackageTags.joinToString(
+                separator = ".",
+                prefix = if (additionalPackageTags.isNotEmpty()) "." else ""
+            )
 
         val augmented =
-                if (options.generatedGlobalPrefix == null) className
-                else "${options.generatedGlobalPrefix}$className"
+            if (options.generatedGlobalPrefix == null) className
+            else "${options.generatedGlobalPrefix}$className"
 
         return if (appendCompanion)
             ClassName(fullPackage, augmented, "Companion")

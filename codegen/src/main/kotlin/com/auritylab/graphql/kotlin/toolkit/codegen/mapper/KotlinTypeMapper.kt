@@ -7,20 +7,28 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
-import graphql.schema.*
+import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLList
+import graphql.schema.GraphQLModifiedType
+import graphql.schema.GraphQLNonNull
+import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLScalarType
+import graphql.schema.GraphQLType
 import java.math.BigDecimal
 import java.math.BigInteger
 
 internal class KotlinTypeMapper(
-        private val options: CodegenInternalOptions,
-        private val generatedMapper: GeneratedMapper
+    private val options: CodegenInternalOptions,
+    private val generatedMapper: GeneratedMapper
 ) {
     fun getKotlinType(type: GraphQLType): TypeName {
         // Unwrap the given type for the actual object/scalar/etc.
 
         // Check if the unwrapped type is registered in the type definition registry.
         // Check if the TypeDefinition is a scalar.
-        val kType = when (val unwrappedType = if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type) {
+        val kType = when (val unwrappedType =
+            if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type) {
             is GraphQLScalarType -> {
                 getScalarKotlinType(unwrappedType)
             }
@@ -91,12 +99,12 @@ internal class KotlinTypeMapper(
 
         // Fetch the kotlin representation class or return "Any".
         return KotlinRepresentationHelper.getClassName(scalarTypeDefinition)
-                ?: ClassName("kotlin", "Any")
+            ?: ClassName("kotlin", "Any")
     }
 
     private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
         return KotlinRepresentationHelper.getClassName(type)
-                ?: getDefaultClassName()
+            ?: getDefaultClassName()
     }
 
     /**

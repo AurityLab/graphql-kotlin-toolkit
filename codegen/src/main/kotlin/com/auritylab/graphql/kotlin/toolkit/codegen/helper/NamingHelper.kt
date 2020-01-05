@@ -7,5 +7,4 @@ internal object NamingHelper {
      */
     fun uppercaseFirstLetter(string: String): String =
             (string.substring(0, 1).toUpperCase()) + string.substring(1)
-
 }

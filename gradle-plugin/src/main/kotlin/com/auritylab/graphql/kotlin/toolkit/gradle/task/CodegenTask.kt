@@ -3,7 +3,11 @@ package com.auritylab.graphql.kotlin.toolkit.gradle.task
 import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.property
 
 open class CodegenTask : DefaultTask() {
@@ -28,18 +32,19 @@ open class CodegenTask : DefaultTask() {
     @TaskAction
     fun doGenerate() {
         val schemas =
-                if (schemas.isEmpty) throw IllegalStateException("No schemas set")
-                else schemas.files.map { it.toPath() }
+            if (schemas.isEmpty) throw IllegalStateException("No schemas set")
+            else schemas.files.map { it.toPath() }
 
         val outputDirectory = outputDirectory.orNull?.asFile?.toPath()
-                ?: throw IllegalStateException("No output directory set")
+            ?: throw IllegalStateException("No output directory set")
 
         val options = CodegenOptions(
-                schemas,
-                outputDirectory,
-                generatedGlobalPrefix.orNull,
-                generatedBasePackage.orNull,
-                generateAll.orNull)
+            schemas,
+            outputDirectory,
+            generatedGlobalPrefix.orNull,
+            generatedBasePackage.orNull,
+            generateAll.orNull
+        )
 
         val codegen = Codegen(options)
 

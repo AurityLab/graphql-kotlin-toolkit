@@ -11,9 +11,9 @@ import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLType
 
 internal abstract class AbstractGenerator(
-        private val options: CodegenInternalOptions,
-        private val kotlinTypeMapper: KotlinTypeMapper,
-        private val generatedMapper: GeneratedMapper
+    private val options: CodegenInternalOptions,
+    private val kotlinTypeMapper: KotlinTypeMapper,
+    private val generatedMapper: GeneratedMapper
 ) {
     protected fun getFileSpecBuilder(className: ClassName): FileSpec.Builder {
         return FileSpec.builder(className.packageName, className.simpleName)
