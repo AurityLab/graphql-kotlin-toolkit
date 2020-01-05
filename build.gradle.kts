@@ -4,7 +4,7 @@ plugins {
 }
 
 subprojects {
-    group = "com.auritylab.graphql.kotlin.toolkit"
+    group = "com.auritylab.graphql-kotlin-toolkit"
     version = "0.1.0"
 
     repositories {
