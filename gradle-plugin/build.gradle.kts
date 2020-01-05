@@ -16,8 +16,8 @@ dependencies {
 gradlePlugin {
     plugins {
         create("graphql-kotlin-toolkit-codegen") {
-            id = "org.auritylab.graphql.kotlin.codegen"
-            implementationClass = "com.auritylab.graphql.kotlin.gradle.CodegenGradlePlugin"
+            id = "org.auritylab.graphql-kotlin-toolkit.codegen"
+            implementationClass = "com.auritylab.graphql.kotlin.toolkit.gradle.CodegenGradlePlugin"
         }
     }
 }
@@ -25,9 +25,7 @@ gradlePlugin {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.auritylab.graphql.kotlin.codegen"
             artifactId = "gradle-plugin"
-            version = "1.0.0"
 
             from(components["java"])
         }
