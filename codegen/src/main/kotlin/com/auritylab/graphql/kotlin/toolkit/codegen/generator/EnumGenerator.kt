@@ -22,28 +22,34 @@ internal class EnumGenerator(
         val fieldResolverClassName = generatedMapper.getGeneratedTypeClassName(enum)
 
         return getFileSpecBuilder(fieldResolverClassName)
-                .addType(buildEnumClass(enum))
-                .build()
+            .addType(buildEnumClass(enum))
+            .build()
     }
 
     private fun buildEnumClass(enum: GraphQLEnumType): TypeSpec {
         return TypeSpec.enumBuilder(getGeneratedTypeClassName(enum))
-                // Create the primary constructor with a "stringValue" parameter.
-                .primaryConstructor(FunSpec.constructorBuilder()
-                        .addParameter("stringValue", String::class)
-                        .build())
-                // Create the "stringValue" property which will be initialized by the previously created primary constructor.
-                .addProperty(PropertySpec.builder("stringValue", String::class)
-                        .initializer("stringValue")
-                        .build())
-                .also {
-                    // Go through all enum values and create enum constants within this enum.
-                    enum.values.forEach { enum ->
-                        it.addEnumConstant(enum.name.toUpperCase(), TypeSpec.anonymousClassBuilder()
-                                .addSuperclassConstructorParameter("%S", enum.name.toUpperCase())
-                                .build())
-                    }
+            // Create the primary constructor with a "stringValue" parameter.
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("stringValue", String::class)
+                    .build()
+            )
+            // Create the "stringValue" property which will be initialized by the previously created primary constructor.
+            .addProperty(
+                PropertySpec.builder("stringValue", String::class)
+                    .initializer("stringValue")
+                    .build()
+            )
+            .also {
+                // Go through all enum values and create enum constants within this enum.
+                enum.values.forEach { enum ->
+                    it.addEnumConstant(
+                        enum.name, TypeSpec.anonymousClassBuilder()
+                            .addSuperclassConstructorParameter("%S", enum.name)
+                            .build()
+                    )
                 }
-                .build()
+            }
+            .build()
     }
 }
