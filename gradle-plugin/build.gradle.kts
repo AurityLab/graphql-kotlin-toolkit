@@ -1,12 +1,8 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
-    id("org.gradle.kotlin.kotlin-dsl") version "1.3.1"
+    id("org.gradle.kotlin.kotlin-dsl")
     id("maven-publish")
-}
-
-repositories {
-    jcenter()
 }
 
 dependencies {
