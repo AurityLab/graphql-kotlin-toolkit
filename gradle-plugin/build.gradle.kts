@@ -17,7 +17,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("graphql-kotlin-toolkit-codegen") {
-            id = "org.auritylab.graphql-kotlin-toolkit.codegen"
+            id = "com.auritylab.graphql-kotlin-toolkit.codegen"
             displayName = "GraphQL Kotlin Toolkit: Codegen"
             description = "GraphQL code generator for Kotlin"
             implementationClass = "com.auritylab.graphql.kotlin.toolkit.gradle.CodegenGradlePlugin"
