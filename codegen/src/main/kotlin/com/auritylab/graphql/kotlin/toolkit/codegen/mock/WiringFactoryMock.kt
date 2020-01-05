@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.codegen.mock
+package com.auritylab.graphql.kotlin.toolkit.codegen.mock
 
 import graphql.TypeResolutionEnvironment
 import graphql.schema.Coercing

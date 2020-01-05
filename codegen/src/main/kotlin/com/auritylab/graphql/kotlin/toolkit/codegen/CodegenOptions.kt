@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.codegen
+package com.auritylab.graphql.kotlin.toolkit.codegen
 
 import java.nio.file.Path
 

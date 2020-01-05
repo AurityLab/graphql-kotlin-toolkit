@@ -1,7 +1,7 @@
 package com.auritylab.graphql.kotlin.gradle.task
 
-import com.auritylab.graphql.kotlin.codegen.Codegen
-import com.auritylab.graphql.kotlin.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.property

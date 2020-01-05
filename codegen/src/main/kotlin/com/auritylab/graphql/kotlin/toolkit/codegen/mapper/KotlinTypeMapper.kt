@@ -1,8 +1,8 @@
-package com.auritylab.graphql.kotlin.codegen.mapper
+package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
-import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
-import com.auritylab.graphql.kotlin.codegen.helper.GraphQLTypeHelper
-import com.auritylab.graphql.kotlin.codegen.helper.KotlinRepresentationHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName

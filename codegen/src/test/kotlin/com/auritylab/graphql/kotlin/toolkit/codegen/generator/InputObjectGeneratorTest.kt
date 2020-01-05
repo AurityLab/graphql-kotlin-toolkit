@@ -1,7 +1,7 @@
-package com.auritylab.graphql.kotlin.codegen.generator
+package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
-import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
-import com.auritylab.graphql.kotlin.codegen._TestObjects
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen._TestObjects
 import graphql.schema.GraphQLInputObjectType
 import io.kotlintest.specs.StringSpec
 

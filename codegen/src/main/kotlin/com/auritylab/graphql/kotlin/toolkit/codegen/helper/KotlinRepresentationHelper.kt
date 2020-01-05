@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.codegen.helper
+package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
 import com.squareup.kotlinpoet.ClassName
 import graphql.schema.GraphQLDirectiveContainer

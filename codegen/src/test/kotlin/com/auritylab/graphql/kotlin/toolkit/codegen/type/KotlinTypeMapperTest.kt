@@ -1,9 +1,9 @@
-package com.auritylab.graphql.kotlin.codegen.type
+package com.auritylab.graphql.kotlin.toolkit.codegen.type
 
-import com.auritylab.graphql.kotlin.codegen.CodegenInternalOptions
-import com.auritylab.graphql.kotlin.codegen._TestObjects
-import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen._TestObjects
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType

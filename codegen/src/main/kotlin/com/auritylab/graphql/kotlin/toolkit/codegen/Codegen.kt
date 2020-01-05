@@ -1,10 +1,15 @@
-package com.auritylab.graphql.kotlin.codegen
+package com.auritylab.graphql.kotlin.toolkit.codegen
 
-import com.auritylab.graphql.kotlin.codegen.generator.*
-import com.auritylab.graphql.kotlin.codegen.helper.KotlinGenerateHelper
-import com.auritylab.graphql.kotlin.codegen.mapper.GeneratedMapper
-import com.auritylab.graphql.kotlin.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.codegen.mock.WiringFactoryMock
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.*
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnumGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnvironmentWrapperGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FieldResolverGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.InputObjectGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
 import graphql.schema.*
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
