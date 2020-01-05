@@ -3,6 +3,7 @@ plugins {
     id("java-gradle-plugin")
     id("org.gradle.kotlin.kotlin-dsl")
     id("maven-publish")
+    id("com.gradle.plugin-publish") version "0.10.1"
 }
 
 dependencies {
@@ -17,17 +18,15 @@ gradlePlugin {
     plugins {
         create("graphql-kotlin-toolkit-codegen") {
             id = "org.auritylab.graphql-kotlin-toolkit.codegen"
+            displayName = "GraphQL Kotlin Toolkit: Codegen"
+            description = "GraphQL code generator for Kotlin"
             implementationClass = "com.auritylab.graphql.kotlin.toolkit.gradle.CodegenGradlePlugin"
         }
     }
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            artifactId = "gradle-plugin"
-
-            from(components["java"])
-        }
-    }
+pluginBundle {
+    website = "https://github.com/AurityLab/graphql-kotlin-toolkit"
+    vcsUrl = "https://github.com/AurityLab/graphql-kotlin-toolkit"
+    tags = listOf("graphql", "kotlin", "codegen", "codegeneration", "graphql-codegen")
 }
