@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.gradle.extension
+package com.auritylab.graphql.kotlin.toolkit.gradle.extension
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.kotlin.dsl.property

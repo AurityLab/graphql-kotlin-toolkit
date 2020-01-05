@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.gradle.task
+package com.auritylab.graphql.kotlin.toolkit.gradle.task
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions

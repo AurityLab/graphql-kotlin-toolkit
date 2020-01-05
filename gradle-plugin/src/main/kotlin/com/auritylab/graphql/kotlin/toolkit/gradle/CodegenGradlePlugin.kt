@@ -1,7 +1,7 @@
-package com.auritylab.graphql.kotlin.gradle
+package com.auritylab.graphql.kotlin.toolkit.gradle
 
-import com.auritylab.graphql.kotlin.gradle.extension.CodegenExtension
-import com.auritylab.graphql.kotlin.gradle.task.CodegenTask
+import com.auritylab.graphql.kotlin.toolkit.gradle.extension.CodegenExtension
+import com.auritylab.graphql.kotlin.toolkit.gradle.task.CodegenTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
