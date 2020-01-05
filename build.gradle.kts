@@ -4,13 +4,15 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
 
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
 subprojects {
     group = "com.auritylab.graphql-kotlin-toolkit"
     version = "0.1.0"
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-
-    repositories {
-        jcenter()
-    }
 }
