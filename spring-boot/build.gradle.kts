@@ -10,6 +10,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation("com.graphql-java:graphql-java:13.0")
+    implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
+    implementation("org.springframework:spring-webmvc:5.2.2.RELEASE")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
+    implementation("com.auritylab:kotlin-object-path:1.0.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
