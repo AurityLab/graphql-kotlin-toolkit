@@ -6,5 +6,7 @@ plugins {
 }
 
 dependencies {
-    "implementation"(project(":spring"))
+    implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
+
+    implementation(project(":spring"))
 }

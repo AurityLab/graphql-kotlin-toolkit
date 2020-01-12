@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.auritylab.graphql.kotlin.toolkit.spring.boot.starter.GraphQLAutoconfiguration
