@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
+import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.server.ResponseStatusException
-import java.util.concurrent.CompletableFuture
 
 @Component
 internal class GQLController(
