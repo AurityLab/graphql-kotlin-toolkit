@@ -1,5 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.kotlin.kapt")
     id("maven-publish")
     id("signing")
     id("org.jetbrains.dokka") version "0.10.0"
@@ -14,6 +15,8 @@ dependencies {
     implementation("org.springframework:spring-webmvc:5.2.2.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
     implementation("com.auritylab:kotlin-object-path:1.0.0")
+
+    kapt("org.springframework.boot:spring-boot-configuration-processor:2.2.2.RELEASE")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
