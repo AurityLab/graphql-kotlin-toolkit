@@ -1,0 +1,26 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    getUser: User!
+    getUsers: [User]!
+}
+
+type Mutation {
+    updateUser(input: UserUpdateInput!): User!
+    updateUsers(input: [UserUpdateInput]): [User!]!
+}
+
+input UserUpdateInput {
+    name: String
+    surname: String
+}
+
+type User {
+    id: ID!
+    name: String
+    surname: String
+    age: Int
+}
