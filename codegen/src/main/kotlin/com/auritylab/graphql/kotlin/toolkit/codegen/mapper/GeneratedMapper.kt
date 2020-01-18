@@ -68,7 +68,6 @@ internal class GeneratedMapper(
      * Will return the [MemberName] of the builder method for the given [inputObject].
      */
     fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName {
-        println(getGeneratedTypeClassName(inputObject, true))
         // Build the MemberName.
         return MemberName(getGeneratedTypeClassName(inputObject, true), "buildByMap")
     }
