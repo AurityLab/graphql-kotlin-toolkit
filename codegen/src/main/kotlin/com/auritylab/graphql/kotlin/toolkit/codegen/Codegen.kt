@@ -24,27 +24,24 @@ import java.nio.file.Path
 
 /**
  * Represents the base class for the code generation.
- *
- * directive @kotlinRepresentation(class: String!) on OBJECT | SCALAR
- * directive @kotlinGenerate on FIELD_DEFINITION | ENUM
  */
 class Codegen(
     inputOptions: CodegenOptions = CodegenOptions()
 ) {
     internal val options = mapOptions(inputOptions)
-    internal val schema = parseSchemas(options.schemas)
-    internal val nameMapper = GeneratedMapper(options)
-    internal val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
-    internal val outputDirectory = getOutputDirectory()
+    private val schema = parseSchemas(options.schemas)
+    private val nameMapper = GeneratedMapper(options)
+    private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
+    private val outputDirectory = getOutputDirectory()
 
-    internal val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
-    internal val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
-    internal val fieldResolverGenerator =
+    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
+    private val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
+    private val fieldResolverGenerator =
         FieldResolverGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
-    internal val inputObjectGenerator =
+    private val inputObjectGenerator =
         InputObjectGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
-    internal val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
-    internal val environmentWrapperGenerator = EnvironmentWrapperGenerator(options, kotlinTypeMapper, nameMapper)
+    private val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
+    private val environmentWrapperGenerator = EnvironmentWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 
     /**
      * Will generate code for the types of the [schema].
