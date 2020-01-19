@@ -1,5 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
+import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnumGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnvironmentWrapperGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FieldResolverGenerator
@@ -36,9 +37,12 @@ class Codegen(
     internal val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
     internal val outputDirectory = getOutputDirectory()
 
+    internal val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
     internal val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
-    internal val fieldResolverGenerator = FieldResolverGenerator(options, kotlinTypeMapper, nameMapper)
-    internal val inputObjectGenerator = InputObjectGenerator(options, kotlinTypeMapper, nameMapper)
+    internal val fieldResolverGenerator =
+        FieldResolverGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
+    internal val inputObjectGenerator =
+        InputObjectGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
     internal val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
     internal val environmentWrapperGenerator = EnvironmentWrapperGenerator(options, kotlinTypeMapper, nameMapper)
 

@@ -3,8 +3,11 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import graphql.schema.GraphQLEnumType
@@ -47,6 +50,27 @@ internal class KotlinTypeMapper(
         return applyWrapping(type, null, kType)
     }
 
+    fun getInputKotlinType(type: GraphQLType): TypeName {
+        val unwrappedType = if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type
+        val kType = when (unwrappedType) {
+            is GraphQLScalarType -> {
+                getScalarKotlinType(unwrappedType)
+            }
+            is GraphQLInputObjectType -> {
+                MAP.parameterizedBy(STRING, ANY)
+            }
+            is GraphQLEnumType -> {
+                STRING
+            }
+            is GraphQLObjectType -> {
+                getObjectKotlinType(unwrappedType)
+            }
+            else -> getDefaultClassName()
+        }
+
+        return applyWrapping(type, null, kType)
+    }
+
     private fun applyWrapping(thisType: GraphQLType, parentType: GraphQLType?, kType: TypeName): TypeName {
         return when (thisType) {
             !is GraphQLModifiedType -> {
@@ -60,7 +84,7 @@ internal class KotlinTypeMapper(
                 val parameterizedList = list.parameterizedBy(applyWrapping(thisType.wrappedType, thisType, kType))
 
                 // Check if the inner type is already a TypeName.
-                val res = applyWrapping(thisType.wrappedType, thisType, parameterizedList)
+                val res = /*applyWrapping(thisType.wrappedType, thisType, parameterizedList)*/ parameterizedList
 
                 if (parentType is GraphQLNonNull)
                     res.copy(false)

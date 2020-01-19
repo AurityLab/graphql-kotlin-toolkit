@@ -1,7 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ClassName
@@ -11,10 +12,8 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
-import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 
 /**
@@ -24,7 +23,8 @@ import graphql.schema.GraphQLInputObjectType
 internal class InputObjectGenerator(
     options: CodegenInternalOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    private val generatedMapper: GeneratedMapper
+    private val generatedMapper: GeneratedMapper,
+    private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
     companion object {
         private val MAP_STRING_ANY_TYPE = ClassName("kotlin.collections", "Map")
@@ -61,9 +61,15 @@ internal class InputObjectGenerator(
     }
 
     private fun buildInputObjectTypeCompanionObject(inputObject: GraphQLInputObjectType): TypeSpec {
-        return TypeSpec.companionObjectBuilder()
-            .addFunction(createBuilderFun(inputObject))
-            .build()
+        val type = TypeSpec.companionObjectBuilder()
+
+        inputObject.fields.forEach {
+            type.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, "map", it.type))
+        }
+
+        type.addFunction(createBuilderFun(inputObject))
+
+        return type.build()
     }
 
     /**
@@ -72,7 +78,7 @@ internal class InputObjectGenerator(
     private fun buildParameters(inputObject: GraphQLInputObjectType): Collection<ParameterSpec> {
         return inputObject.fields.map { field ->
             val kType = getKotlinType(field.type)
-                .let { if (it.isNullable) createWrappedValue(it) else it }
+                .let { /*if (it.isNullable) createWrappedValue(it) else*/ it }
 
             ParameterSpec(field.name, kType)
         }
@@ -85,7 +91,7 @@ internal class InputObjectGenerator(
     private fun buildProperties(inputObject: GraphQLInputObjectType): Collection<PropertySpec> {
         return inputObject.fields.map { field ->
             val kType = getKotlinType(field.type)
-                .let { if (it.isNullable) createWrappedValue(it) else it }
+                .let { /*if (it.isNullable) createWrappedValue(it) else*/ it }
 
             PropertySpec.builder(field.name, kType)
                 .initializer(field.name)
@@ -111,57 +117,11 @@ internal class InputObjectGenerator(
             .returns(inputObjectClassName)
             .also { spec ->
                 // Go through each input object field and create the according parser statement
-                inputObject.fields.forEach { field ->
-                    val gType = GraphQLTypeHelper.unwrapTypeFull(field.type)
-                    val kType = getKotlinType(field.type)
 
-                    if (gType is GraphQLInputObjectType) {
-                        // Type is a InputObject -> Delegate to builder fun.
-
-                        // Fetch the input object builder.
-                        val fieldTypeBuilder = generatedMapper.getInputObjectBuilderMemberName(gType)
-
-                        if (kType.isNullable)
-                            spec.addStatement(
-                                "val %LArg = if(map.containsKey(\"${field.name}\")) %T(%M(map[\"${field.name}\"] as %T)) else null",
-                                field.name, valueWrapper, fieldTypeBuilder, MAP_STRING_ANY_TYPE
-                            )
-                        else
-                            spec.addStatement(
-                                "val %LArg = %T(%M(map[\"${field.name}\"] as %T))",
-                                valueWrapper,
-                                fieldTypeBuilder
-                            )
-                    } else if (gType is GraphQLEnumType) {
-                        val enum = generatedMapper.getGeneratedTypeClassName(gType)
-
-                        if (kType.isNullable)
-                            spec.addStatement(
-                                "val %LArg = if(map.containsKey(\"${field.name}\")) %T(%T.valueOf(map[\"${field.name}\"] as %T)) else null",
-                                field.name, valueWrapper, enum, STRING
-                            )
-                        else
-                            spec.addStatement(
-                                "val %LArg = %T.valueOf(map[\"${field.name}\"] as %T)",
-                                field.name, enum, STRING
-                            )
-                    } else {
-                        if (kType.isNullable)
-                            spec.addStatement(
-                                "val %LArg = if(map.containsKey(\"${field.name}\")) %T(map[\"${field.name}\"] as %T) else null",
-                                field.name, valueWrapper, kType
-                            )
-                        else
-                            spec.addStatement(
-                                "val %LArg = map[\"${field.name}\"] as %T",
-                                field.name, kType
-                            )
-                    }
-                }
             }
             .also { spec ->
                 val namedParameters = inputObject.fields.joinToString(", ") {
-                    "${it.name} = ${it.name}Arg"
+                    "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
                 }
 
                 spec.addStatement("return %T($namedParameters)", inputObjectClassName)
