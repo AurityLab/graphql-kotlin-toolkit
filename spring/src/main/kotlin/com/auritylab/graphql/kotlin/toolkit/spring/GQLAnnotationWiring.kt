@@ -131,8 +131,6 @@ class GQLAnnotationWiring(
         return components
             // Filter with type check
             .filterIsInstance<C>()
-            // Map it to the correct type
-            .map { it as C }
             // Associate with the annotation (It assumes there is a annotation of that type).
             .associateBy {
                 AnnotationUtils.findAnnotation(it::class.java, A::class.java)!!
