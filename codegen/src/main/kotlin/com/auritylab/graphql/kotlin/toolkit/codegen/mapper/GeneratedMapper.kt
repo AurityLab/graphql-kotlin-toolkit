@@ -8,6 +8,7 @@ import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLType
 
 /**
@@ -29,6 +30,9 @@ internal class GeneratedMapper(
             }
             is GraphQLInputObjectType -> {
                 buildClassName(name, appendCompanion, "inputObject")
+            }
+            is GraphQLObjectType -> {
+                buildClassName(name, appendCompanion, "object")
             }
             else -> {
                 throw IllegalArgumentException("Unable to build name for ${graphQLType.name}")

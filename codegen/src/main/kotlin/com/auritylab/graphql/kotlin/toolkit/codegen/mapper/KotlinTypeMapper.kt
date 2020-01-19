@@ -2,19 +2,23 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.BOOLEAN
+import com.squareup.kotlinpoet.BYTE
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FLOAT
+import com.squareup.kotlinpoet.INT
+import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.SHORT
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
-import graphql.schema.GraphQLList
-import graphql.schema.GraphQLModifiedType
-import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
@@ -25,77 +29,38 @@ internal class KotlinTypeMapper(
     private val options: CodegenOptions,
     private val generatedMapper: GeneratedMapper
 ) {
+    /**
+     * Will try to find a corresponding [TypeName] for the given [type].
+     * The returned types already assume the incoming data has been parsed.
+     */
     fun getKotlinType(type: GraphQLType): TypeName {
-        // Unwrap the given type for the actual object/scalar/etc.
-
-        // Check if the unwrapped type is registered in the type definition registry.
-        // Check if the TypeDefinition is a scalar.
-        val kType = when (val unwrappedType =
-            if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type) {
-            is GraphQLScalarType -> {
-                getScalarKotlinType(unwrappedType)
-            }
-            is GraphQLInputObjectType -> {
-                generatedMapper.getGeneratedTypeClassName(unwrappedType)
-            }
-            is GraphQLEnumType -> {
-                generatedMapper.getGeneratedTypeClassName(unwrappedType)
-            }
-            is GraphQLObjectType -> {
-                getObjectKotlinType(unwrappedType)
-            }
-            else -> getDefaultClassName()
+        val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
+            is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
+            is GraphQLInputObjectType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
+            is GraphQLEnumType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
+            is GraphQLObjectType -> getObjectKotlinType(unwrappedType)
+            else -> ANY
         }
 
-        return applyWrapping(type, null, kType)
+        // Apply the wrapping of the GraphQL type to the Kotlin type.
+        return GraphQLTypeHelper.wrapType(type, res)
     }
 
+    /**
+     * Will Try to find a corresponding [TypeName] for the given [type].
+     * Thr returned types represent the incoming types from graphql-java.
+     */
     fun getInputKotlinType(type: GraphQLType): TypeName {
-        val unwrappedType = if (type is GraphQLModifiedType) GraphQLTypeHelper.unwrapTypeFull(type) else type
-        val kType = when (unwrappedType) {
-            is GraphQLScalarType -> {
-                getScalarKotlinType(unwrappedType)
-            }
-            is GraphQLInputObjectType -> {
-                MAP.parameterizedBy(STRING, ANY)
-            }
-            is GraphQLEnumType -> {
-                STRING
-            }
-            is GraphQLObjectType -> {
-                getObjectKotlinType(unwrappedType)
-            }
-            else -> getDefaultClassName()
+        val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
+            is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
+            is GraphQLInputObjectType -> MAP.parameterizedBy(STRING, ANY)
+            is GraphQLEnumType -> STRING
+            is GraphQLObjectType -> getObjectKotlinType(unwrappedType)
+            else -> ANY
         }
 
-        return applyWrapping(type, null, kType)
-    }
-
-    private fun applyWrapping(thisType: GraphQLType, parentType: GraphQLType?, kType: TypeName): TypeName {
-        return when (thisType) {
-            !is GraphQLModifiedType -> {
-                return if (parentType is GraphQLNonNull)
-                    kType.copy(false)
-                else
-                    kType.copy(true)
-            }
-            is GraphQLList -> {
-                val list = ClassName("kotlin.collections", "List")
-                val parameterizedList = list.parameterizedBy(applyWrapping(thisType.wrappedType, thisType, kType))
-
-                // Check if the inner type is already a TypeName.
-                val res = /*applyWrapping(thisType.wrappedType, thisType, parameterizedList)*/ parameterizedList
-
-                if (parentType is GraphQLNonNull)
-                    res.copy(false)
-                else
-                    res.copy(true)
-            }
-            is GraphQLNonNull -> {
-                return applyWrapping(thisType.wrappedType, thisType, kType)
-            }
-            else -> kType
-        }
+        // Apply the wrapping of the GraphQL type to the Kotlin type.
+        return GraphQLTypeHelper.wrapType(type, res)
     }
 
     /**
@@ -104,35 +69,42 @@ internal class KotlinTypeMapper(
     private fun getScalarKotlinType(scalarTypeDefinition: GraphQLScalarType): ClassName {
         // Check for the default scalars of GraphQL itself and the `graphql-java` library.
         val defaultClass = when (scalarTypeDefinition.name) {
-            "String" -> String::class
-            "Boolean" -> Boolean::class
-            "Int" -> Int::class
-            "Float" -> Float::class
-            "ID" -> String::class
-            "Long" -> Long::class
-            "Short" -> Short::class
-            "Byte" -> Byte::class
-            "BigDecimal" -> BigDecimal::class
-            "BigInteger" -> BigInteger::class
+            "String" -> STRING
+            "Boolean" -> BOOLEAN
+            "Int" -> INT
+            "Float" -> FLOAT
+            "ID" -> STRING
+            "Long" -> LONG
+            "Short" -> SHORT
+            "Byte" -> BYTE
+            "BigDecimal" -> BigDecimal::class.asClassName()
+            "BigInteger" -> BigInteger::class.asClassName()
             else -> null
         }
 
         // If it's a default scalar just return its ClassName.
-        if (defaultClass != null)
-            return defaultClass.asClassName()
+        if (defaultClass != null) return defaultClass
 
         // Fetch the kotlin representation class or return "Any".
-        return KotlinRepresentationHelper.getClassName(scalarTypeDefinition)
-            ?: ClassName("kotlin", "Any")
-    }
-
-    private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
-        return KotlinRepresentationHelper.getClassName(type)
-            ?: getDefaultClassName()
+        return KotlinRepresentationHelper.getClassName(scalarTypeDefinition) ?: ANY
     }
 
     /**
-     * Will return the default [ClassName] which is used as a fallback. Defaults to [Any].
+     * Will return the [ClassName] for the given [type].
      */
-    private fun getDefaultClassName(): ClassName = ClassName("kotlin", "Any")
+    private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
+        // Check if the type is annotated with the "kotlinRepresentation" directive.
+        val helperResult = KotlinRepresentationHelper.getClassName(type)
+
+        // If the directive is available return the content.
+        if (helperResult != null)
+            return helperResult
+
+        return if (options.generateAll || KotlinGenerateHelper.shouldGenerate(type)) {
+            // The object has a generated type, return the generated one.
+            generatedMapper.getGeneratedTypeClassName(type, false)
+        } else
+        // The object does not have a generated type, therefore return ANY.
+            ANY
+    }
 }
