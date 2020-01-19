@@ -14,7 +14,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
     implementation("org.springframework:spring-webmvc:5.2.2.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
-    implementation("com.auritylab:kotlin-object-path:1.0.0")
 
     kapt("org.springframework.boot:spring-boot-configuration-processor:2.2.2.RELEASE")
 

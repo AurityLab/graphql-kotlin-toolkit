@@ -6,7 +6,6 @@ plugins {
 
 allprojects {
     repositories {
-        mavenLocal()
         jcenter()
     }
 }
