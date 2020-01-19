@@ -117,7 +117,6 @@ internal class InputObjectGenerator(
             .returns(inputObjectClassName)
             .also { spec ->
                 // Go through each input object field and create the according parser statement
-
             }
             .also { spec ->
                 val namedParameters = inputObject.fields.joinToString(", ") {

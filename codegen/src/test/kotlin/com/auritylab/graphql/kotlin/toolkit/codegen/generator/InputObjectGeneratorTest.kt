@@ -6,7 +6,7 @@ import io.kotlintest.specs.StringSpec
 
 internal class InputObjectGeneratorTest : StringSpec({
     "should generate file spec correctly" {
-        val generator = InputObjectGenerator(_TestObjects.mockOptions, _TestObjects.kotlinTypeMapper, _TestObjects.nameMapper)
+        val generator = InputObjectGenerator(_TestObjects.mockOptions, _TestObjects.kotlinTypeMapper, _TestObjects.nameMapper, _TestObjects.argumentCodeBlockGenerator)
 
         val schema = _TestObjects.schema
 
