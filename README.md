@@ -31,7 +31,10 @@ graphqlKotlinCodegen {
     generatedGlobalPrefix.set("GQL")
 
     // (Optional) Set a specific package for all generated classes.
-    generatedBasePackage.set("com.auritylab.tutors.graphql._generated")
+    generatedBasePackage.set("com.auritylab.graphql.generated")
+    
+    // (Optional) If everything should be generated.
+    generateAll.set(true)
 }
 ```
 
@@ -40,3 +43,49 @@ To provide additional information to the generator it's recommended to add the f
 directive @kotlinRepresentation(class: String!) on OBJECT | SCALAR
 directive @kotlinGenerate on FIELD_DEFINITION | OBJECT | INTERFACE                                                                  
 ```
+
+### Configuration
+To make your schema work perfectly with this code generator you need to add some additional information to the schema using the previously given directives.
+
+#### Bind object type to existing class (`@kotlinRepresentation`)
+Given the following schema:
+```graphql
+type User {
+    ...
+}
+```
+If you don't supply additional information on this type the code generator will represent this type with `Any` as it doesn't know what else to do with it.
+
+Using the `@kotlinRepresentation` directive you can supply the class to use.
+```graphql
+type User @kotlinRepresentation(class: "com.auritylab.graphql.entity.User") {
+    ...
+}
+```
+
+#### Avoid generating too much code (`@kotlinGenerate`)
+When building a large GraphQL API there can be a lot of resolvers, input objects, enums, etc. By default the code generator will generate code for everything.
+This behavior can be adjusted using the `generateAll` option (See [usage](#usage)). When setting it to `false` the code generator will only generate code if the `@kotlinGenerate` directive has been added in the schema.
+This is also useful as the `graphql-java` library provides a property resolver.
+
+The directive can be used on
+- Field definitions
+- Objects
+- Interfaces
+
+Examples:
+```graphql
+# Will generate resolvers for "getUser" and "getUsers".
+type Query @kotlinGenerate {
+    getUser: User!
+    getUsers: [User]!
+}
+
+# Will generate a resolver just for "age".
+type User {
+    id: ID!
+    name: String
+    age: Int @kotlinGenerate
+}
+```
+
