@@ -7,12 +7,15 @@ A toolkit for GraphQL specifically with [Kotlin](https://kotlinlang.org/). This 
 
 Currently available tools:
 * [Code generation](#code-generation)
-* More coming soon!
+* Spring Boot integration
 
-## Usage
-This toolkit provides a Gradle plugin to simply the usage.
+## Code generation
+The code generation of this toolkit follows the **schema-first** approach, which means you first write your _schema.graphqls_ files and implement the server-side code for it. 
+This code generator especially creates a `abstract class` for each resolver which can be extended to implement the resolver in a clean way.
+The generated code provides specific parameters for each argument which allows a more type safe way to access the incoming data.
 
-### Code generation plugin
+### Usage
+The code generation can easily be used with the provided Gradle plugin.
 ```kotlin
 plugins {
   // Apply the plugin with the latest version.
@@ -32,8 +35,8 @@ graphqlKotlinCodegen {
 }
 ```
 
-## Code generation
-The code generation of this toolkit follows a different approach than some other available code generators for GraphQL.
-For every resolver (also called DataFetcher in graphql-java) there will be a new `abstract class` which can be extended to implement the resolver.
-Each generated resolver contains specific code to access the arguments in a more type safe way (including input and enum types).
-
+To provide additional information to the generator it's recommended to add the following directives to the schema:
+```graphql
+directive @kotlinRepresentation(class: String!) on OBJECT | SCALAR
+directive @kotlinGenerate on FIELD_DEFINITION | OBJECT | INTERFACE                                                                  
+```
