@@ -5,8 +5,10 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnumGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.EnvironmentWrapperGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FieldResolverGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.InputObjectGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ObjectTypeGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
@@ -41,6 +43,7 @@ class Codegen(
         InputObjectGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
     private val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
     private val environmentWrapperGenerator = EnvironmentWrapperGenerator(options, kotlinTypeMapper, nameMapper)
+    private val objectTypeGenerator = ObjectTypeGenerator(options, kotlinTypeMapper, nameMapper)
 
     /**
      * Will generate code for the types of the [schema].
@@ -64,6 +67,9 @@ class Codegen(
         allTypes.filterIsInstance<GraphQLObjectType>()
             .forEach { objectType ->
                 val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
+
+                if (generatedForObject && KotlinRepresentationHelper.getClassName(objectType) == null)
+                    objectTypeGenerator.getObjectType(objectType).writeTo(outputDirectory)
 
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll || generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
