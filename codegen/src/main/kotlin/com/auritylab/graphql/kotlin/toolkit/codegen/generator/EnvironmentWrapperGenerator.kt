@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ANY
@@ -12,7 +12,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 
 internal class EnvironmentWrapperGenerator(
-    options: CodegenInternalOptions,
+    options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {

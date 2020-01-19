@@ -3,9 +3,9 @@ package com.auritylab.graphql.kotlin.toolkit.codegen
 import java.nio.file.Path
 
 data class CodegenOptions(
-    val schemas: Collection<Path>? = null,
-    val outputDirectory: Path? = null,
-    val generatedGlobalPrefix: String? = null,
-    val generatedBasePackage: String? = null,
-    val generateAll: Boolean? = null
+    val schemas: Collection<Path>,
+    val outputDirectory: Path,
+    var generatedGlobalPrefix: String? = null,
+    var generatedBasePackage: String = "graphql.kotlin.toolkit.codegen",
+    var generateAll: Boolean = true
 )

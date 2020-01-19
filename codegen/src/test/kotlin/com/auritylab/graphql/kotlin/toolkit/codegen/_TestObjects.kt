@@ -77,7 +77,7 @@ internal object _TestObjects {
         }.build()
 
     val schema = GraphQLSchema.newSchema().query(queryType).build()
-    val mockOptions = CodegenInternalOptions(listOf(), Path.of(""), null, "com.generated", true)
+    val mockOptions = CodegenOptions(listOf(), Path.of(""), null, "com.generated", true)
 
     val nameMapper = GeneratedMapper(mockOptions)
     val kotlinTypeMapper = KotlinTypeMapper(mockOptions, nameMapper)

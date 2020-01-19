@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
@@ -14,7 +14,7 @@ import graphql.schema.GraphQLType
  * Describes a central place in which all components can access the naming for generated classes.
  */
 internal class GeneratedMapper(
-    private val options: CodegenInternalOptions
+    private val options: CodegenOptions
 ) {
     /**
      * Will return the [ClassName] for the given [graphQLType].

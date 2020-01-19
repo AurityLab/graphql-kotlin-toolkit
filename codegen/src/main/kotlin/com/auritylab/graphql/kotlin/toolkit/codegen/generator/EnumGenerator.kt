@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenInternalOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.FileSpec
@@ -14,7 +14,7 @@ import graphql.schema.GraphQLEnumType
  * This will generate the actual `enum` which an additional [String] value.
  */
 internal class EnumGenerator(
-    options: CodegenInternalOptions,
+    options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {

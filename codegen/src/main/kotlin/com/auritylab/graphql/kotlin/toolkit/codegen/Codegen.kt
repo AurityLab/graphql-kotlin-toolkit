@@ -26,9 +26,8 @@ import java.nio.file.Path
  * Represents the base class for the code generation.
  */
 class Codegen(
-    inputOptions: CodegenOptions = CodegenOptions()
+    private val options: CodegenOptions
 ) {
-    internal val options = mapOptions(inputOptions)
     private val schema = parseSchemas(options.schemas)
     private val nameMapper = GeneratedMapper(options)
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
@@ -133,23 +132,5 @@ class Codegen(
         Files.createDirectories(directory)
 
         return directory
-    }
-
-    private fun mapOptions(inputOptions: CodegenOptions): CodegenInternalOptions {
-        val schemaFiles = inputOptions.schemas
-            ?: throw IllegalArgumentException("'schemaFiles' not set")
-        val outputDirectory = inputOptions.outputDirectory
-            ?: throw IllegalArgumentException("'outputDirectory' not set")
-        val generatedGlobalPrefix = inputOptions.generatedGlobalPrefix
-        val generatedBasePackage = inputOptions.generatedBasePackage ?: "graphql.kotlin.toolkit.codegen"
-        val generateAll = inputOptions.generateAll ?: true
-
-        return CodegenInternalOptions(
-            schemaFiles,
-            outputDirectory,
-            generatedGlobalPrefix,
-            generatedBasePackage,
-            generateAll
-        )
     }
 }
