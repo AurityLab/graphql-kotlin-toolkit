@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.gradle.task
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
+import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -31,24 +32,56 @@ open class CodegenTask : DefaultTask() {
 
     @TaskAction
     fun doGenerate() {
-        val schemas =
-            if (schemas.isEmpty) throw IllegalStateException("No schemas set")
-            else schemas.files.map { it.toPath() }
-
-        val outputDirectory = outputDirectory.orNull?.asFile?.toPath()
-            ?: throw IllegalStateException("No output directory set")
-
-        val options = CodegenOptions(
-            schemas,
-            outputDirectory,
-            generatedGlobalPrefix.orNull,
-            generatedBasePackage.orNull,
-            generateAll.orNull
-        )
-
-        val codegen = Codegen(options)
+        val codegen = Codegen(buildCodegenOptions())
 
         // Start the generation process.
         codegen.generate()
+    }
+
+    /**
+     * Will build a new [CodegenOptions] instance with the given tasks options.
+     */
+    private fun buildCodegenOptions(): CodegenOptions {
+        val options = CodegenOptions(
+            getSchemaPaths(),
+            getOutputDirectoryPath()
+        )
+
+        generatedGlobalPrefix.orNull?.also {
+            options.generatedGlobalPrefix = it
+        }
+
+        generatedBasePackage.orNull?.also {
+            options.generatedBasePackage = it
+        }
+
+        generateAll.orNull?.also {
+            options.generateAll = it
+        }
+
+        return options
+    }
+
+    /**
+     * Will return all schema paths in a list.
+     * If no schemas are set it will throw an exception.
+     */
+    private fun getSchemaPaths(): List<Path> {
+        // Check if there are any schemas.
+        if (schemas.isEmpty) throw IllegalStateException("No schemas provided")
+
+        // Map the files to paths.
+        return schemas.files.map { it.toPath() }
+    }
+
+    /**
+     * Will return the output directory path.
+     * If no output directory is set it will throw an exception.
+     */
+    private fun getOutputDirectoryPath(): Path {
+        if (!outputDirectory.isPresent)
+            throw IllegalStateException("No output directory provided")
+
+        return outputDirectory.asFile.get().toPath()
     }
 }
