@@ -7,8 +7,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FieldResolverGener
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.InputObjectGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ObjectTypeGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenerator
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
@@ -66,13 +65,16 @@ class Codegen(
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
             .forEach { objectType ->
-                val generatedForObject = KotlinGenerateHelper.shouldGenerate(objectType)
+                val generatedForObject = DirectiveHelper.hasGenerateDirective(objectType)
 
-                if (generatedForObject && KotlinRepresentationHelper.getClassName(objectType) == null)
+                if (generatedForObject && DirectiveHelper.getRepresentationClass(objectType) == null)
                     objectTypeGenerator.getObjectType(objectType).writeTo(outputDirectory)
 
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
-                    if (options.generateAll || generatedForObject || KotlinGenerateHelper.shouldGenerate(fieldDefinition))
+                    if (options.generateAll || generatedForObject || DirectiveHelper.hasGenerateDirective(
+                            fieldDefinition
+                        )
+                    )
                         fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
                             .writeTo(outputDirectory)
                 }
@@ -81,10 +83,10 @@ class Codegen(
         // Will create code for all interface types.
         allTypes.filterIsInstance<GraphQLInterfaceType>()
             .forEach { interfaceType ->
-                val generatedForInterface = KotlinGenerateHelper.shouldGenerate(interfaceType)
+                val generatedForInterface = DirectiveHelper.hasGenerateDirective(interfaceType)
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
-                    if (options.generateAll || generatedForInterface || KotlinGenerateHelper.shouldGenerate(
+                    if (options.generateAll || generatedForInterface || DirectiveHelper.hasGenerateDirective(
                             fieldDefinition
                         )
                     )

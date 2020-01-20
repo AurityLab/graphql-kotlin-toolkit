@@ -1,9 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinGenerateHelper
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.KotlinRepresentationHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
@@ -86,7 +85,7 @@ internal class KotlinTypeMapper(
         if (defaultClass != null) return defaultClass
 
         // Fetch the kotlin representation class or return "Any".
-        return KotlinRepresentationHelper.getClassName(scalarTypeDefinition) ?: ANY
+        return DirectiveHelper.getRepresentationClass(scalarTypeDefinition) ?: ANY
     }
 
     /**
@@ -94,13 +93,13 @@ internal class KotlinTypeMapper(
      */
     private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
         // Check if the type is annotated with the "kotlinRepresentation" directive.
-        val helperResult = KotlinRepresentationHelper.getClassName(type)
+        val helperResult = DirectiveHelper.getRepresentationClass(type)
 
         // If the directive is available return the content.
         if (helperResult != null)
             return helperResult
 
-        return if (options.generateAll || KotlinGenerateHelper.shouldGenerate(type)) {
+        return if (options.generateAll || DirectiveHelper.hasGenerateDirective(type)) {
             // The object has a generated type, return the generated one.
             generatedMapper.getGeneratedTypeClassName(type, false)
         } else
