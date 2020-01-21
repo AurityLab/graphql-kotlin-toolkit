@@ -10,16 +10,10 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenera
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLSchema
-import graphql.schema.idl.RuntimeWiring
-import graphql.schema.idl.SchemaGenerator
-import graphql.schema.idl.SchemaParser
-import graphql.schema.idl.TypeDefinitionRegistry
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -29,7 +23,7 @@ import java.nio.file.Path
 class Codegen(
     private val options: CodegenOptions
 ) {
-    private val schema = parseSchemas(options.schemas)
+    private val schema = CodegenSchemaParser(options).parseSchemas(options.schemas)
     private val nameMapper = GeneratedMapper(options)
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
     private val outputDirectory = getOutputDirectory()
@@ -102,31 +96,6 @@ class Codegen(
         // Will create code for the environment wrapper.
         environmentWrapperGenerator.getEnvironmentWrapper()
             .writeTo(outputDirectory)
-    }
-
-    /**
-     * Will parse the given [schemaFiles] and return a [GraphQLSchema] which contains all
-     * registered definitions from the given schemas.
-     */
-    private fun parseSchemas(schemaFiles: Collection<Path>): GraphQLSchema {
-        val parser = SchemaParser()
-        val generator = SchemaGenerator()
-
-        // Create a empty registry.
-        val baseRegistry = TypeDefinitionRegistry()
-
-        // Parse each schema and merge it with the base registry.
-        schemaFiles.forEach {
-            baseRegistry.merge(parser.parse(it.toFile()))
-        }
-
-        val genOptions = SchemaGenerator.Options.defaultOptions().enforceSchemaDirectives(false)
-
-        return generator.makeExecutableSchema(
-            genOptions,
-            baseRegistry,
-            RuntimeWiring.newRuntimeWiring().wiringFactory(WiringFactoryMock()).build()
-        )
     }
 
     /**
