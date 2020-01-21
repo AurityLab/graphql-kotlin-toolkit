@@ -21,12 +21,6 @@ internal class FieldResolverGenerator(
     private val generatedMapper: GeneratedMapper,
     private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    val inputMapType = ClassName("kotlin.collections", "Map")
-        .parameterizedBy(
-            ClassName("kotlin", "String"),
-            ClassName("kotlin", "Any")
-        )
-
     fun getFieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FileSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
 

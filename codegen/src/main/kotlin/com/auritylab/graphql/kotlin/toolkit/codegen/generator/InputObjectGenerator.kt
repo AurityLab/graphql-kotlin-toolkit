@@ -5,13 +5,15 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockG
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
-import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLInputObjectType
@@ -26,14 +28,6 @@ internal class InputObjectGenerator(
     private val generatedMapper: GeneratedMapper,
     private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    companion object {
-        private val MAP_STRING_ANY_TYPE = ClassName("kotlin.collections", "Map")
-            .parameterizedBy(
-                ClassName("kotlin", "String"),
-                ClassName("kotlin", "Any")
-            )
-    }
-
     fun getInputObject(inputObject: GraphQLInputObjectType): FileSpec {
         val fieldResolverName = generatedMapper.getGeneratedTypeClassName(inputObject)
 
@@ -113,7 +107,7 @@ internal class InputObjectGenerator(
         val valueWrapper = generatedMapper.getValueWrapperName()
 
         return FunSpec.builder(builderMemberName.simpleName)
-            .addParameter("map", MAP_STRING_ANY_TYPE)
+            .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(inputObjectClassName)
             .also { spec ->
                 // Go through each input object field and create the according parser statement
