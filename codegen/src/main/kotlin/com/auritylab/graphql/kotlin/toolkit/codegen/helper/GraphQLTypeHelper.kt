@@ -39,6 +39,11 @@ object GraphQLTypeHelper {
     private fun internalWrapType(type: GraphQLType, parentType: GraphQLType?, kotlinType: TypeName): TypeName {
         return when (type) {
             !is GraphQLModifiedType -> {
+                // Per default all types are nullable in GraphQL,
+                //therefore always return nullable types for top level types.
+                if (parentType == null)
+                    return kotlinType.copy(true)
+
                 // If the unmodified type is reached access the parent and check if it's NoNull.
                 return if (parentType is GraphQLNonNull)
                     kotlinType.copy(false)
