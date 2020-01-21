@@ -18,11 +18,18 @@ import graphql.schema.GraphQLModifiedType
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLType
 
+/**
+ * Describes a generator which generates functions which are able to access specific arguments from any given GraphQL input.
+ */
 internal class ArgumentCodeBlockGenerator(
     private val kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper
 ) {
-    fun buildArgumentResolverFun(argumentName: String, mapName: String, type: GraphQLType): FunSpec {
+    /**
+     * Will build a function which takes a map (parameterized by String, Any) to access the given [argumentName] from it.
+     * A [type] is also required to decide how to access the argument value.
+     */
+    fun buildArgumentResolverFun(argumentName: String, type: GraphQLType): FunSpec {
         val kotlinType = kotlinTypeMapper.getKotlinType(type)
 
         return FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
