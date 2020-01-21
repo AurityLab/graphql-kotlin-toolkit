@@ -57,23 +57,23 @@ class Codegen(
 
         // Will create code for all input object types.
         allTypes.filterIsInstance<GraphQLInputObjectType>()
-            .forEach {
-                inputObjectGenerator.getInputObject(it)
-                    .writeTo(outputDirectory)
-            }
+            .forEach { inputObjectGenerator.getInputObject(it).writeTo(outputDirectory) }
 
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
             .forEach { objectType ->
-                val generatedForObject = DirectiveHelper.hasGenerateDirective(objectType)
+                val objectHasGenerate = DirectiveHelper.hasGenerateDirective(objectType)
+                val objectHasRepresentation = DirectiveHelper.getRepresentationClass(objectType) != null
+                val objectHasResolver = DirectiveHelper.hasResolverDirective(objectType)
 
-                if (generatedForObject && DirectiveHelper.getRepresentationClass(objectType) == null)
+                // Generate for object type if the directive is given and does not have a representation class.
+                if ((options.generateAll && !objectHasRepresentation) || (objectHasGenerate && !objectHasRepresentation))
                     objectTypeGenerator.getObjectType(objectType).writeTo(outputDirectory)
 
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
-                    if (options.generateAll || generatedForObject || DirectiveHelper.hasGenerateDirective(
-                            fieldDefinition
-                        )
+                    if (options.generateAll ||
+                        objectHasGenerate ||
+                        DirectiveHelper.hasGenerateDirective(fieldDefinition)
                     )
                         fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
                             .writeTo(outputDirectory)
