@@ -118,7 +118,11 @@ internal class ArgumentCodeBlockGenerator(
                 }
             }
             is GraphQLEnumType -> {
-                val enumClass = typeMapper.getKotlinType(type)
+                // Fetch the Kotlin Type for the enum and copy it to a not nullable type.
+                // This is required because it would generate code like this:
+                // "GQLAnyEnum?.valueOf(it)"
+                // which is definitely invalid.
+                val enumClass = typeMapper.getKotlinType(type).copy(false)
 
                 if (kType.isNullable)
                     code.addStatement(
