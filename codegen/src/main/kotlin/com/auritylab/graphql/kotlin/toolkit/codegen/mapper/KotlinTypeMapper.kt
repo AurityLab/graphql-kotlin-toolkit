@@ -25,6 +25,9 @@ import graphql.schema.GraphQLType
 import java.math.BigDecimal
 import java.math.BigInteger
 
+/**
+ * Describes a central place which is capable of converting given [GraphQLType]s to Kotlin types.
+ */
 internal class KotlinTypeMapper(
     private val options: CodegenOptions,
     private val generatedMapper: GeneratedMapper
@@ -107,11 +110,13 @@ internal class KotlinTypeMapper(
         if (helperResult != null)
             return helperResult
 
+        // Use the generated class if "generateAll" is enabled or
+        // the object type is annoated with the generate directive
         return if (options.generateAll || DirectiveHelper.hasGenerateDirective(type)) {
             // The object has a generated type, return the generated one.
             generatedMapper.getGeneratedTypeClassName(type, false)
         } else
-        // The object does not have a generated type, therefore return ANY.
+        // The object does not have a generated type, therefore return Any.
             ANY
     }
 }
