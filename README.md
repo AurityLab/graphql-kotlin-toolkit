@@ -13,6 +13,7 @@ Currently available tools:
 This tool follows the **schema-first** approach, in which you first write your *schema.graphqls* files and implement the server-side code for it afterwards.
 This code generator additionally creates an abstract class for each resolver. 
 These can be extended to implement the resolver in a clean way. The tool also provides specific parameters for each argument, allowing a more type safe way to access the incoming data.
+This code generator also **supports Kotlin's null safety feature**!
 
 ### Usage
 The code generation can easily be used with the provided Gradle plugin.
@@ -40,14 +41,15 @@ graphqlKotlinCodegen {
 
 To provide additional information to the generator it's recommended to add the following directives to the schema:
 ```graphql
-directive @kotlinRepresentation(class: String!) on OBJECT | SCALAR
-directive @kotlinGenerate on FIELD_DEFINITION | OBJECT | INTERFACE                                                                  
+directive @kRepresentation(class: String!) on OBJECT | SCALAR
+directive @kGenerate on OBJECT
+directive @kResolver on FIELD_DEFINITION | OBJECT | INTERFACE                                                        
 ```
 
 ### Configuration
 To make your schema work perfectly with this code generator you need to add some additional information to the schema using the previously given directives.
 
-#### Bind object type to existing class (`@kotlinRepresentation`)
+#### Bind object type to existing class (`@kRepresentation`)
 Given the following schema:
 ```graphql
 type User {
@@ -56,27 +58,26 @@ type User {
 ```
 If you don't supply additional information on this type the code generator will represent this type with `Any` as it doesn't know what else to do with it.
 
-Using the `@kotlinRepresentation` directive you can supply the class to use.
+Using the `@kRepresentation` directive you can supply the class to use.
 ```graphql
-type User @kotlinRepresentation(class: "com.auritylab.graphql.entity.User") {
+type User @kRepresentation(class: "com.auritylab.graphql.entity.User") {
     ...
 }
 ```
 
-#### Avoid generating too much code (`@kotlinGenerate`)
-When building a large GraphQL API there can be a lot of resolvers, input objects, enums, etc. By default the code generator will generate code for everything.
-This behavior can be adjusted using the `generateAll` option (See [usage](#usage)). When setting it to `false` the code generator will only generate code if the `@kotlinGenerate` directive has been added in the schema.
-This is also useful as the `graphql-java` library provides a property resolver.
+#### Avoid generating all resolvers (`@kResolver`)
+When building a large GraphQL API there can be a lot of resolvers. By default the code generator will generate code for every resolver.
+This behavior can be adjusted using the `generateAll` option (See [usage](#usage)). When setting it to `false` the code generator will only generate code if the `@kResolver` directive has been added in the schema.
+This is also useful as the `graphql-java` library provides a property resolver, which mostly takes most of the work.
 
 The directive can be used on
-- Field definitions
-- Objects
-- Interfaces
+- **Field definitions**
+- **Objects** *(to generate resolvers for all field definitions in the object)*
 
 Examples:
 ```graphql
 # Will generate resolvers for "getUser" and "getUsers".
-type Query @kotlinGenerate {
+type Query @kResolver {
     getUser: User!
     getUsers: [User]!
 }
@@ -85,7 +86,27 @@ type Query @kotlinGenerate {
 type User {
     id: ID!
     name: String
-    age: Int @kotlinGenerate
+    age: Int @kResolver
 }
 ```
 
+#### Avoid generating all object types (`@kGenerate`)
+In GraphQL you mostly use object types to represent your data. By default the code generator will generate a `data class` for each object type if no `@kRepresentation` is given.
+
+Given the following object type:
+```graphql
+type User {
+    ID: ID!
+    name: String
+    surname: String
+}
+```
+
+The following `data class` would be generated:
+```kotlin
+data class(
+    val ID: String,
+    val name: String?,
+    val surname: String?
+)
+```
