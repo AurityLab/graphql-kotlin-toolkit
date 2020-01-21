@@ -22,14 +22,12 @@ internal class ArgumentCodeBlockGenerator(
     private val kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper
 ) {
-    private val inputMapType = MAP.parameterizedBy(STRING, ANY)
-
     fun buildArgumentResolverFun(argumentName: String, mapName: String, type: GraphQLType): FunSpec {
         val kotlinType = kotlinTypeMapper.getKotlinType(type)
 
         return FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
             .addModifiers(KModifier.PRIVATE)
-            .addParameter("map", inputMapType)
+            .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(kotlinType)
             .addCode(buildArgumentResolverCodeBlock(argumentName, type))
             .build()
@@ -54,7 +52,7 @@ internal class ArgumentCodeBlockGenerator(
             }
         }
 
-        code.addStatement("return layer${currentIndex - 1}(map.get(\"$name\") as %T)", lastType)
+        code.addStatement("return layer${currentIndex - 1}(map[\"$name\"] as %T)", lastType)
 
         return code.build()
     }
