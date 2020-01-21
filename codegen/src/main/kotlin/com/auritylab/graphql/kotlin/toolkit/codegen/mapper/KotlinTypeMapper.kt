@@ -11,6 +11,7 @@ import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.MAP
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
 import com.squareup.kotlinpoet.STRING
@@ -60,6 +61,13 @@ internal class KotlinTypeMapper(
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
         return GraphQLTypeHelper.wrapType(type, res)
+    }
+
+    /**
+     * Will build a [MemberName] which points to the builder function of the given [inputObject].
+     */
+    fun getInputObjectBuilder(inputObject: GraphQLInputObjectType): MemberName {
+        return generatedMapper.getInputObjectBuilderMemberName(inputObject)
     }
 
     /**

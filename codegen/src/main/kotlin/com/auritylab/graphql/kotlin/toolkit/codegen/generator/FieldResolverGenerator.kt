@@ -53,7 +53,7 @@ internal class FieldResolverGenerator(
             }.build())
             .also { typeSpec ->
                 field.arguments.forEach {
-                    typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, "map", it.type))
+                    typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
                 }
 
                 typeSpec.addFunction(FunSpec.builder("get")

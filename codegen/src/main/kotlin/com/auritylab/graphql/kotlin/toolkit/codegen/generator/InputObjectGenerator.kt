@@ -64,7 +64,7 @@ internal class InputObjectGenerator(
         val type = TypeSpec.companionObjectBuilder()
 
         inputObject.fields.forEach {
-            type.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, "map", it.type))
+            type.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
         }
 
         type.addFunction(createBuilderFun(inputObject))

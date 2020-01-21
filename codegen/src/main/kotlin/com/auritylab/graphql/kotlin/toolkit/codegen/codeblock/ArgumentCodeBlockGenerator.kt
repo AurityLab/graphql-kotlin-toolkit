@@ -1,7 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
-import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.CodeBlock
@@ -22,15 +21,14 @@ import graphql.schema.GraphQLType
  * Describes a generator which generates functions which are able to access specific arguments from any given GraphQL input.
  */
 internal class ArgumentCodeBlockGenerator(
-    private val kotlinTypeMapper: KotlinTypeMapper,
-    private val generatedMapper: GeneratedMapper
+    private val typeMapper: KotlinTypeMapper
 ) {
     /**
      * Will build a function which takes a map (parameterized by String, Any) to access the given [argumentName] from it.
      * A [type] is also required to decide how to access the argument value.
      */
     fun buildArgumentResolverFun(argumentName: String, type: GraphQLType): FunSpec {
-        val kotlinType = kotlinTypeMapper.getKotlinType(type)
+        val kotlinType = typeMapper.getKotlinType(type)
 
         return FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
             .addModifiers(KModifier.PRIVATE)
@@ -88,12 +86,12 @@ internal class ArgumentCodeBlockGenerator(
         kotlinType: TypeName? = null
     ): Pair<CodeBlock, TypeName> {
         val code = CodeBlock.builder()
-        val kType = kotlinType ?: kotlinTypeMapper.getInputKotlinType(type)
+        val kType = kotlinType ?: typeMapper.getInputKotlinType(type)
 
         when (type) {
             is GraphQLNonNull -> return Pair(buildLayerParser(type.wrappedType, index, kType).first, kType)
             is GraphQLList -> {
-                val wrappedKType = kotlinTypeMapper.getInputKotlinType(type.wrappedType)
+                val wrappedKType = typeMapper.getInputKotlinType(type.wrappedType)
 
                 if (wrappedKType.isNullable) {
                     if (kType.isNullable)
@@ -120,7 +118,7 @@ internal class ArgumentCodeBlockGenerator(
                 }
             }
             is GraphQLEnumType -> {
-                val enumClass = generatedMapper.getGeneratedTypeClassName(type, false)
+                val enumClass = typeMapper.getKotlinType(type)
 
                 if (kType.isNullable)
                     code.addStatement(
@@ -136,7 +134,7 @@ internal class ArgumentCodeBlockGenerator(
                     )
             }
             is GraphQLInputObjectType -> {
-                val inputObjectBuilder = generatedMapper.getInputObjectBuilderMemberName(type)
+                val inputObjectBuilder = typeMapper.getInputObjectBuilder(type)
                 if (kType.isNullable)
                     code.addStatement(
                         "val layer$index = {it: %T -> if(it == null) null else %M(it)}",

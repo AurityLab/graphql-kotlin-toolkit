@@ -34,7 +34,7 @@ class Codegen(
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
     private val outputDirectory = getOutputDirectory()
 
-    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
+    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper)
     private val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
     private val fieldResolverGenerator =
         FieldResolverGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
