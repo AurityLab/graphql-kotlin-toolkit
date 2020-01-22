@@ -115,6 +115,26 @@ data class User(
 This integration works in a more opinionated way as it provides additional annotations which can be used to register code for various GraphQL types.
 It also comes with a servlet, which handles all GraphQL requests.
 
+### Getting started
+By using the starter everything you need to get started will be automatically configured.
+
+#### Gradle
+```kotlin
+dependencies {
+    implementation("com.auritylab.graphql-kotlin-toolkit:spring-boot-starter:0.1.0")
+}
+```
+
+#### Maven
+```xml
+<dependency>
+    <groupId>com.auritylab.graphql-kotlin-toolkit</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+
 ### Annotations
 You can register your code through the following annotations which are provided by this integration.
 
