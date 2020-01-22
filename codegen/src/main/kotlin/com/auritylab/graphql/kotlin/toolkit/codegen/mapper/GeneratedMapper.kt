@@ -77,6 +77,36 @@ internal class GeneratedMapper(
     }
 
     /**
+     * Will return the [MemberName] which points to a string which contains the name of the container for the given field resolver.
+     */
+    fun getFieldResolverContainerMemberName(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): MemberName {
+        val resolver = getGeneratedFieldResolverClassName(container, field)
+
+        return MemberName(
+            ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Meta"),
+            "CONTAINER"
+        )
+    }
+
+    /**
+     * Will return the [MemberName] which points to a string which contains the name of the field for the given field resolver.
+     */
+    fun getFieldResolverFieldMemberName(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): MemberName {
+        val resolver = getGeneratedFieldResolverClassName(container, field)
+
+        return MemberName(
+            ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Meta"),
+            "FIELD"
+        )
+    }
+
+    /**
      * Will build a new [ClassName] with the given [className] as identifier for the class.
      * Additional package tags will be joined with dots (.) and appended to the base package.
      */

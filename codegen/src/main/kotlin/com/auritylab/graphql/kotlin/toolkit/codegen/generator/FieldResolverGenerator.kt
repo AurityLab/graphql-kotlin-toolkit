@@ -12,6 +12,8 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
@@ -45,13 +47,27 @@ internal class FieldResolverGenerator(
                     .addParameter("env", environmentWrapperClassName)
                     .returns(getKotlinType(field.type)).build()
             )
+            .addType(
+                TypeSpec.companionObjectBuilder("Meta")
+                    .addProperty(
+                        PropertySpec.builder("CONTAINER", STRING, KModifier.CONST)
+                            .initializer("\"${container.name}\"")
+                            .build()
+                    )
+                    .addProperty(
+                        PropertySpec.builder("FIELD", STRING, KModifier.CONST)
+                            .initializer("\"${field.name}\"")
+                            .build()
+                    )
+                    .build()
+            )
             .also { typeSpec ->
                 // Add the resolver annotation if the spring boot integration is enabled.
                 if (options.enableSpringBootIntegration)
                     typeSpec.addAnnotation(
                         SpringBootIntegrationHelper.createResolverAnnotation(
-                            container.name,
-                            field.name
+                            generatedMapper.getFieldResolverContainerMemberName(container, field),
+                            generatedMapper.getFieldResolverFieldMemberName(container, field)
                         )
                     )
 

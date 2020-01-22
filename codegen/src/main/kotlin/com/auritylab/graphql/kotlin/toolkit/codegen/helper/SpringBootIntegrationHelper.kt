@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.MemberName
 
 /**
  * Represents a helper which provides additional code the spring boot integration.
@@ -32,9 +33,9 @@ object SpringBootIntegrationHelper {
      * Will create a annotation which points to the GQLResolver annotation from the spring boot integration.
      * THe given [container] and [field] will be added to the annotation.
      */
-    fun createResolverAnnotation(container: String, field: String): AnnotationSpec {
+    fun createResolverAnnotation(container: MemberName, field: MemberName): AnnotationSpec {
         return AnnotationSpec.builder(resolverAnnotation)
-            .addMember("\"$container\", \"$field\"")
+            .addMember("%M, %M", container, field)
             .build()
     }
 }
