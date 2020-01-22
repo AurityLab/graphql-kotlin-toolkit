@@ -7,7 +7,7 @@ A toolkit for GraphQL, specifically for [Kotlin](https://kotlinlang.org/). This 
 
 Currently available tools:
 * [Code generation](#code-generation)
-* Spring Boot integration
+* [Spring Boot integration](#spring-boot-integration)
 
 ## Code generation
 This tool follows the **schema-first** approach, in which you first write your *schema.graphqls* files and implement the server-side code for it afterwards.
@@ -112,10 +112,11 @@ data class User(
 ```
 
 ## Spring Boot integration
-This integration works in a more opinionated way than e.g. [graphql-java-spring](https://github.com/graphql-java/graphql-java-spring) as it provides additional annotations which can be used to register code for various GraphQL types.
+This integration works in a more opinionated way as it provides additional annotations which can be used to register code for various GraphQL types.
+It also comes with a servlet, which handles all GraphQL requests.
 
 ### Annotations
-The following annotations are provided by this integration:
+You can register your code through the following annotations which are provided by this integration.
 
 ####  [**GQLResolver**](https://github.com/AurityLab/graphql-kotlin-toolkit/blob/master/spring/src/main/kotlin/com/auritylab/graphql/kotlin/toolkit/spring/annotation/GQLResolver.kt)
 Defines a resolver using the given container name and field name.
