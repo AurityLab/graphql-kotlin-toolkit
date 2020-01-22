@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.SpringBootIntegrationHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ClassName
@@ -37,15 +38,24 @@ internal class FieldResolverGenerator(
         return TypeSpec.classBuilder(fieldResolverClassName)
             .addModifiers(KModifier.ABSTRACT)
             .addSuperinterface(ClassName("graphql.schema", "DataFetcher").parameterizedBy(fieldOutputTypeName))
-            .addFunction(FunSpec.builder("resolve").also {
-                it.modifiers.add(KModifier.ABSTRACT)
-
-                it.addParameters(buildResolverFunArguments(field))
-                it.addParameter("env", environmentWrapperClassName)
-
-                it.returns(getKotlinType(field.type))
-            }.build())
+            .addFunction(
+                FunSpec.builder("resolve")
+                    .addModifiers(KModifier.ABSTRACT)
+                    .addParameters(buildResolverFunArguments(field))
+                    .addParameter("env", environmentWrapperClassName)
+                    .returns(getKotlinType(field.type)).build()
+            )
             .also { typeSpec ->
+                // Add the resolver annotation if the spring boot integration is enabled.
+                if (options.enableSpringBootIntegration)
+                    typeSpec.addAnnotation(
+                        SpringBootIntegrationHelper.createResolverAnnotation(
+                            container.name,
+                            field.name
+                        )
+                    )
+
+
                 field.arguments.forEach {
                     typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
                 }

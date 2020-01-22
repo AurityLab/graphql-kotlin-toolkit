@@ -11,7 +11,7 @@ import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLType
 
 internal abstract class AbstractGenerator(
-    private val options: CodegenOptions,
+    val options: CodegenOptions,
     private val kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper
 ) {
