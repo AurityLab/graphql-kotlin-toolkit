@@ -32,5 +32,11 @@ data class CodegenOptions(
      * Describes if the code shall be generated for all found types, enums, etc.
      * If this is [true] it will ignore the generate directive.
      */
-    var generateAll: Boolean = true
+    var generateAll: Boolean = true,
+
+    /**
+     * Describes if the generated code should contain additional code
+     * which can be used to simplify usage with the spring boot integration.
+     */
+    var enableSpringBootIntegration: Boolean = false
 )

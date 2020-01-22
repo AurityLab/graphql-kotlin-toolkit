@@ -13,4 +13,6 @@ open class CodegenExtension(objects: ObjectFactory) {
     val generatedBasePackage = objects.property<String>()
 
     val generateAll = objects.property<Boolean>()
+
+    val enableSpringBootIntegration = objects.property<Boolean>()
 }

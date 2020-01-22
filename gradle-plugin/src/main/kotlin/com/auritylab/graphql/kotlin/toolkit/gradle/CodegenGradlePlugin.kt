@@ -24,7 +24,7 @@ class CodegenGradlePlugin : Plugin<Project> {
 
         project.afterEvaluate {
             val kotlinProjectExtension = this.extensions.findByType<KotlinProjectExtension>()
-                    ?: throw IllegalStateException("Plugin 'org.jetbrains.kotlin.jvm' not applied.")
+                ?: throw IllegalStateException("Plugin 'org.jetbrains.kotlin.jvm' not applied.")
 
             kotlinProjectExtension.sourceSets {
                 "main" {
@@ -40,6 +40,7 @@ class CodegenGradlePlugin : Plugin<Project> {
                 generatedGlobalPrefix.set(generateExtension.generatedGlobalPrefix)
                 generatedBasePackage.set(generateExtension.generatedBasePackage)
                 generateAll.set(generateExtension.generateAll)
+                enableSpringBootIntegration.set(generateExtension.enableSpringBootIntegration)
             }
 
             tasks.withType<KotlinCompile>() {

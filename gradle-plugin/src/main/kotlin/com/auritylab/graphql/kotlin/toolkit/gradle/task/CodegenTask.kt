@@ -2,7 +2,6 @@ package com.auritylab.graphql.kotlin.toolkit.gradle.task
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
-import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -10,6 +9,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.property
+import java.nio.file.Path
 
 open class CodegenTask : DefaultTask() {
     @InputFiles
@@ -29,6 +29,10 @@ open class CodegenTask : DefaultTask() {
     @Input
     @Optional
     val generateAll = project.objects.property<Boolean>()
+
+    @Input
+    @Optional
+    val enableSpringBootIntegration = project.objects.property<Boolean>()
 
     @TaskAction
     fun doGenerate() {
@@ -57,6 +61,10 @@ open class CodegenTask : DefaultTask() {
 
         generateAll.orNull?.also {
             options.generateAll = it
+        }
+
+        enableSpringBootIntegration.orNull?.also {
+            options.enableSpringBootIntegration = it
         }
 
         return options
