@@ -40,7 +40,7 @@ object GraphQLTypeHelper {
         return when (type) {
             !is GraphQLModifiedType -> {
                 // Per default all types are nullable in GraphQL,
-                //therefore always return nullable types for top level types.
+                // therefore always return nullable types for top level types.
                 if (parentType == null)
                     return kotlinType.copy(true)
 

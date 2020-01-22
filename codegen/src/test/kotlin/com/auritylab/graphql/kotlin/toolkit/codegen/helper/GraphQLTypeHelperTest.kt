@@ -62,7 +62,6 @@ internal class GraphQLTypeHelperTest : StringSpec({
             )
         ) { a, b ->
             GraphQLTypeHelper.wrapType(a, ANY).shouldBe(b)
-
         }
     }
 })
