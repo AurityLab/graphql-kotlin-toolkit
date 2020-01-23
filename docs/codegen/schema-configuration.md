@@ -1,6 +1,6 @@
 # Schema configuration
 To make your schema work perfectly with this code generator you need to add some additional information to the schema using the following directives.
-By default the code generator will generate code for all available types, to disable this behavior see here.
+By default the code generator **will generate code for all available types**, to disable this behavior see [here](#disable-generating-code-for-all-types).
 
 #### Directives
 ```graphql
