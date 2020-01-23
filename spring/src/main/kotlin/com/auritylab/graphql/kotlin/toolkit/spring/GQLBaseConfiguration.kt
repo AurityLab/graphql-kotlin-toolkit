@@ -13,11 +13,11 @@ import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.WiringFactory
-import java.util.Optional
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import java.util.Optional
 
 @Component
 @ConditionalOnMissingBean(GraphQL::class)

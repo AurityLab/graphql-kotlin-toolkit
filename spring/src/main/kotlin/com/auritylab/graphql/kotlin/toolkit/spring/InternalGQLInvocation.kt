@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
 
 @Component
-@ConditionalOnMissingBean(GQLInvocation::class)
 internal class InternalGQLInvocation(
     private val gql: GraphQL
 ) : GQLInvocation {
