@@ -10,6 +10,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenera
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.FileSpec
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
@@ -47,11 +48,11 @@ class Codegen(
 
         // Create code for all enum types.
         allTypes.filterIsInstance<GraphQLEnumType>()
-            .forEach { enumGenerator.getEnum(it).writeTo(outputDirectory) }
+            .forEach { write(enumGenerator.getEnum(it)) }
 
         // Will create code for all input object types.
         allTypes.filterIsInstance<GraphQLInputObjectType>()
-            .forEach { inputObjectGenerator.getInputObject(it).writeTo(outputDirectory) }
+            .forEach { write(inputObjectGenerator.getInputObject(it)) }
 
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
@@ -62,15 +63,14 @@ class Codegen(
 
                 // Generate for object type if the directive is given and does not have a representation class.
                 if ((options.generateAll && !objectHasRepresentation) || (objectHasGenerate && !objectHasRepresentation))
-                    objectTypeGenerator.getObjectType(objectType).writeTo(outputDirectory)
+                    write(objectTypeGenerator.getObjectType(objectType))
 
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
-                        objectHasGenerate ||
-                        DirectiveHelper.hasGenerateDirective(fieldDefinition)
+                        objectHasResolver ||
+                        DirectiveHelper.hasResolverDirective(fieldDefinition)
                     )
-                        fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition)
-                            .writeTo(outputDirectory)
+                        write(fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition))
                 }
             }
 
@@ -80,22 +80,19 @@ class Codegen(
                 val generatedForInterface = DirectiveHelper.hasGenerateDirective(interfaceType)
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
-                    if (options.generateAll || generatedForInterface || DirectiveHelper.hasGenerateDirective(
-                            fieldDefinition
-                        )
+                    if (options.generateAll
+                        || generatedForInterface
+                        || DirectiveHelper.hasGenerateDirective(fieldDefinition)
                     )
-                        fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition)
-                            .writeTo(outputDirectory)
+                        write(fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition))
                 }
             }
 
         // Will create code for the value wrapper.
-        valueWrapperGenerator.getValueWrapper()
-            .writeTo(outputDirectory)
+        write(valueWrapperGenerator.getValueWrapper())
 
         // Will create code for the environment wrapper.
-        environmentWrapperGenerator.getEnvironmentWrapper()
-            .writeTo(outputDirectory)
+        write(environmentWrapperGenerator.getEnvironmentWrapper())
     }
 
     /**
@@ -110,4 +107,10 @@ class Codegen(
 
         return directory
     }
+
+    /**
+     * Will write the given [spec] to the [outputDirectory].
+     */
+    private fun write(spec: FileSpec) =
+        spec.writeTo(outputDirectory)
 }
