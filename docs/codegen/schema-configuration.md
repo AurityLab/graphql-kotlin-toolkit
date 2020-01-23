@@ -1,5 +1,6 @@
 # Schema configuration
 To make your schema work perfectly with this code generator you need to add some additional information to the schema using the following directives.
+By default the code generator will generate code for all available types, to disable this behavior see here.
 
 #### Directives
 ```graphql
@@ -73,4 +74,14 @@ data class User(
     val name: String?,
     val surname: String?
 )
+```
+
+## Disable generating code for all types
+As described above, it will generate code for all available types, this behavior can be controlled using the following property:
+```kotlin
+graphqlKotlinCodegen {
+    // ...
+    generateAll.set(false)
+    // ...
+}
 ```
