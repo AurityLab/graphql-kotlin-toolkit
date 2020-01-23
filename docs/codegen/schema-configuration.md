@@ -1,5 +1,17 @@
-# Configuration
-To make your schema work perfectly with this code generator you need to add some additional information to the schema using the previously given directives.
+# Schema configuration
+To make your schema work perfectly with this code generator you need to add some additional information to the schema using the following directives.
+
+#### Directives
+```graphql
+# Defines the representation of a object or scalar in the kotlin code.
+directive @kRepresentation(class: String!) on OBJECT | SCALAR
+
+# Tells the code generator that a data class for the object shall be generated.
+directive @kGenerate on OBJECT
+
+# Tells the code generator that a resolver shall be generated.
+directive @kResolver on FIELD_DEFINITION | OBJECT | INTERFACE                                                        
+```
 
 #### Bind object type to existing class (`@kRepresentation`)
 Given the following schema:
