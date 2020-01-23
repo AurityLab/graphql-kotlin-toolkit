@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.gradle.task
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.Codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
+import java.nio.file.Path
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -9,7 +10,6 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.property
-import java.nio.file.Path
 
 open class CodegenTask : DefaultTask() {
     @InputFiles

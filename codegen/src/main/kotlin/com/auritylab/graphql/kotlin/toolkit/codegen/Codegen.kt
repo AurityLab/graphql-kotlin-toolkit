@@ -80,9 +80,9 @@ class Codegen(
                 val generatedForInterface = DirectiveHelper.hasGenerateDirective(interfaceType)
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
-                    if (options.generateAll
-                        || generatedForInterface
-                        || DirectiveHelper.hasGenerateDirective(fieldDefinition)
+                    if (options.generateAll ||
+                        generatedForInterface ||
+                        DirectiveHelper.hasGenerateDirective(fieldDefinition)
                     )
                         write(fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition))
                 }

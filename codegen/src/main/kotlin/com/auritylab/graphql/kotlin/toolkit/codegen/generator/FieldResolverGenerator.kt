@@ -71,7 +71,6 @@ internal class FieldResolverGenerator(
                         )
                     )
 
-
                 field.arguments.forEach {
                     typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
                 }
