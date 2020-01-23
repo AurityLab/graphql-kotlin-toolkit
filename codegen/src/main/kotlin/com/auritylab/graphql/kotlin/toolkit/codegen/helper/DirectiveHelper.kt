@@ -40,7 +40,7 @@ object DirectiveHelper {
      */
     fun getRepresentationClass(container: GraphQLDirectiveContainer): ClassName? {
         // Nothing to do here...
-        if (hasRepresentationDirective(container))
+        if (!hasRepresentationDirective(container))
             return null
 
         // Fetch the directive, the class argument and cast the value to `String?`.
