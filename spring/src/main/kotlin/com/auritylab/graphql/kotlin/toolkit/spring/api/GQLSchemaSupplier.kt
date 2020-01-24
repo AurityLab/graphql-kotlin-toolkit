@@ -2,6 +2,9 @@ package com.auritylab.graphql.kotlin.toolkit.spring.api
 
 import org.springframework.core.io.DefaultResourceLoader
 
+/**
+ * Describes a supplier for multiple GraphQL schemas.
+ */
 class GQLSchemaSupplier private constructor(strings: Collection<String>) {
     internal val schemaStrings: Collection<String> = strings
 
