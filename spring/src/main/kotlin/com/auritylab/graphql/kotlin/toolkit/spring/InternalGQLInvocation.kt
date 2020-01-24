@@ -5,7 +5,6 @@ import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
 import java.util.concurrent.CompletableFuture
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
 
