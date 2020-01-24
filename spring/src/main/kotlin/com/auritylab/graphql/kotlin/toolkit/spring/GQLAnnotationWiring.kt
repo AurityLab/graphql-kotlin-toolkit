@@ -27,11 +27,11 @@ import org.springframework.stereotype.Component
 class GQLAnnotationWiring(
     private val context: ApplicationContext
 ) {
-    val resolvers = fetchDataFetcherComponents()
-    val directives = fetchDirectiveComponents()
-    val scalars = fetchScalarComponents()
-    val interfaceTypeResolvers: Map<GQLTypeResolver, TypeResolver>
-    val unionTypeResolvers: Map<GQLTypeResolver, TypeResolver>
+    private final val resolvers = fetchDataFetcherComponents()
+    final val directives = fetchDirectiveComponents()
+    private final val scalars = fetchScalarComponents()
+    private final val interfaceTypeResolvers: Map<GQLTypeResolver, TypeResolver>
+    private final val unionTypeResolvers: Map<GQLTypeResolver, TypeResolver>
 
     init {
         val typeResolvers = fetchTypeResolverComponents()
@@ -41,32 +41,34 @@ class GQLAnnotationWiring(
     }
 
     fun getResolver(env: FieldWiringEnvironment): DataFetcher<*>? =
-        resolvers.filter {
-            env.parentType.name == it.key.container &&
-                env.fieldDefinition.name == it.key.field
-        }.values.firstOrNull()
+        resolvers.entries
+            .firstOrNull {
+                env.parentType.name == it.key.container &&
+                    env.fieldDefinition.name == it.key.field
+            }?.value
 
     fun getDirective(env: SchemaDirectiveWiringEnvironment<*>): SchemaDirectiveWiring? =
-        directives.filter {
-            if (env.directive != null)
-                env.directive.name == it.key.directive
-            false
-        }.values.firstOrNull()
+        directives.entries
+            .firstOrNull {
+                if (env.directive != null)
+                    env.directive.name == it.key.directive
+                false
+            }?.value
 
     fun getTypeResolver(env: InterfaceWiringEnvironment): TypeResolver? =
-        interfaceTypeResolvers.filter {
-            env.interfaceTypeDefinition.name == it.key.type
-        }.values.firstOrNull()
+        interfaceTypeResolvers.entries
+            .firstOrNull { env.interfaceTypeDefinition.name == it.key.type }
+            ?.value
 
     fun getTypeResolver(env: UnionWiringEnvironment): TypeResolver? =
-        unionTypeResolvers.filter {
-            env.unionTypeDefinition.name == it.key.type
-        }.values.firstOrNull()
+        unionTypeResolvers.entries
+            .firstOrNull { env.unionTypeDefinition.name == it.key.type }
+            ?.value
 
     fun getScalar(env: ScalarWiringEnvironment): GraphQLScalarType? =
-        scalars.filter {
-            env.scalarTypeDefinition.name == it.key.name
-        }.values.firstOrNull()
+        scalars.entries
+            .firstOrNull { env.scalarTypeDefinition.name == it.key.name }
+            ?.value
 
     /**
      * Will fetch all components which are marked with [GQLResolver] or [GQLResolvers].
