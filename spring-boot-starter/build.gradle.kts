@@ -7,6 +7,8 @@ plugins {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     api(project(":spring"))
 }
