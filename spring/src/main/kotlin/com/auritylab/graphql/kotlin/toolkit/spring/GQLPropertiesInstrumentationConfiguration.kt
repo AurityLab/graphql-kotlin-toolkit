@@ -17,6 +17,5 @@ class GQLPropertiesInstrumentationConfiguration {
      */
     @Bean
     @ConditionalOnProperty(name = ["graphql-kotlin-toolkit.spring.enableTracing"], havingValue = "true")
-    fun tracingInstrumentation(): Instrumentation =
-        TracingInstrumentation()
+    fun tracingInstrumentation(): Instrumentation = TracingInstrumentation()
 }
