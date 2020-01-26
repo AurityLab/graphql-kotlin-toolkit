@@ -11,7 +11,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
     implementation(gradleApi())
-    implementation(project(":codegen"))
+    implementation(project(":graphql-kotlin-toolkit-codegen"))
 }
 
 gradlePlugin {

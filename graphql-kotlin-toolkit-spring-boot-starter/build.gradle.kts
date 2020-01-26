@@ -10,7 +10,7 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    api(project(":spring"))
+    api(project(":graphql-kotlin-toolkit-spring"))
 }
 
 tasks.create("sourceJar", Jar::class) {
