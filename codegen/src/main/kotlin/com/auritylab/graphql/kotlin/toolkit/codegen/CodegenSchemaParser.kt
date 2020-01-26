@@ -1,11 +1,10 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.mock.WiringFactoryMock
 import graphql.schema.GraphQLSchema
-import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
+import graphql.schema.idl.UnExecutableSchemaGenerator
 import java.nio.file.Path
 
 /**
@@ -29,10 +28,7 @@ class CodegenSchemaParser(
             baseRegistry.merge(parser.parse(it.toFile()))
         }
 
-        // Create a executable schema with the create registry and the mocked WiringFactory.
-        return generator.makeExecutableSchema(
-            baseRegistry,
-            RuntimeWiring.newRuntimeWiring().wiringFactory(WiringFactoryMock()).build()
-        )
+        // Create a UnExecutable schema with the created type registry.
+        return UnExecutableSchemaGenerator.makeUnExecutableSchema(baseRegistry)
     }
 }
