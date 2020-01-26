@@ -8,12 +8,12 @@ import graphql.schema.idl.InterfaceWiringEnvironment
 import graphql.schema.idl.ScalarWiringEnvironment
 import graphql.schema.idl.UnionWiringEnvironment
 import graphql.schema.idl.WiringFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component
 
 @Component
-@ConditionalOnMissingBean(WiringFactory::class)
-internal class InternalGQLWiringFactory(
+class GQLWiringFactory(
     private val annotationWiring: GQLAnnotationWiring
 ) : WiringFactory {
     override fun getDataFetcher(environment: FieldWiringEnvironment): DataFetcher<*> =

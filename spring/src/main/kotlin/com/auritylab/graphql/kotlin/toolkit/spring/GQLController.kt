@@ -5,24 +5,23 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.server.ResponseStatusException
+import java.util.concurrent.CompletableFuture
 
-@Component
+@RestController
 internal class GQLController(
     private val objectMapper: ObjectMapper,
-    private val invocation: GQLInvocation,
-    private val properties: GQLProperties
+    private val invocation: GQLInvocation
 ) {
     companion object {
         private const val GRAPHQL_CONTENT_TYPE = "application/graphql"
@@ -34,7 +33,7 @@ internal class GQLController(
      * Implements the specs: https://graphql.org/learn/serving-over-http/#get-request
      */
     @RequestMapping(
-        value = ["\${graphql-kotlin-toolkit.spring:endpoint}"],
+        value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.GET],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
@@ -55,10 +54,10 @@ internal class GQLController(
      * Implements the specs: https://graphql.org/learn/serving-over-http/#post-request
      */
     @RequestMapping(
-        value = ["\${graphql-kotlin-toolkit.spring:endpoint}"],
+        value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+        // consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
     )
     fun post(
         @RequestHeader(value = HttpHeaders.CONTENT_TYPE, required = false) contentType: String,
