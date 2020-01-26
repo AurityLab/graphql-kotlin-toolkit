@@ -18,10 +18,22 @@ class GQLSchemaSupplier private constructor(strings: Collection<String>) {
             GQLSchemaSupplier(strings)
 
         /**
+         * Will use the given [strings] as schema.
+         */
+        fun ofStrings(vararg strings: String): GQLSchemaSupplier =
+            ofStrings(strings.asList())
+
+        /**
          * Will resolve the given [files] and use their content as schemas.
          */
         fun ofResourceFiles(files: Collection<String>): GQLSchemaSupplier =
             GQLSchemaSupplier(files.map { resolveResourceFile(it) })
+
+        /**
+         * Will resolve the given [files] and use their content as schemas.
+         */
+        fun ofResourceFiles(vararg files: String): GQLSchemaSupplier =
+            ofResourceFiles(files.asList())
 
         /**
          * Will search for the given [file] on the classpath.
