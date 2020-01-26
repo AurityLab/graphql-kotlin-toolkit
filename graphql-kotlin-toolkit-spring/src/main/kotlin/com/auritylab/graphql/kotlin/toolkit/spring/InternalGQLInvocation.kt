@@ -4,10 +4,10 @@ import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLInvocation
 import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
+import java.util.concurrent.CompletableFuture
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
-import java.util.concurrent.CompletableFuture
 
 @Component
 @ConditionalOnMissingBean(GQLInvocation::class)
