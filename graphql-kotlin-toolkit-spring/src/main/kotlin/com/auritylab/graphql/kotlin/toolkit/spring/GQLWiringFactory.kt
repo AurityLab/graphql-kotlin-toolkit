@@ -8,9 +8,12 @@ import graphql.schema.idl.InterfaceWiringEnvironment
 import graphql.schema.idl.ScalarWiringEnvironment
 import graphql.schema.idl.UnionWiringEnvironment
 import graphql.schema.idl.WiringFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
 
-@Component
+@Configuration
+@ConditionalOnMissingBean(WiringFactory::class)
 class GQLWiringFactory(
     private val annotationResolver: GQLAnnotationResolver
 ) : WiringFactory {

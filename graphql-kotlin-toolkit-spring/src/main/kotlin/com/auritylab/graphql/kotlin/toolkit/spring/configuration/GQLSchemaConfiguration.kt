@@ -1,33 +1,38 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.configuration
 
 import com.auritylab.graphql.kotlin.toolkit.spring.GQLAnnotationResolver
+import com.auritylab.graphql.kotlin.toolkit.spring.GQLWiringFactory
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLSchemaSupplier
 import graphql.schema.GraphQLSchema
+import graphql.schema.idl.EchoingWiringFactory
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.WiringFactory
-import java.util.Optional
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
+import java.util.Optional
 
 @Configuration
+@Import(GQLWiringFactory::class)
 class GQLSchemaConfiguration(
     private val schemaSupplier: Optional<GQLSchemaSupplier>,
-    private val annotationResolver: GQLAnnotationResolver
+    private val annotationResolver: GQLAnnotationResolver,
+    private val wiringFactory: WiringFactory
 ) {
     @Bean
     @ConditionalOnMissingBean(GraphQLSchema::class)
-    fun configureSchema(wiringFactory: WiringFactory): GraphQLSchema = buildSchema(wiringFactory)
+    fun configureSchema(): GraphQLSchema = buildSchema()
 
     /**
      * Will build the [GraphQLSchema].
      */
-    private fun buildSchema(wiringFactory: WiringFactory): GraphQLSchema {
+    private fun buildSchema(): GraphQLSchema {
         return when {
-            schemaSupplier.isPresent -> parseSchema(schemaSupplier.get().schemaStrings, wiringFactory)
+            schemaSupplier.isPresent -> parseSchema(schemaSupplier.get().schemaStrings, EchoingWiringFactory())
             else -> throw IllegalStateException("No GraphQLSchema instance, nor a GQLSchemaSupplier instance was found.")
         }
     }
