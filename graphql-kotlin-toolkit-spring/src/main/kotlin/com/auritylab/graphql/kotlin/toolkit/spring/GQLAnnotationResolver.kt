@@ -13,7 +13,6 @@ import graphql.schema.idl.FieldWiringEnvironment
 import graphql.schema.idl.InterfaceWiringEnvironment
 import graphql.schema.idl.ScalarWiringEnvironment
 import graphql.schema.idl.SchemaDirectiveWiring
-import graphql.schema.idl.SchemaDirectiveWiringEnvironment
 import graphql.schema.idl.UnionWiringEnvironment
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
@@ -30,16 +29,16 @@ class GQLAnnotationResolver(
     private final val resolvers = fetchDataFetcherComponents()
     final val directives = fetchDirectiveComponents()
     private final val scalars = fetchScalarComponents()
-    private final val interfaceTypeResolvers: Map<GQLTypeResolver, TypeResolver>
-    private final val unionTypeResolvers: Map<GQLTypeResolver, TypeResolver>
+    private val typeResolvers = fetchTypeResolverComponents()
+    private final val interfaceTypeResolvers = typeResolvers
+        .filter { it.key.scope == GQLTypeResolver.Scope.INTERFACE }
+    private final val unionTypeResolvers = typeResolvers
+        .filter { it.key.scope == GQLTypeResolver.Scope.UNION }
 
-    init {
-        val typeResolvers = fetchTypeResolverComponents()
-
-        interfaceTypeResolvers = typeResolvers.filter { it.key.scope == GQLTypeResolver.Scope.INTERFACE }
-        unionTypeResolvers = typeResolvers.filter { it.key.scope == GQLTypeResolver.Scope.UNION }
-    }
-
+    /**
+     * Will search for a [DataFetcher] which matches the given [FieldWiringEnvironment].
+     * If none were found it will return null.
+     */
     fun getResolver(env: FieldWiringEnvironment): DataFetcher<*>? =
         resolvers.entries
             .firstOrNull {
@@ -47,24 +46,28 @@ class GQLAnnotationResolver(
                     env.fieldDefinition.name == it.key.field
             }?.value
 
-    fun getDirective(env: SchemaDirectiveWiringEnvironment<*>): SchemaDirectiveWiring? =
-        directives.entries
-            .firstOrNull {
-                if (env.directive != null)
-                    env.directive.name == it.key.directive
-                false
-            }?.value
-
+    /**
+     * Will search for a [TypeResolver] which matches the given [InterfaceWiringEnvironment].
+     * If none were found it will return null.
+     */
     fun getTypeResolver(env: InterfaceWiringEnvironment): TypeResolver? =
         interfaceTypeResolvers.entries
             .firstOrNull { env.interfaceTypeDefinition.name == it.key.type }
             ?.value
 
+    /**
+     * Will search for a [TypeResolver] which matches the given [UnionWiringEnvironment].
+     * If none were found it will return null.
+     */
     fun getTypeResolver(env: UnionWiringEnvironment): TypeResolver? =
         unionTypeResolvers.entries
             .firstOrNull { env.unionTypeDefinition.name == it.key.type }
             ?.value
 
+    /**
+     * Will search for a [GraphQLScalarType] which matches the given [ScalarWiringEnvironment].
+     * If none were found it will return null.
+     */
     fun getScalar(env: ScalarWiringEnvironment): GraphQLScalarType? =
         scalars.entries
             .firstOrNull { env.scalarTypeDefinition.name == it.key.name }
@@ -107,14 +110,11 @@ class GQLAnnotationResolver(
     /**
      * Will fetch all components which are marked with [GQLScalar]
      */
-    private fun fetchScalarComponents(): Map<GQLScalar, GraphQLScalarType> {
-        val components = context.getBeansWithAnnotation(GQLScalar::class.java).values
-
-        return mapComponents<GQLScalar, Coercing<*, *>>(components)
+    private fun fetchScalarComponents(): Map<GQLScalar, GraphQLScalarType> =
+        mapComponents<GQLScalar, Coercing<*, *>>(context.getBeansWithAnnotation(GQLScalar::class.java).values)
             // Map the value to an actual GraphQLScalarType instance.
             .map { Pair(it.key, buildGraphQLScalarType(it.key.name, it.value)) }
             .associate { it }
-    }
 
     /**
      * Will build a new [GraphQLScalarType] instance with the given [name] and [coercing].
@@ -129,13 +129,13 @@ class GQLAnnotationResolver(
      * @param components Collection of all components.
      * @return Map of all valid components mapped with the annotation as key.
      */
-    private inline fun <reified A : Annotation, reified C : Any> mapComponents(components: Collection<Any?>): Map<A, C> {
-        return components
-            // Filter with type check
-            .filterIsInstance<C>()
-            // Associate with the annotation (It assumes there is a annotation of that type).
-            .associateBy {
-                AnnotationUtils.findAnnotation(it::class.java, A::class.java)!!
-            }
-    }
+    private inline fun <reified A : Annotation, reified C : Any> mapComponents(
+        components: Collection<Any?>
+    ): Map<A, C> = components
+        // Filter with type check
+        .filterIsInstance<C>()
+        // Associate with the annotation (It assumes there is a annotation of that type).
+        .associateBy {
+            AnnotationUtils.findAnnotation(it::class.java, A::class.java)!!
+        }
 }
