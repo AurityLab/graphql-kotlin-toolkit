@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.configuration
 
-import com.auritylab.graphql.kotlin.toolkit.spring.GQLAnnotationWiring
+import com.auritylab.graphql.kotlin.toolkit.spring.GQLAnnotationResolver
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLSchemaSupplier
 import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class GQLSchemaConfiguration(
     private val schemaSupplier: Optional<GQLSchemaSupplier>,
-    private val annotationWiring: GQLAnnotationWiring
+    private val annotationResolver: GQLAnnotationResolver
 ) {
     @Bean
     @ConditionalOnMissingBean(GraphQLSchema::class)
@@ -47,7 +47,7 @@ class GQLSchemaConfiguration(
     }
 
     /**
-     * Will build a [RuntimeWiring] with the current [wiringFactory] and all directives from the[annotationWiring].
+     * Will build a [RuntimeWiring] with the current [wiringFactory] and all directives from the[annotationResolver].
      */
     private fun buildRuntimeWiring(wiringFactory: WiringFactory): RuntimeWiring {
         val wiring = RuntimeWiring.newRuntimeWiring()
@@ -56,7 +56,7 @@ class GQLSchemaConfiguration(
         wiring.wiringFactory(wiringFactory)
 
         // Register each directive.
-        annotationWiring.directives.forEach { wiring.directive(it.key.directive, it.value) }
+        annotationResolver.directives.forEach { wiring.directive(it.key.directive, it.value) }
 
         return wiring.build()
     }

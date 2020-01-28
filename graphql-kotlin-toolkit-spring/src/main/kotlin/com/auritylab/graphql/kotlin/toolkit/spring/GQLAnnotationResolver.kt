@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component
  * Including [GQLResolvers], [GQLResolver], [GQLTypeResolver], [GQLDirective] and [GQLScalar].
  */
 @Component
-class GQLAnnotationWiring(
+class GQLAnnotationResolver(
     private val context: ApplicationContext
 ) {
     private final val resolvers = fetchDataFetcherComponents()

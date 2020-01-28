@@ -12,29 +12,29 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLWiringFactory(
-    private val annotationWiring: GQLAnnotationWiring
+    private val annotationResolver: GQLAnnotationResolver
 ) : WiringFactory {
     override fun getDataFetcher(environment: FieldWiringEnvironment): DataFetcher<*> =
-        annotationWiring.getResolver(environment)!!
+        annotationResolver.getResolver(environment)!!
 
     override fun getScalar(environment: ScalarWiringEnvironment): GraphQLScalarType =
-        annotationWiring.getScalar(environment)!!
+        annotationResolver.getScalar(environment)!!
 
     override fun getTypeResolver(environment: InterfaceWiringEnvironment): TypeResolver =
-        annotationWiring.getTypeResolver(environment)!!
+        annotationResolver.getTypeResolver(environment)!!
 
     override fun getTypeResolver(environment: UnionWiringEnvironment): TypeResolver =
-        annotationWiring.getTypeResolver(environment)!!
+        annotationResolver.getTypeResolver(environment)!!
 
     override fun providesScalar(environment: ScalarWiringEnvironment): Boolean =
-        annotationWiring.getScalar(environment) != null
+        annotationResolver.getScalar(environment) != null
 
     override fun providesTypeResolver(environment: InterfaceWiringEnvironment): Boolean =
-        annotationWiring.getTypeResolver(environment) != null
+        annotationResolver.getTypeResolver(environment) != null
 
     override fun providesTypeResolver(environment: UnionWiringEnvironment): Boolean =
-        annotationWiring.getTypeResolver(environment) != null
+        annotationResolver.getTypeResolver(environment) != null
 
     override fun providesDataFetcher(environment: FieldWiringEnvironment): Boolean =
-        annotationWiring.getResolver(environment) != null
+        annotationResolver.getResolver(environment) != null
 }
