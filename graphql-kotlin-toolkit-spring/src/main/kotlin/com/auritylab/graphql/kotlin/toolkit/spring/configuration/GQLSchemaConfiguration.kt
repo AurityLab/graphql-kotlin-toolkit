@@ -10,11 +10,11 @@ import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.WiringFactory
+import java.util.Optional
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import java.util.Optional
 
 @Configuration
 @Import(GQLWiringFactory::class)

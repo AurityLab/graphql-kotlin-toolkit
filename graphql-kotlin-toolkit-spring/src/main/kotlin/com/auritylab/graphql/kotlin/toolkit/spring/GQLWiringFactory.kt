@@ -10,7 +10,6 @@ import graphql.schema.idl.UnionWiringEnvironment
 import graphql.schema.idl.WiringFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Configuration
-import org.springframework.stereotype.Component
 
 @Configuration
 @ConditionalOnMissingBean(WiringFactory::class)
