@@ -5,6 +5,6 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 
 @Configuration
+@ComponentScan
 @ConditionalOnWebApplication
-@ComponentScan("com.auritylab.graphql.kotlin.toolkit.spring")
-open class GraphQLAutoconfiguration
+class GQLAutoConfiguration

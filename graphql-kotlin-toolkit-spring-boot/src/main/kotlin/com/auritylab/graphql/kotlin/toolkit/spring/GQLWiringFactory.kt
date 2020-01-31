@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-@ConditionalOnMissingBean(WiringFactory::class)
 class GQLWiringFactory(
     private val annotationResolver: GQLAnnotationResolver
 ) : WiringFactory {
