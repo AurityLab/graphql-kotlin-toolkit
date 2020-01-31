@@ -1,9 +1,10 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
 import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Directive
-import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Resolver
 import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLResolvers
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Resolver
 import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Scalar
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.TypeResolver
 import graphql.schema.Coercing
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLScalarType

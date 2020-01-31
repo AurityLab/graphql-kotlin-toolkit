@@ -9,11 +9,11 @@ import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.WiringFactory
+import java.util.Optional
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import java.util.Optional
 
 @Configuration
 @Import(AnnotationWiringFactory::class)
@@ -31,7 +31,7 @@ class SchemaConfiguration(
      */
     private fun buildSchema(): GraphQLSchema {
         return when {
-            schemaSupplier.isPresent -> parseSchema(schemaSupplier.get().schemaStrings, wiringFactory)
+            schemaSupplier.isPresent -> parseSchema(schemaSupplier.get().schemas, wiringFactory)
             else -> throw IllegalStateException("No GraphQLSchema instance, nor a GQLSchemaSupplier instance was found.")
         }
     }
