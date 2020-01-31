@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated
 @Validated
 @Configuration
 @ConfigurationProperties("graphql-kotlin-toolkit.spring")
-open class GQLProperties {
+open class Properties {
     /**
      * Represents the endpoint for the GraphQL controller.
      * Defaults to "graphql".
@@ -19,7 +19,7 @@ open class GQLProperties {
     /**
      * Represents the property to access the instrumentation properties.
      */
-    var instrumentation: GQLProperties.Instrumentation = Instrumentation()
+    var instrumentation: Properties.Instrumentation = Instrumentation()
 
     /**
      * Represents all available options for instrumentations.

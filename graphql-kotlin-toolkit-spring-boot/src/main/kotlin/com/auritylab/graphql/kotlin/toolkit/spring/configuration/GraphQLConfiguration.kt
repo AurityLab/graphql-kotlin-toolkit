@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Import
 
 @Configuration
 @ConditionalOnMissingBean(GraphQL::class)
-@Import(GQLSchemaConfiguration::class)
-class GQLConfiguration(
+@Import(SchemaConfiguration::class)
+class GraphQLConfiguration(
     private val context: ApplicationContext,
     private val schema: GraphQLSchema,
     private val exceptionHandler: Optional<DataFetcherExceptionHandler>

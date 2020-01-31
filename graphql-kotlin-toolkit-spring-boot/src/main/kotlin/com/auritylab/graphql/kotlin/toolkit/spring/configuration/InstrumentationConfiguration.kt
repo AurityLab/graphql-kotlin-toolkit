@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
- * Takes care about registering [Instrumentation] beans based on the properties ([GQLProperties]).
+ * Takes care about registering [Instrumentation] beans based on the properties ([Properties]).
  */
 @Configuration
-class GQLInstrumentationConfiguration {
+class InstrumentationConfiguration {
     /**
      * Will conditionally create a bean of type [TracingInstrumentation] if the
      * "graphql-kotlin-toolkit.spring.enableTracing" property is set to "true".

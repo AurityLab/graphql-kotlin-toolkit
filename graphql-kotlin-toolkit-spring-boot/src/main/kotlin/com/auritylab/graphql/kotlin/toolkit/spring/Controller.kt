@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
-import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLInvocation
+import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -19,9 +19,9 @@ import org.springframework.web.context.request.WebRequest
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-internal class GQLController(
+internal class Controller(
     private val objectMapper: ObjectMapper,
-    private val invocation: GQLInvocation
+    private val invocation: GraphQLInvocation
 ) {
     companion object {
         private const val GRAPHQL_CONTENT_TYPE = "application/graphql"
@@ -124,7 +124,7 @@ internal class GQLController(
         variables: Map<String, Any>?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> {
-        val result = invocation.invoke(GQLInvocation.Data(query, operation, variables), request)
+        val result = invocation.invoke(GraphQLInvocation.Data(query, operation, variables), request)
         return result
     }
 

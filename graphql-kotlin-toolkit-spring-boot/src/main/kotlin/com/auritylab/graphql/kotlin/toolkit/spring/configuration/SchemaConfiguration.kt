@@ -1,8 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.configuration
 
-import com.auritylab.graphql.kotlin.toolkit.spring.GQLAnnotationResolver
-import com.auritylab.graphql.kotlin.toolkit.spring.GQLWiringFactory
-import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLSchemaSupplier
+import com.auritylab.graphql.kotlin.toolkit.spring.AnnotationResolver
+import com.auritylab.graphql.kotlin.toolkit.spring.AnnotationWiringFactory
+import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLSchemaSupplier
 import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
 import graphql.schema.idl.SchemaGenerator
@@ -16,10 +16,10 @@ import org.springframework.context.annotation.Import
 import java.util.Optional
 
 @Configuration
-@Import(GQLWiringFactory::class)
-class GQLSchemaConfiguration(
-    private val schemaSupplier: Optional<GQLSchemaSupplier>,
-    private val annotationResolver: GQLAnnotationResolver,
+@Import(AnnotationWiringFactory::class)
+class SchemaConfiguration(
+    private val schemaSupplier: Optional<GraphQLSchemaSupplier>,
+    private val annotationResolver: AnnotationResolver,
     private val wiringFactory: WiringFactory
 ) {
     @Bean

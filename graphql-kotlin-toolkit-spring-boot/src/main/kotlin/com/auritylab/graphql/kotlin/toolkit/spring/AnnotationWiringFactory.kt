@@ -8,12 +8,14 @@ import graphql.schema.idl.InterfaceWiringEnvironment
 import graphql.schema.idl.ScalarWiringEnvironment
 import graphql.schema.idl.UnionWiringEnvironment
 import graphql.schema.idl.WiringFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Configuration
 
+/**
+ * Describes a [WiringFactory] which resolves types using [AnnotationResolver].
+ */
 @Configuration
-class GQLWiringFactory(
-    private val annotationResolver: GQLAnnotationResolver
+class AnnotationWiringFactory(
+    private val annotationResolver: AnnotationResolver
 ) : WiringFactory {
     override fun getDataFetcher(environment: FieldWiringEnvironment): DataFetcher<*> =
         annotationResolver.getResolver(environment)!!

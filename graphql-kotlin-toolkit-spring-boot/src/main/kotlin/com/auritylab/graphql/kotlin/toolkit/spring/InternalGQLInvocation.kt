@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
-import com.auritylab.graphql.kotlin.toolkit.spring.api.GQLInvocation
+import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
 
 @Component
-@ConditionalOnMissingBean(GQLInvocation::class)
+@ConditionalOnMissingBean(GraphQLInvocation::class)
 internal class InternalGQLInvocation(
     private val gql: GraphQL
-) : GQLInvocation {
-    override fun invoke(data: GQLInvocation.Data, request: WebRequest): CompletableFuture<ExecutionResult> {
+) : GraphQLInvocation {
+    override fun invoke(data: GraphQLInvocation.Data, request: WebRequest): CompletableFuture<ExecutionResult> {
         val executionInput = ExecutionInput.newExecutionInput()
             .query(data.query)
             .operationName(data.operationName)

@@ -4,7 +4,7 @@ import graphql.ExecutionResult
 import java.util.concurrent.CompletableFuture
 import org.springframework.web.context.request.WebRequest
 
-interface GQLInvocation {
+interface GraphQLInvocation {
     /**
      * Will execute the GraphQL Query (described in [data]) and return a [CompletableFuture]
      * which contains the [ExecutionResult]. The corresponding [WebRequest] is also supplied

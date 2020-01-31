@@ -7,4 +7,4 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ComponentScan
 @ConditionalOnWebApplication
-class GQLAutoConfiguration
+class AutoConfiguration
