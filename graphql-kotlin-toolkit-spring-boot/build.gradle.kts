@@ -8,16 +8,20 @@ plugins {
 }
 
 dependencies {
+    // Kotlin dependencies.
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    implementation("com.graphql-java:graphql-java:13.0")
+    // Spring (Boot) dependencies.
     implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
     implementation("org.springframework:spring-webmvc:5.2.2.RELEASE")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1")
-
     kapt("org.springframework.boot:spring-boot-configuration-processor:2.2.2.RELEASE")
 
+    // GraphQL-Java dependency.
+    implementation("com.graphql-java:graphql-java:13.0")
+
+    // Test dependencies.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
@@ -53,7 +57,7 @@ tasks.create("javadocJar", Jar::class) {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "spring"
+            artifactId = "spring-boot"
             from(components["java"])
             artifact(tasks.getByName("sourceJar"))
             artifact(tasks.getByName("javadocJar"))

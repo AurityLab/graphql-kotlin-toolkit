@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.toolkit.spring.boot.starter
+package com.auritylab.graphql.kotlin.toolkit.spring
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.ComponentScan
