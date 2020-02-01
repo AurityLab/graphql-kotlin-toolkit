@@ -1,7 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.configuration
 
 import com.auritylab.graphql.kotlin.toolkit.spring.AnnotationResolver
-import com.auritylab.graphql.kotlin.toolkit.spring.AnnotationWiringFactory
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLSchemaSupplier
 import graphql.schema.GraphQLSchema
 import graphql.schema.idl.RuntimeWiring
@@ -9,16 +8,15 @@ import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.WiringFactory
-import java.util.Optional
+import org.springframework.beans.factory.getBeansOfType
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
 
 @Configuration
-@Import(AnnotationWiringFactory::class)
 class SchemaConfiguration(
-    private val schemaSupplier: Optional<GraphQLSchemaSupplier>,
+    private val context: ApplicationContext,
     private val annotationResolver: AnnotationResolver,
     private val wiringFactory: WiringFactory
 ) {
@@ -31,7 +29,7 @@ class SchemaConfiguration(
      */
     private fun buildSchema(): GraphQLSchema {
         return when {
-            schemaSupplier.isPresent -> parseSchema(schemaSupplier.get().schemas, wiringFactory)
+            hasSchemaSuppliers() -> parseSchema(fetchSchemaSuppliers(), wiringFactory)
             else -> throw IllegalStateException("No GraphQLSchema instance, nor a GQLSchemaSupplier instance was found.")
         }
     }
@@ -64,4 +62,20 @@ class SchemaConfiguration(
 
         return wiring.build()
     }
+
+    /**
+     * Will check if there are any beans of type [GraphQLSchemaSupplier].
+     */
+    private fun hasSchemaSuppliers(): Boolean =
+        context.getBeansOfType<GraphQLSchemaSupplier>().isNotEmpty()
+
+    /**
+     * Will fetch all beans of type [GraphQLSchemaSupplier] and merge all schemas into a single [Collection].
+     */
+    private fun fetchSchemaSuppliers(): Collection<String> =
+        context.getBeansOfType<GraphQLSchemaSupplier>().values
+            .fold(mutableSetOf(), { acc, supplier ->
+                acc.addAll(supplier.schemas)
+                acc
+            })
 }
