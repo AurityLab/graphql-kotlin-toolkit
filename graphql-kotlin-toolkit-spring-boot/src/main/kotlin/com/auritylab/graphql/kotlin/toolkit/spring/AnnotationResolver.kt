@@ -1,10 +1,10 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
-import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Directive
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLDirective
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLResolver
 import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLResolvers
-import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Resolver
-import com.auritylab.graphql.kotlin.toolkit.spring.annotation.Scalar
-import com.auritylab.graphql.kotlin.toolkit.spring.annotation.TypeResolver
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLScalar
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLTypeResolver
 import graphql.schema.Coercing
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLScalarType
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 
 /**
  * Will fetch all annotated GraphQL components.
- * Including [GQLResolvers], [Resolver], [TypeResolver], [Directive] and [Scalar].
+ * Including [GQLResolvers], [GQLResolver], [GQLTypeResolver], [GQLDirective] and [GQLScalar].
  */
 @Component
 class AnnotationResolver(
@@ -30,9 +30,9 @@ class AnnotationResolver(
     private final val scalars = fetchScalarComponents()
     private val typeResolvers = fetchTypeResolverComponents()
     private final val interfaceTypeResolvers = typeResolvers
-        .filter { it.key.scope == TypeResolver.Scope.INTERFACE }
+        .filter { it.key.scope == GQLTypeResolver.Scope.INTERFACE }
     private final val unionTypeResolvers = typeResolvers
-        .filter { it.key.scope == TypeResolver.Scope.UNION }
+        .filter { it.key.scope == GQLTypeResolver.Scope.UNION }
 
     /**
      * Will search for a [DataFetcher] which matches the given [FieldWiringEnvironment].
@@ -46,7 +46,7 @@ class AnnotationResolver(
             }?.value
 
     /**
-     * Will search for a [TypeResolver] which matches the given [InterfaceWiringEnvironment].
+     * Will search for a [GQLTypeResolver] which matches the given [InterfaceWiringEnvironment].
      * If none were found it will return null.
      */
     fun getTypeResolver(env: InterfaceWiringEnvironment): graphql.schema.TypeResolver? =
@@ -55,7 +55,7 @@ class AnnotationResolver(
             ?.value
 
     /**
-     * Will search for a [TypeResolver] which matches the given [UnionWiringEnvironment].
+     * Will search for a [GQLTypeResolver] which matches the given [UnionWiringEnvironment].
      * If none were found it will return null.
      */
     fun getTypeResolver(env: UnionWiringEnvironment): graphql.schema.TypeResolver? =
@@ -73,15 +73,15 @@ class AnnotationResolver(
             ?.value
 
     /**
-     * Will fetch all components which are marked with [Resolver] or [GQLResolvers].
+     * Will fetch all components which are marked with [GQLResolver] or [GQLResolvers].
      * The components will then be mapped with the [DataFetcher] instance and the according annotation.
      */
-    private fun fetchDataFetcherComponents(): Map<Resolver, DataFetcher<*>> {
-        val singleComponents = context.getBeansWithAnnotation(Resolver::class.java).values
+    private fun fetchDataFetcherComponents(): Map<GQLResolver, DataFetcher<*>> {
+        val singleComponents = context.getBeansWithAnnotation(GQLResolver::class.java).values
         val multiComponents = context.getBeansWithAnnotation(GQLResolvers::class.java).values
 
         // Map the single components.
-        val flat = mapComponents<Resolver, DataFetcher<*>>(singleComponents)
+        val flat = mapComponents<GQLResolver, DataFetcher<*>>(singleComponents)
 
         // Map the multi components.
         val multi = mapComponents<GQLResolvers, DataFetcher<*>>(multiComponents)
@@ -93,24 +93,24 @@ class AnnotationResolver(
     }
 
     /**
-     * Will fetch all components which are marked with [Directive].
+     * Will fetch all components which are marked with [GQLDirective].
      * The components will be then be mapped with the [SchemaDirectiveWiring] instance and the according annotation.
      */
-    private fun fetchDirectiveComponents(): Map<Directive, SchemaDirectiveWiring> =
-        mapComponents(context.getBeansWithAnnotation(Directive::class.java).values)
+    private fun fetchDirectiveComponents(): Map<GQLDirective, SchemaDirectiveWiring> =
+        mapComponents(context.getBeansWithAnnotation(GQLDirective::class.java).values)
 
     /**
-     * Will fetch all components which are marked with [TypeResolver].
-     * The components will be then mapped with the [TypeResolver] instance and the according instance.
+     * Will fetch all components which are marked with [GQLTypeResolver].
+     * The components will be then mapped with the [GQLTypeResolver] instance and the according instance.
      */
-    private fun fetchTypeResolverComponents(): Map<com.auritylab.graphql.kotlin.toolkit.spring.annotation.TypeResolver, graphql.schema.TypeResolver> =
-        mapComponents(context.getBeansWithAnnotation(TypeResolver::class.java).values)
+    private fun fetchTypeResolverComponents(): Map<com.auritylab.graphql.kotlin.toolkit.spring.annotation.GQLTypeResolver, graphql.schema.TypeResolver> =
+        mapComponents(context.getBeansWithAnnotation(GQLTypeResolver::class.java).values)
 
     /**
-     * Will fetch all components which are marked with [Scalar]
+     * Will fetch all components which are marked with [GQLScalar]
      */
-    private fun fetchScalarComponents(): Map<Scalar, GraphQLScalarType> =
-        mapComponents<Scalar, Coercing<*, *>>(context.getBeansWithAnnotation(Scalar::class.java).values)
+    private fun fetchScalarComponents(): Map<GQLScalar, GraphQLScalarType> =
+        mapComponents<GQLScalar, Coercing<*, *>>(context.getBeansWithAnnotation(GQLScalar::class.java).values)
             // Map the value to an actual GraphQLScalarType instance.
             .map { Pair(it.key, buildGraphQLScalarType(it.key.name, it.value)) }
             .associate { it }

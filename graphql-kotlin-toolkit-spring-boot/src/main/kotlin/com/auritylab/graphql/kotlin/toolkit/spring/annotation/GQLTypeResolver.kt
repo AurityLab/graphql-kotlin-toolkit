@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class TypeResolver(
+annotation class GQLTypeResolver(
     /**
      * The actual name of the type.
      */

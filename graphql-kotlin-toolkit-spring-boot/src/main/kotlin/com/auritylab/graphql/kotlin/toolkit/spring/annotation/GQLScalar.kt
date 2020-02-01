@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Scalar(
+annotation class GQLScalar(
     /**
      * The actual name of the scalar.
      */

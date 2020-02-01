@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 @Component
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Resolver(
+annotation class GQLResolver(
     /**
      * The container in which the field is located.
      */
