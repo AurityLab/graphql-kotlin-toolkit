@@ -9,6 +9,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ObjectTypeGenerato
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.ValueWrapperGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.FileSpec
 import graphql.schema.GraphQLEnumType
@@ -27,12 +28,13 @@ class Codegen(
     private val schema = CodegenSchemaParser(options).parseSchemas(options.schemas)
     private val nameMapper = GeneratedMapper(options)
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
+    private val implementerMapper = ImplementerMapper(options, schema)
     private val outputDirectory = getOutputDirectory()
 
     private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper)
     private val enumGenerator = EnumGenerator(options, kotlinTypeMapper, nameMapper)
     private val fieldResolverGenerator =
-        FieldResolverGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
+        FieldResolverGenerator(options, kotlinTypeMapper, implementerMapper, nameMapper, argumentCodeBlockGenerator)
     private val inputObjectGenerator =
         InputObjectGenerator(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator)
     private val valueWrapperGenerator = ValueWrapperGenerator(options, kotlinTypeMapper, nameMapper)
@@ -77,12 +79,12 @@ class Codegen(
         // Will create code for all interface types.
         allTypes.filterIsInstance<GraphQLInterfaceType>()
             .forEach { interfaceType ->
-                val generatedForInterface = DirectiveHelper.hasGenerateDirective(interfaceType)
+                val generatedForInterface = DirectiveHelper.hasResolverDirective(interfaceType)
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         generatedForInterface ||
-                        DirectiveHelper.hasGenerateDirective(fieldDefinition)
+                        DirectiveHelper.hasResolverDirective(fieldDefinition)
                     )
                         write(fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition))
                 }

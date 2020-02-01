@@ -5,7 +5,9 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockG
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.SpringBootIntegrationHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -17,10 +19,13 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLInterfaceType
+import graphql.schema.GraphQLObjectType
 
 internal class FieldResolverGenerator(
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
+    private val implementorMapper: ImplementerMapper,
     private val generatedMapper: GeneratedMapper,
     private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
 ) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
@@ -64,12 +69,7 @@ internal class FieldResolverGenerator(
             .also { typeSpec ->
                 // Add the resolver annotation if the spring boot integration is enabled.
                 if (options.enableSpringBootIntegration)
-                    typeSpec.addAnnotation(
-                        SpringBootIntegrationHelper.createResolverAnnotation(
-                            generatedMapper.getFieldResolverContainerMemberName(container, field),
-                            generatedMapper.getFieldResolverFieldMemberName(container, field)
-                        )
-                    )
+                    typeSpec.addAnnotation(buildSpringBootIntegrationAnnotation(container, field))
 
                 field.arguments.forEach {
                     typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
@@ -104,5 +104,29 @@ internal class FieldResolverGenerator(
         return field.arguments.map { argument ->
             ParameterSpec(argument.name, getKotlinType(argument.type))
         }
+    }
+
+    private fun buildSpringBootIntegrationAnnotation(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): AnnotationSpec {
+        if (container is GraphQLObjectType) {
+            return SpringBootIntegrationHelper.createResolverAnnotation(
+                generatedMapper.getFieldResolverContainerMemberName(container, field),
+                generatedMapper.getFieldResolverFieldMemberName(container, field)
+            )
+        } else if (container is GraphQLInterfaceType) {
+            // Search for the implementors of the interface and map it to the according field definitions.
+            val implementersMapping = implementorMapper
+                .getImplementers(container)
+                .map {
+                    val fieldDefinition = it.getFieldDefinition(field.name)
+                    Pair(it.name, fieldDefinition.name)
+                }
+
+            return SpringBootIntegrationHelper.createMultiResolverAnnotation(implementersMapping)
+        }
+
+        throw UnsupportedOperationException()
     }
 }

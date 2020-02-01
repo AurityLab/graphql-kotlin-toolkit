@@ -31,11 +31,25 @@ object SpringBootIntegrationHelper {
 
     /**
      * Will create a annotation which points to the GQLResolver annotation from the spring boot integration.
-     * THe given [container] and [field] will be added to the annotation.
+     * The given [container] and [field] will be added to the annotation.
      */
     fun createResolverAnnotation(container: MemberName, field: MemberName): AnnotationSpec {
         return AnnotationSpec.builder(resolverAnnotation)
             .addMember("%M, %M", container, field)
+            .build()
+    }
+
+    /**
+     * Will create a annotation which points to the GQLResolvers annotation from the spring boot integration.
+     * The given [resolvers] is a collection of pairs where [Pair.first] is the container and [Pair.second] is the field.
+     */
+    fun createMultiResolverAnnotation(resolvers: Collection<Pair<String, String>>): AnnotationSpec {
+        return AnnotationSpec.builder(resolversAnnotation)
+            .also {
+                resolvers.forEach { resolver ->
+                    it.addMember("%T(\"%L\", \"%L\")", resolverAnnotation, resolver.first, resolver.second)
+                }
+            }
             .build()
     }
 }

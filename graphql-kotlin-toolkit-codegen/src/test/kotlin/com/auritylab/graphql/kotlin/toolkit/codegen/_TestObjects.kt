@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import graphql.Scalars.GraphQLBoolean
 import graphql.Scalars.GraphQLID
@@ -82,4 +83,5 @@ internal object _TestObjects {
     val nameMapper = GeneratedMapper(mockOptions)
     val kotlinTypeMapper = KotlinTypeMapper(mockOptions, nameMapper)
     val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper)
+    val implementerMapper = ImplementerMapper(mockOptions, schema)
 }

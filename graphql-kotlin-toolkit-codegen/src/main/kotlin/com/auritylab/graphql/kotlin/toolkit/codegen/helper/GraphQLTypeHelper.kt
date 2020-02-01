@@ -4,6 +4,8 @@ import com.squareup.kotlinpoet.COLLECTION
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLModifiedType
 import graphql.schema.GraphQLNonNull
@@ -76,5 +78,13 @@ object GraphQLTypeHelper {
             }
             else -> kotlinType
         }
+    }
+
+    /**
+     * Will search for the [GraphQLFieldDefinition] on the given [container] with the given name ([field]).
+     * If no [GraphQLFieldDefinition] were found `null` will be returned.
+     */
+    private fun getFieldDefinition(container: GraphQLFieldsContainer, field: String): GraphQLFieldDefinition? {
+        return container.getFieldDefinition(field)
     }
 }
