@@ -10,26 +10,26 @@ private data class Data(override val schemas: Collection<String>) : GraphQLSchem
 /**
  * Will use the given [strings] as schemas.
  */
-fun GraphQLSchemaSupplier.ofStrings(strings: Collection<String>): GraphQLSchemaSupplier =
+fun schemaOfStrings(strings: Collection<String>): GraphQLSchemaSupplier =
     Data(strings)
 
 /**
  * Will use the given [strings] as schema.
  */
-fun GraphQLSchemaSupplier.ofStrings(vararg strings: String): GraphQLSchemaSupplier =
-    ofStrings(strings.asList())
+fun schemaOfStrings(vararg strings: String): GraphQLSchemaSupplier =
+    schemaOfStrings(strings.asList())
 
 /**
  * Will resolve the given [files] and use their content as schemas.
  */
-fun GraphQLSchemaSupplier.ofResourceFiles(files: Collection<String>): GraphQLSchemaSupplier =
+fun schemaOfResourceFiles(files: Collection<String>): GraphQLSchemaSupplier =
     Data(files.map { resolveResourceFile(it) })
 
 /**
  * Will resolve the given [files] and use their content as schemas.
  */
-fun GraphQLSchemaSupplier.ofResourceFiles(vararg files: String): GraphQLSchemaSupplier =
-    ofResourceFiles(files.asList())
+fun schemaOfResourceFiles(vararg files: String): GraphQLSchemaSupplier =
+    schemaOfResourceFiles(files.asList())
 
 /**
  * Will search for the given [file] on the classpath.
