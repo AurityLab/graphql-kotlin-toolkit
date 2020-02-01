@@ -7,6 +7,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.SpringBootIntegration
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -16,6 +17,7 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
@@ -39,7 +41,7 @@ internal class FieldResolverGenerator(
     private fun buildFieldResolverClass(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): TypeSpec {
         val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
         val fieldOutputTypeName = getKotlinType(field.type)
-        val parentType = getKotlinType(container).copy(false)
+        val parentType = getParentType(container).copy(false)
         val environmentWrapperClassName = generatedMapper.getEnvironmentWrapperClassName().parameterizedBy(parentType)
 
         return TypeSpec.classBuilder(fieldResolverClassName)
@@ -100,12 +102,19 @@ internal class FieldResolverGenerator(
             .build()
     }
 
-    private fun buildResolverFunArguments(field: GraphQLFieldDefinition): Collection<ParameterSpec> {
-        return field.arguments.map { argument ->
-            ParameterSpec(argument.name, getKotlinType(argument.type))
-        }
-    }
+    /**
+     * Will build a list of [ParameterSpec] for all parameters of the given [GraphQLFieldDefinition].
+     */
+    private fun buildResolverFunArguments(field: GraphQLFieldDefinition): Collection<ParameterSpec> =
+        field.arguments
+            .map { argument -> ParameterSpec(argument.name, getKotlinType(argument.type)) }
 
+    /**
+     * Will build the [AnnotationSpec] for the Spring Boot integration support. If the given [container] is a
+     * [GraphQLObjectType] it will return a GQLResolver annotation which points to a single field definition. If it is
+     * a [GraphQLInterfaceType] it will return a GQLResolvers annotation which points to all all implementors
+     * field definitions.
+     */
     private fun buildSpringBootIntegrationAnnotation(
         container: GraphQLFieldsContainer,
         field: GraphQLFieldDefinition
@@ -125,6 +134,33 @@ internal class FieldResolverGenerator(
                 }
 
             return SpringBootIntegrationHelper.createMultiResolverAnnotation(implementersMapping)
+        }
+
+        throw UnsupportedOperationException()
+    }
+
+    /**
+     * Will build the [TypeName] which for the parent type for the resolver. If the [container] is just a
+     * [GraphQLObjectType] it will resolve it to the according Kotlin type. If it's a [GraphQLInterfaceType] it will
+     * fetch all implementers of that interface and check if all of them are represented with the same type.
+     * If they are represented with the same type the according Kotlin type will be returned, if not simply Any will
+     * returned.
+     */
+    private fun getParentType(container: GraphQLFieldsContainer): TypeName {
+        if (container is GraphQLObjectType) {
+            // Simply resolve the container to the according Kotlin type.
+            return getKotlinType(container)
+        } else if (container is GraphQLInterfaceType) {
+            // Fetch the implementers of the interface and map them to the Kotlin type.
+            val implementersTypes = implementorMapper
+                .getImplementers(container)
+                .map { getKotlinType(it) }
+
+            val firstType = implementersTypes.first()
+            return if (implementersTypes.all { it == firstType })
+                firstType
+            else
+                ANY
         }
 
         throw UnsupportedOperationException()
