@@ -1,5 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
+import com.squareup.kotlinpoet.COLLECTION
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
@@ -28,15 +29,21 @@ object GraphQLTypeHelper {
 
     /**
      * Will wrap the given [kotlinType] with the same wrapping of the given [type].
+     * If the wrapped type will be used for a output the parameter [isOutput] shall be set to true.
      */
-    fun wrapType(type: GraphQLType, kotlinType: TypeName): TypeName =
-        internalWrapType(type, null, kotlinType)
+    fun wrapType(type: GraphQLType, kotlinType: TypeName, isOutput: Boolean): TypeName =
+        internalWrapType(type, null, kotlinType, isOutput)
 
     /**
      * Will wrap the given [kotlinType] with the same wrapping of the given [type].
      * This method can be supplied with the [parentType] to define the nullability.
      */
-    private fun internalWrapType(type: GraphQLType, parentType: GraphQLType?, kotlinType: TypeName): TypeName {
+    private fun internalWrapType(
+        type: GraphQLType,
+        parentType: GraphQLType?,
+        kotlinType: TypeName,
+        isOutput: Boolean
+    ): TypeName {
         return when (type) {
             !is GraphQLModifiedType -> {
                 // Per default all types are nullable in GraphQL,
@@ -51,9 +58,11 @@ object GraphQLTypeHelper {
                     kotlinType.copy(true)
             }
             is GraphQLList -> {
-                // Continue to unwrap the wrapped type of this list.
-                // When unwrapping is finished then create a parameterized list.
-                val list = LIST.parameterizedBy(internalWrapType(type.wrappedType, type, kotlinType))
+                // Create the wrapped type of the wrapped type of the list.
+                val inner = internalWrapType(type.wrappedType, type, kotlinType, isOutput)
+
+                // Use a Collection if the type is used for a output type, a List of not.
+                val list = (if (isOutput) COLLECTION else LIST).parameterizedBy(inner)
 
                 // Check if the parent is NonNull.
                 if (parentType is GraphQLNonNull)
@@ -63,7 +72,7 @@ object GraphQLTypeHelper {
             }
             is GraphQLNonNull -> {
                 // If there is a NonNull type just delegate to the wrapped type.
-                return internalWrapType(type.wrappedType, type, kotlinType)
+                return internalWrapType(type.wrappedType, type, kotlinType, isOutput)
             }
             else -> kotlinType
         }

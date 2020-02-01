@@ -46,7 +46,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        return GraphQLTypeHelper.wrapType(type, res)
+        return GraphQLTypeHelper.wrapType(type, res, true)
     }
 
     /**
@@ -63,7 +63,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        return GraphQLTypeHelper.wrapType(type, res)
+        return GraphQLTypeHelper.wrapType(type, res, false)
     }
 
     /**
