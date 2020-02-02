@@ -1,7 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
 import graphql.schema.GraphQLSchema
-import graphql.schema.idl.SchemaGenerator
 import graphql.schema.idl.SchemaParser
 import graphql.schema.idl.TypeDefinitionRegistry
 import graphql.schema.idl.UnExecutableSchemaGenerator
@@ -14,7 +13,6 @@ class CodegenSchemaParser(
     private val options: CodegenOptions
 ) {
     private val parser = SchemaParser()
-    private val generator = SchemaGenerator()
 
     /**
      * Takes the given [files] (which shall be GraphQL schema files) and create a executable [GraphQLSchema].
