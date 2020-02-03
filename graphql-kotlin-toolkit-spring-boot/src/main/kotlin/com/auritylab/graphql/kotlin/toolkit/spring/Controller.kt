@@ -1,11 +1,11 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
+import com.auritylab.kotlin.object_path.KObjectPath
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.MultipartRequest
 import org.springframework.web.server.ResponseStatusException
+import java.util.concurrent.CompletableFuture
 
 @RestController
 internal class Controller(
@@ -56,8 +59,8 @@ internal class Controller(
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE]
-        // consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
     )
     fun post(
         @RequestHeader(value = HttpHeaders.CONTENT_TYPE, required = false) contentType: String,
@@ -69,13 +72,11 @@ internal class Controller(
         @RequestBody(required = false) body: String?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> {
+        val parsedMediaType = MediaType.parseMediaType(contentType)
+
         if (body != null && contentType == MediaType.APPLICATION_JSON_VALUE) {
             val parsed = objectMapper.readValue<Body>(body)
             return execute(parsed.query, parsed.operationName, parsed.variables, request)
-        }
-
-        if (contentType == MediaType.MULTIPART_FORM_DATA_VALUE && operations != null && map != null) {
-            val singleOperation = parseOperations(operations)
         }
 
         if (body != null && contentType == GRAPHQL_CONTENT_TYPE) {
@@ -85,6 +86,37 @@ internal class Controller(
         if (query != null) {
             return execute(query, operationName, variables?.let { parseVariables(it) }, request)
         }
+
+        throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
+    }
+
+    @RequestMapping(
+        value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
+        method = [RequestMethod.POST],
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE]
+    )
+    fun postMultipart(
+        @RequestParam(value = "operations") operations: String,
+        @RequestParam(value = "map") map: String,
+        request: MultipartRequest
+    ): CompletableFuture<ExecutionResult> {
+        val parsedOperation = parseOperations(operations)
+            ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse operations!")
+        val parsedMap = parseMap(map)
+            ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse map!")
+
+        parsedMap.forEach { (key, value) ->
+            value.forEach { path ->
+                KObjectPath(parsedOperation).path(path).set(request.fileMap[key])
+            }
+        }
+
+
+        println(request.fileMap)
+        println(parsedOperation)
+        println(parsedMap)
+
 
         throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
     }
@@ -113,6 +145,14 @@ internal class Controller(
     private fun parseMultiOperation(operations: String): List<Body>? {
         return try {
             objectMapper.readValue<List<Body>>(operations)
+        } catch (ex: JsonMappingException) {
+            null
+        }
+    }
+
+    private fun parseMap(map: String): Map<String, List<String>>? {
+        return try {
+            objectMapper.readValue<Map<String, List<String>>>(map)
         } catch (ex: JsonMappingException) {
             null
         }

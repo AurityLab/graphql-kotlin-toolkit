@@ -21,6 +21,8 @@ dependencies {
     // GraphQL-Java dependency.
     implementation("com.graphql-java:graphql-java:13.0")
 
+    implementation("com.auritylab:kotlin-object-path:1.0.0")
+
     // Test dependencies.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
