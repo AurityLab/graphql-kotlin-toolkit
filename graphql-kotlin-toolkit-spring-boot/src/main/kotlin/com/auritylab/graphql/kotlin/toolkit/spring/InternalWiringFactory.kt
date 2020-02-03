@@ -1,5 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
+import com.auritylab.graphql.kotlin.toolkit.spring.provided.providedUploadScalar
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLScalarType
 import graphql.schema.TypeResolver
@@ -14,14 +15,17 @@ import org.springframework.context.annotation.Configuration
  * Describes a [WiringFactory] which resolves types using [AnnotationResolver].
  */
 @Configuration
-class AnnotationWiringFactory(
+class InternalWiringFactory(
     private val annotationResolver: AnnotationResolver
 ) : WiringFactory {
+    private val providedScalars = mapOf(Pair("Upload", providedUploadScalar))
+
     override fun getDataFetcher(environment: FieldWiringEnvironment): DataFetcher<*> =
         annotationResolver.getResolver(environment)!!
 
     override fun getScalar(environment: ScalarWiringEnvironment): GraphQLScalarType =
-        annotationResolver.getScalar(environment)!!
+        providedScalars.get(environment.scalarTypeDefinition.name)
+            ?: annotationResolver.getScalar(environment)!!
 
     override fun getTypeResolver(environment: InterfaceWiringEnvironment): TypeResolver =
         annotationResolver.getTypeResolver(environment)!!
@@ -30,7 +34,8 @@ class AnnotationWiringFactory(
         annotationResolver.getTypeResolver(environment)!!
 
     override fun providesScalar(environment: ScalarWiringEnvironment): Boolean =
-        annotationResolver.getScalar(environment) != null
+        providedScalars.containsKey(environment.scalarTypeDefinition.name) ||
+            annotationResolver.getScalar(environment) != null
 
     override fun providesTypeResolver(environment: InterfaceWiringEnvironment): Boolean =
         annotationResolver.getTypeResolver(environment) != null
