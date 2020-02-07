@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,7 +18,11 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.multipart.MultipartRequest
 import org.springframework.web.server.ResponseStatusException
+import java.util.concurrent.CompletableFuture
 
+/**
+ * Implements the controller, which handles all incoming requests.
+ */
 @RestController
 internal class Controller(
     private val objectMapper: ObjectMapper,
@@ -32,7 +35,7 @@ internal class Controller(
     /**
      * Will execute the given GraphQL [query].
      *
-     * Implements the specs: https://graphql.org/learn/serving-over-http/#get-request
+     * @see [https://graphql.org/learn/serving-over-http/#get-request]
      */
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
@@ -155,15 +158,16 @@ internal class Controller(
         }
     }
 
+    /**
+     * Will execute the given [query], using the given additional parameters.
+     */
     private fun execute(
         query: String,
-        operation: String?,
+        operationName: String?,
         variables: Map<String, Any>?,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> {
-        val result = invocation.invoke(GraphQLInvocation.Data(query, operation, variables), request)
-        return result
-    }
+    ): CompletableFuture<ExecutionResult> =
+        invocation.invoke(GraphQLInvocation.Data(query, operationName, variables), request)
 
     /**
      * Represents the body for a post request.
