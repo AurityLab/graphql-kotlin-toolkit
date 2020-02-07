@@ -24,9 +24,16 @@ dependencies {
     implementation("com.auritylab:kotlin-object-path:1.0.0")
 
     // Test dependencies.
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
+    testImplementation("org.springframework.boot:spring-boot-starter-web:2.2.2.RELEASE")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.2.2.RELEASE") {
+        exclude("junit", "junit")
+    }
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    testImplementation("me.lazmaid.kraph:kraph:0.6.0")
+    testImplementation("com.natpryce:hamkrest:1.7.0.0")
+
 }
 
 tasks.dokka {
