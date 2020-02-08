@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Implements the controller, which handles all incoming requests.
+ * This supports GET and POST requests.
  */
 @RestController
 internal class Controller(
@@ -33,9 +34,11 @@ internal class Controller(
     }
 
     /**
-     * Will execute the given GraphQL [query].
+     * Will accept GET requests. The [query] has to be preset, [operationName] and [variables] are optional.
      *
-     * @see [https://graphql.org/learn/serving-over-http/#get-request]
+     * See:
+     * - https://graphql.org/learn/serving-over-http/#get-request
+     * - https://github.com/APIs-guru/graphql-over-http#get
      */
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
@@ -43,14 +46,21 @@ internal class Controller(
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun get(
-        @RequestParam("query") query: String,
-        @RequestParam(value = "operationName", required = false) operation: String?,
+        @RequestParam(value = "query", required = false) query: String?,
+        @RequestParam(value = "operationName", required = false) operationName: String?,
         @RequestParam(value = "variables", required = false) variables: String?,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> =
-        execute(query, operation, variables?.let { parseVariables(it) }, request)
+    ): CompletableFuture<ExecutionResult> {
+        // The query parameter must be present.
+        if (query == null)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Query parameter not found")
+
+        return execute(query, operationName, variables, request)
+    }
 
     /**
+     * Will accept POST requests.
+     *
      * Will execute a query in multiple ways:
      * - [body] is given and Content-Type is `application/json`
      * - [query] is given.
@@ -65,18 +75,16 @@ internal class Controller(
         consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
     )
     fun post(
-        @RequestHeader(value = HttpHeaders.CONTENT_TYPE, required = false) contentType: String,
+        @RequestHeader(value = HttpHeaders.CONTENT_TYPE) contentType: String,
         @RequestParam(value = "query", required = false) query: String?,
         @RequestParam(value = "operationName", required = false) operationName: String?,
         @RequestParam(value = "variables", required = false) variables: String?,
-        @RequestParam(value = "operations", required = false) operations: String?,
-        @RequestParam(value = "map", required = false) map: String?,
         @RequestBody(required = false) body: String?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> {
         val parsedMediaType = MediaType.parseMediaType(contentType)
 
-        if (body != null && contentType == MediaType.APPLICATION_JSON_VALUE) {
+        if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
             val parsed = objectMapper.readValue<Body>(body)
             return execute(parsed.query, parsed.operationName, parsed.variables, request)
         }
@@ -86,7 +94,7 @@ internal class Controller(
         }
 
         if (query != null) {
-            return execute(query, operationName, variables?.let { parseVariables(it) }, request)
+            return execute(query, operationName, variables, request)
         }
 
         throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
@@ -103,7 +111,7 @@ internal class Controller(
         @RequestParam(value = "map") map: String,
         request: MultipartRequest
     ): CompletableFuture<ExecutionResult> {
-        val parsedOperation = parseOperations(operations)
+        val parsedOperation = parseSingleOperation(operations)
             ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse operations!")
         val parsedMap = parseMap(map)
             ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse map!")
@@ -129,22 +137,9 @@ internal class Controller(
         return objectMapper.readValue(variables)
     }
 
-    private fun parseOperations(operations: String): List<Body>? {
-        // Try to parse a single operation, if it does not succeed try to parse multiple.
-        return parseSingleOperation(operations) ?: parseMultiOperation(operations)
-    }
-
     private fun parseSingleOperation(operations: String): List<Body>? {
         return try {
             listOf(objectMapper.readValue<Body>(operations))
-        } catch (ex: JsonMappingException) {
-            null
-        }
-    }
-
-    private fun parseMultiOperation(operations: String): List<Body>? {
-        return try {
-            objectMapper.readValue<List<Body>>(operations)
         } catch (ex: JsonMappingException) {
             null
         }
@@ -162,12 +157,12 @@ internal class Controller(
      * Will execute the given [query], using the given additional parameters.
      */
     private fun execute(
-        query: String,
+        query: String?,
         operationName: String?,
-        variables: Map<String, Any>?,
+        variables: String?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> =
-        invocation.invoke(GraphQLInvocation.Data(query, operationName, variables), request)
+        invocation.invoke(GraphQLInvocation.Data(query, operationName, variables?.let { parseVariables(it) }), request)
 
     /**
      * Represents the body for a post request.
@@ -175,6 +170,6 @@ internal class Controller(
     private data class Body(
         val query: String = "",
         val operationName: String?,
-        val variables: Map<String, Any>?
+        val variables: String?
     )
 }

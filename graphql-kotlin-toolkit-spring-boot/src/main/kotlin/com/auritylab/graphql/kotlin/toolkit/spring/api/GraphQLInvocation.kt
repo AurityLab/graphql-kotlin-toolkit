@@ -16,7 +16,7 @@ interface GraphQLInvocation {
      * Describes the GraphQL Query.
      */
     data class Data(
-        val query: String,
+        val query: String?,
         val operationName: String?,
         val variables: Map<String, Any>?
     )

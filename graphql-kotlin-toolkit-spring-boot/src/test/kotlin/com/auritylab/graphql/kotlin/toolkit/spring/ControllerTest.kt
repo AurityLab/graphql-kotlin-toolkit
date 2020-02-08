@@ -1,46 +1,92 @@
 package com.auritylab.graphql.kotlin.toolkit.spring
 
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.reset
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
 import me.lazmaid.kraph.Kraph
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import java.util.UUID
 
 @AutoConfigureMockMvc
+@ActiveProfiles("graphql-invocation-mock")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = [TestConfiguration::class])
+@DirtiesContext
 class ControllerTest {
     @Autowired
-    private lateinit var mockMvc: MockMvc
+    private lateinit var mvc: MockMvc
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var invocation: GraphQLInvocation
 
-    @Test
-    fun test() {
-        mockMvc.get("/graphql") {
-            param("query", simpleQuery())
-
-        }.andExpect {
-            status { isOk }
-            request {
-                asyncStarted()
-            }
-        }
+    @BeforeEach
+    fun resetMock() {
+        reset(invocation)
     }
 
     @Test
-    fun testPost() {
-        mockMvc.get("/graphql") {
-            param("query", simpleQuery())
-        }.andExpect {
-            status { isOk }
-            request { asyncStarted() }
-        }.andDo { print() }
+    fun `(get) should call invocation correctly`() {
+        val inputQuery = simpleQuery()
+
+        mvc.get("/graphql") {
+            param("query", inputQuery)
+        }.andExpect { status { isOk } }
+
+        // Invocation shall be called exactly once with the input query.
+        verify(invocation, times(1))
+            .invoke(argThat { query == inputQuery }, any())
+    }
+
+    @Test
+    fun `(get) should call invocation with variables correctly`() {
+        val inputQuery = simpleQuery()
+        val inputVariables = mapOf(Pair("name", "test"), Pair("surname", "test"))
+
+        mvc.get("/graphql") {
+            param("query", inputQuery)
+            param("variables", objectMapper.writeValueAsString(inputVariables))
+        }.andExpect { status { isOk } }
+
+        // Invocation shall be called exactly once with the input variables.
+        verify(invocation, times(1))
+            .invoke(argThat { variables == inputVariables }, any())
+    }
+
+    @Test
+    fun `(get) should call invocation with operation name correctly`() {
+        val inputQuery = simpleQuery()
+        val inputOperationName = UUID.randomUUID().toString()
+
+        mvc.get("/graphql") {
+            param("query", inputQuery)
+            param("operationName", inputOperationName)
+        }.andExpect { status { isOk } }
+
+        // Invocation shall be called exactly once with the input operation name.
+        verify(invocation, times(1))
+            .invoke(argThat { operationName == inputOperationName }, any())
+    }
+
+    @Test
+    fun `(get) should throw error when query param is not given`() {
+        mvc.get("/graphql")
+            .andExpect { status { `is`(400) } }
     }
 
     private fun simpleQuery(): String {
