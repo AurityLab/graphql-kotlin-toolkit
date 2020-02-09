@@ -47,29 +47,24 @@ internal class Controller(
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun get(
-        @RequestParam(value = "query", required = false) query: String?,
+        @RequestParam(value = "query") query: String,
         @RequestParam(value = "operationName", required = false) operationName: String?,
         @RequestParam(value = "variables", required = false) variables: String?,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> {
-        // The query parameter must be present.
-        if (query == null)
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Query parameter not found")
-
-        return execute(query, operationName, variables, request)
-    }
+    ): CompletableFuture<ExecutionResult> =
+        execute(query, operationName, variables, request)
 
     /**
      * Will accept POST requests.
      *
      * See:
      * - https://graphql.org/learn/serving-over-http/#post-request
+     * - https://github.com/APIs-guru/graphql-over-http#post
      */
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.POST],
-        produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE_VALUE]
+        produces = [MediaType.APPLICATION_JSON_VALUE]
     )
     fun post(
         @RequestHeader(value = HttpHeaders.CONTENT_TYPE) contentType: String,
@@ -82,8 +77,9 @@ internal class Controller(
 
         // If thee body is given and the contentType is application/json just parse the body and execute the data.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
-            val parsedBody = objectMapper.readValue<Body>(body)
-            return execute(parsedBody, request)
+            val operation = parseOperation(body)
+                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
+            return execute(operation, request)
         }
 
         // If a body is given and the contentType is application/graphql just use the body as query.
@@ -98,6 +94,12 @@ internal class Controller(
         throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request")
     }
 
+    /**
+     * Will accept POST (multipart/form-data) requests.
+     *
+     * See:
+     * - https://github.com/jaydenseric/graphql-multipart-request-spec
+     */
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.POST],
@@ -107,41 +109,46 @@ internal class Controller(
     fun postMultipart(
         @RequestParam(value = "operations") operations: String,
         @RequestParam(value = "map") map: String,
-        request: MultipartRequest
+        multipartRequest: MultipartRequest,
+        request: WebRequest
     ): CompletableFuture<ExecutionResult> {
-        val parsedOperation = parseSingleOperation(operations)
-            ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse operations!")
+        val parsedOperation = parseOperation(operations)
+            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
         val parsedMap = parseMap(map)
-            ?: throw ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Unable to parse map!")
+            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse map")
 
-        parsedMap.forEach { (key, value) ->
-            value.forEach { path ->
-                KObjectPath(parsedOperation).path(path).set(request.fileMap[key])
+        parsedMap.forEach { (mapKey, mapValue) ->
+            // Check if the file exists.
+            if (!multipartRequest.fileMap.containsKey(mapKey))
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "File '$mapKey' could not be found")
+
+            mapValue.forEach { path ->
+                try {
+                    KObjectPath(parsedOperation).path(path).set(multipartRequest.fileMap[mapKey])
+                } catch (ex: Exception) {
+                }
             }
         }
 
-        println(request.fileMap)
-        println(parsedOperation)
-        println(parsedMap)
-
-        throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
+        return execute(parsedOperation, request)
     }
 
     /**
      * Will parse the given [variables] input into a [Map].
      * This method utilizes the Jackson [ObjectMapper].
      */
-    private fun parseVariables(variables: String): Map<String, Any> {
-        return objectMapper.readValue(variables)
-    }
+    private fun parseVariables(variables: String): Map<String, Any> = objectMapper.readValue(variables)
 
-    private fun parseSingleOperation(operations: String): List<Body>? {
-        return try {
-            listOf(objectMapper.readValue<Body>(operations))
-        } catch (ex: JsonMappingException) {
+    /**
+     * Will parse the given [operation] input into a [Operation] instance.
+     * This method utilizes the Jackson [ObjectMapper].
+     */
+    private fun parseOperation(operation: String): Operation? =
+        try {
+            objectMapper.readValue(operation)
+        } catch (ex: Exception) {
             null
         }
-    }
 
     private fun parseMap(map: String): Map<String, List<String>>? {
         return try {
@@ -163,17 +170,20 @@ internal class Controller(
         invocation.invoke(GraphQLInvocation.Data(query, operationName, variables?.let { parseVariables(it) }), request)
 
     /**
-     * Will execute the given [body] using the [invocation].
+     * Will execute the given [operation] using the [invocation].
      */
     private fun execute(
-        body: Body, request: WebRequest
+        operation: Operation, request: WebRequest
     ): CompletableFuture<ExecutionResult> =
-        invocation.invoke(GraphQLInvocation.Data(body.query, body.operationName, body.variables), request)
+        invocation.invoke(
+            GraphQLInvocation.Data(operation.query, operation.operationName, operation.variables),
+            request
+        )
 
     /**
-     * Represents the body for a post request.
+     * Represents a GraphQL operation with a [query], [operationName] (optional) and [variables] (optional).
      */
-    private data class Body(
+    private data class Operation(
         val query: String = "",
         val operationName: String?,
         val variables: Map<String, String>?
