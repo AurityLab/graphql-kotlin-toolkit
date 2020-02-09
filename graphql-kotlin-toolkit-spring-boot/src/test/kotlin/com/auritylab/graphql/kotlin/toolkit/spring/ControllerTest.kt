@@ -7,7 +7,9 @@ import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.check
 import me.lazmaid.kraph.Kraph
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +21,9 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
+import org.springframework.web.multipart.MultipartFile
 import java.util.UUID
 
 @AutoConfigureMockMvc
@@ -141,6 +145,26 @@ class ControllerTest {
             }, any())
     }
 
+    @Test
+    fun `(post multipart) should call invocation correctly`() {
+        val inputFileZero = getTestFile()
+        val inputQuery = simpleQuery()
+        val inputOperation = createBody(inputQuery, null, mapOf(Pair("file", null)))
+        val inputMap = objectMapper.writeValueAsString(mapOf(Pair("0", listOf("variables.file"))))
+
+        mvc.multipart("/graphql") {
+            param("operations", inputOperation)
+            param("map", inputMap)
+            file("0", inputFileZero)
+        }.andExpect { status { isOk } }
+
+        verify(invocation, times(1))
+            .invoke(check {
+                Assertions.assertEquals(inputQuery, it.query)
+                Assertions.assertEquals(inputFileZero, (it.variables!!["file"] as MultipartFile).bytes)
+            }, any())
+    }
+
     private fun simpleQuery(): String {
         return Kraph {
             query {
@@ -153,7 +177,7 @@ class ControllerTest {
         }.toGraphQueryString()
     }
 
-    private fun createBody(query: String, operationName: String?, variables: Map<String, String>?): String {
+    private fun createBody(query: String, operationName: String?, variables: Map<String, String?>?): String {
         val map = mutableMapOf<String, Any>()
 
         map["query"] = query
@@ -167,5 +191,9 @@ class ControllerTest {
         }
 
         return objectMapper.writeValueAsString(map)
+    }
+
+    private fun getTestFile(): ByteArray {
+        return javaClass.classLoader.getResourceAsStream("test_file.png").readAllBytes()
     }
 }
