@@ -33,7 +33,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.2")
     testImplementation("me.lazmaid.kraph:kraph:0.6.0")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-
 }
 
 tasks.dokka {

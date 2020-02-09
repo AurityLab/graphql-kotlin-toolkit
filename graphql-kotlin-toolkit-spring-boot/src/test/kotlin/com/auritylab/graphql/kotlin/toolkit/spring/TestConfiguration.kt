@@ -25,5 +25,5 @@ internal class TestConfiguration {
 
     @Bean
     @Profile("graphql-invocation-mock")
-    fun invocation (): GraphQLInvocation = Mockito.mock(GraphQLInvocation::class.java)
+    fun invocation(): GraphQLInvocation = Mockito.mock(GraphQLInvocation::class.java)
 }
