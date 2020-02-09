@@ -2,7 +2,6 @@ package com.auritylab.graphql.kotlin.toolkit.spring
 
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.auritylab.kotlin.object_path.KObjectPath
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
@@ -52,7 +51,7 @@ internal class Controller(
         @RequestParam(value = "variables", required = false) variables: String?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> =
-        execute(query, operationName, variables, request)
+        execute(Operation(query, operationName, variables?.let { parse<Map<String, String>>(it) }), request)
 
     /**
      * Will accept POST requests.
@@ -77,18 +76,18 @@ internal class Controller(
 
         // If thee body is given and the contentType is application/json just parse the body and execute the data.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
-            val operation = parseOperation(body)
+            val operation = parse<Operation>(body)
                 ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
             return execute(operation, request)
         }
 
         // If a body is given and the contentType is application/graphql just use the body as query.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(GRAPHQL_CONTENT_TYPE))
-            return execute(body, null, null, request)
+            return execute(Operation(body, null, null), request)
 
         // If the query parameter is give just is it as query.
         if (query != null)
-            return execute(query, null, null, request)
+            return execute(Operation(query, null, null), request)
 
         // Non of the conditions above matched, therefore an error will be thrown.ø
         throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request")
@@ -96,6 +95,7 @@ internal class Controller(
 
     /**
      * Will accept POST (multipart/form-data) requests.
+     * This implements the graphql-multipart-request-spec.
      *
      * See:
      * - https://github.com/jaydenseric/graphql-multipart-request-spec
@@ -112,9 +112,9 @@ internal class Controller(
         multipartRequest: MultipartRequest,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> {
-        val parsedOperation = parseOperation(operations)
+        val parsedOperation = parse<Operation>(operations)
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
-        val parsedMap = parseMap(map)
+        val parsedMap = parse<Map<String, List<String>>>(map)
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse map")
 
         parsedMap.forEach { (mapKey, mapValue) ->
@@ -134,40 +134,14 @@ internal class Controller(
     }
 
     /**
-     * Will parse the given [variables] input into a [Map].
-     * This method utilizes the Jackson [ObjectMapper].
+     * Will parse the given [input] into [T]. If the given [input] can not be parsed into [T] `null` will be returned.
      */
-    private fun parseVariables(variables: String): Map<String, Any> = objectMapper.readValue(variables)
-
-    /**
-     * Will parse the given [operation] input into a [Operation] instance.
-     * This method utilizes the Jackson [ObjectMapper].
-     */
-    private fun parseOperation(operation: String): Operation? =
+    private inline fun <reified T : Any> parse(input: String): T? =
         try {
-            objectMapper.readValue(operation)
+            objectMapper.readValue<T>(input)
         } catch (ex: Exception) {
             null
         }
-
-    private fun parseMap(map: String): Map<String, List<String>>? {
-        return try {
-            objectMapper.readValue<Map<String, List<String>>>(map)
-        } catch (ex: JsonMappingException) {
-            null
-        }
-    }
-
-    /**
-     * Will execute the given [query], using the given additional parameters.
-     */
-    private fun execute(
-        query: String?,
-        operationName: String?,
-        variables: String?,
-        request: WebRequest
-    ): CompletableFuture<ExecutionResult> =
-        invocation.invoke(GraphQLInvocation.Data(query, operationName, variables?.let { parseVariables(it) }), request)
 
     /**
      * Will execute the given [operation] using the [invocation].
