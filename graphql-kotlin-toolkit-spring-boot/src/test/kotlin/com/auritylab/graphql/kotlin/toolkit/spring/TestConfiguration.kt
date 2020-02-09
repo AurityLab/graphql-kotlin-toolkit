@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @Import(AutoConfiguration::class)
 internal class TestConfiguration {
     @Bean
-    fun objectMapper() = ObjectMapper().registerModule(KotlinModule())
+    fun objectMapper(): ObjectMapper = ObjectMapper().registerModule(KotlinModule())
 
     @Bean
     fun schema() = schemaOfResourceFiles("schemas/schema.graphqls")
