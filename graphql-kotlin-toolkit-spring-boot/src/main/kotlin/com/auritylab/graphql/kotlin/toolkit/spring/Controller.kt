@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.multipart.MultipartRequest
 import org.springframework.web.server.ResponseStatusException
+import java.util.concurrent.CompletableFuture
 
 /**
  * Implements the controller, which handles all incoming requests.
@@ -82,8 +82,8 @@ internal class Controller(
 
         // If thee body is given and the contentType is application/json just parse the body and execute the data.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
-            val parsed = objectMapper.readValue<Body>(body)
-            return execute(parsed.query, parsed.operationName, parsed.variables, request)
+            val parsedBody = objectMapper.readValue<Body>(body)
+            return execute(parsedBody, request)
         }
 
         // If a body is given and the contentType is application/graphql just use the body as query.
@@ -95,7 +95,7 @@ internal class Controller(
             return execute(query, null, null, request)
 
         // Non of the conditions above matched, therefore an error will be thrown.ø
-        throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
+        throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request")
     }
 
     @RequestMapping(
@@ -163,11 +163,19 @@ internal class Controller(
         invocation.invoke(GraphQLInvocation.Data(query, operationName, variables?.let { parseVariables(it) }), request)
 
     /**
+     * Will execute the given [body] using the [invocation].
+     */
+    private fun execute(
+        body: Body, request: WebRequest
+    ): CompletableFuture<ExecutionResult> =
+        invocation.invoke(GraphQLInvocation.Data(body.query, body.operationName, body.variables), request)
+
+    /**
      * Represents the body for a post request.
      */
     private data class Body(
         val query: String = "",
         val operationName: String?,
-        val variables: String?
+        val variables: Map<String, String>?
     )
 }

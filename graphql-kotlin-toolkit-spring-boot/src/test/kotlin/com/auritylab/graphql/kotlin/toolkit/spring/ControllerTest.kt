@@ -7,7 +7,6 @@ import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import java.util.UUID
 import me.lazmaid.kraph.Kraph
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import java.util.UUID
 
 @AutoConfigureMockMvc
 @ActiveProfiles("graphql-invocation-mock")
@@ -93,10 +93,52 @@ class ControllerTest {
 
     @Test
     fun `(post) should call invocation on application-json body correctly`() {
+        val inputQuery = simpleQuery()
+        val inputOperation = UUID.randomUUID().toString()
+        val inputVariables = mapOf(Pair("name", "test"), Pair("surname", "test"))
+        val inputContent = createBody(inputQuery, inputOperation, inputVariables)
+
         mvc.post("/graphql") {
-            content = createBody(simpleQuery(), null, null)
+            content = inputContent
             contentType = MediaType.APPLICATION_JSON
         }.andExpect { status { isOk } }
+
+        verify(invocation, times(1))
+            .invoke(argThat {
+                query == inputQuery
+                    && operationName == inputOperation
+                    && variables == inputVariables
+            }, any())
+    }
+
+    @Test
+    fun `(post) should call invocation on application-graphql body correctly`() {
+        val inputQuery = simpleQuery()
+
+        mvc.post("/graphql") {
+            content = inputQuery
+            contentType = MediaType.parseMediaType("application/graphql")
+        }.andExpect { status { isOk } }
+
+        verify(invocation, times(1))
+            .invoke(argThat {
+                query == inputQuery
+            }, any())
+    }
+
+    @Test
+    fun `(post) should call invocation on query parameter correctly`() {
+        val inputQuery = simpleQuery()
+
+        mvc.post("/graphql") {
+            param("query", inputQuery)
+            contentType = MediaType.TEXT_PLAIN
+        }.andExpect { status { isOk } }
+
+        verify(invocation, times(1))
+            .invoke(argThat {
+                query == inputQuery
+            }, any())
     }
 
     private fun simpleQuery(): String {
