@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import graphql.ExecutionResult
+import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.multipart.MultipartRequest
 import org.springframework.web.server.ResponseStatusException
-import java.util.concurrent.CompletableFuture
 
 /**
  * Implements the controller, which handles all incoming requests.
@@ -173,7 +173,8 @@ internal class Controller(
      * Will execute the given [operation] using the [invocation].
      */
     private fun execute(
-        operation: Operation, request: WebRequest
+        operation: Operation,
+        request: WebRequest
     ): CompletableFuture<ExecutionResult> =
         invocation.invoke(
             GraphQLInvocation.Data(operation.query, operation.operationName, operation.variables),
