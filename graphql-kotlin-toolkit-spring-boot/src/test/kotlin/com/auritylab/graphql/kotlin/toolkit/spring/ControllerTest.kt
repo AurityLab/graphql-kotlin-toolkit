@@ -13,11 +13,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 import java.util.UUID
 
 @AutoConfigureMockMvc
@@ -89,6 +91,14 @@ class ControllerTest {
             .andExpect { status { `is`(400) } }
     }
 
+    @Test
+    fun `(post) should call invocation on application-json body correctly`() {
+        mvc.post("/graphql") {
+            content = createBody(simpleQuery(), null, null)
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect { status { isOk } }
+    }
+
     private fun simpleQuery(): String {
         return Kraph {
             query {
@@ -99,5 +109,21 @@ class ControllerTest {
                 }
             }
         }.toGraphQueryString()
+    }
+
+    private fun createBody(query: String, operationName: String?, variables: Map<String, String>?): String {
+        val map = mutableMapOf<String, Any>()
+
+        map["query"] = query
+
+        operationName?.let {
+            map["operationName"] = it
+        }
+
+        variables?.let {
+            map["variables"] = it
+        }
+
+        return objectMapper.writeValueAsString(map)
     }
 }

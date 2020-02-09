@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.spring
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.auritylab.graphql.kotlin.toolkit.spring.api.schemaOfResourceFiles
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
@@ -17,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @Import(AutoConfiguration::class)
 internal class TestConfiguration {
     @Bean
-    fun objectMapper() = ObjectMapper()
+    fun objectMapper() = ObjectMapper().registerModule(KotlinModule())
 
     @Bean
     fun schema() = schemaOfResourceFiles("schemas/schema.graphqls")

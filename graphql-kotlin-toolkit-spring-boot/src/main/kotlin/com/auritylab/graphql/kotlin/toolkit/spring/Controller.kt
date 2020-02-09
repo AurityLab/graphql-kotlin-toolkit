@@ -30,7 +30,8 @@ internal class Controller(
     private val invocation: GraphQLInvocation
 ) {
     companion object {
-        private const val GRAPHQL_CONTENT_TYPE = "application/graphql"
+        private const val GRAPHQL_CONTENT_TYPE_VALUE = "application/graphql"
+        private val GRAPHQL_CONTENT_TYPE = MediaType.parseMediaType(GRAPHQL_CONTENT_TYPE_VALUE)
     }
 
     /**
@@ -61,42 +62,39 @@ internal class Controller(
     /**
      * Will accept POST requests.
      *
-     * Will execute a query in multiple ways:
-     * - [body] is given and Content-Type is `application/json`
-     * - [query] is given.
-     * - [body] is given and Content-Type is `application/graphql`
-     *
-     * Implements the specs: https://graphql.org/learn/serving-over-http/#post-request
+     * See:
+     * - https://graphql.org/learn/serving-over-http/#post-request
      */
     @RequestMapping(
         value = ["\${graphql-kotlin-toolkit.spring.endpoint:graphql}"],
         method = [RequestMethod.POST],
         produces = [MediaType.APPLICATION_JSON_VALUE],
-        consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE]
+        consumes = [MediaType.APPLICATION_JSON_VALUE, GRAPHQL_CONTENT_TYPE_VALUE]
     )
     fun post(
         @RequestHeader(value = HttpHeaders.CONTENT_TYPE) contentType: String,
         @RequestParam(value = "query", required = false) query: String?,
-        @RequestParam(value = "operationName", required = false) operationName: String?,
-        @RequestParam(value = "variables", required = false) variables: String?,
         @RequestBody(required = false) body: String?,
         request: WebRequest
     ): CompletableFuture<ExecutionResult> {
+        // Parse the given contentType into a MediaType.
         val parsedMediaType = MediaType.parseMediaType(contentType)
 
+        // If thee body is given and the contentType is application/json just parse the body and execute the data.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
             val parsed = objectMapper.readValue<Body>(body)
             return execute(parsed.query, parsed.operationName, parsed.variables, request)
         }
 
-        if (body != null && contentType == GRAPHQL_CONTENT_TYPE) {
+        // If a body is given and the contentType is application/graphql just use the body as query.
+        if (body != null && parsedMediaType.equalsTypeAndSubtype(GRAPHQL_CONTENT_TYPE))
             return execute(body, null, null, request)
-        }
 
-        if (query != null) {
-            return execute(query, operationName, variables, request)
-        }
+        // If the query parameter is give just is it as query.
+        if (query != null)
+            return execute(query, null, null, request)
 
+        // Non of the conditions above matched, therefore an error will be thrown.ø
         throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request!")
     }
 
