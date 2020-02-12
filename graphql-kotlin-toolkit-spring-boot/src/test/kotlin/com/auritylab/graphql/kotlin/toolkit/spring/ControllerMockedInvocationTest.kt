@@ -8,6 +8,7 @@ import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import java.util.UUID
 import me.lazmaid.kraph.Kraph
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +25,6 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.multipart
 import org.springframework.test.web.servlet.post
 import org.springframework.web.multipart.MultipartFile
-import java.util.UUID
 
 @DirtiesContext
 @AutoConfigureMockMvc
