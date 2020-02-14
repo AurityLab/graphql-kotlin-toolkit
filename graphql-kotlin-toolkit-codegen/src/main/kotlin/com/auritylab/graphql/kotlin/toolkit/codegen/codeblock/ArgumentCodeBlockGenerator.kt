@@ -1,6 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.CodeBlock
@@ -10,6 +12,7 @@ import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
+import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLList
@@ -21,24 +24,33 @@ import graphql.schema.GraphQLType
  * Describes a generator which generates functions which are able to access specific arguments from any given GraphQL input.
  */
 internal class ArgumentCodeBlockGenerator(
-    private val typeMapper: KotlinTypeMapper
+    private val typeMapper: KotlinTypeMapper,
+    private val generatedMapper: GeneratedMapper
 ) {
     /**
      * Will build a function which takes a map (parameterized by String, Any) to access the given [argumentName] from it.
      * A [type] is also required to decide how to access the argument value.
      */
-    fun buildArgumentResolverFun(argumentName: String, type: GraphQLType): FunSpec {
-        val kotlinType = typeMapper.getKotlinType(type)
+    fun buildArgumentResolverFun(
+        argumentName: String,
+        type: GraphQLType,
+        fieldDirectiveContainer: GraphQLDirectiveContainer
+    ): FunSpec {
+        val kotlinType = typeMapper.getKotlinType(type, fieldDirectiveContainer)
 
         return FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
             .addModifiers(KModifier.PRIVATE)
             .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(kotlinType)
-            .addCode(buildArgumentResolverCodeBlock(argumentName, type))
+            .addCode(buildArgumentResolverCodeBlock(argumentName, type, fieldDirectiveContainer))
             .build()
     }
 
-    private fun buildArgumentResolverCodeBlock(name: String, type: GraphQLType): CodeBlock {
+    private fun buildArgumentResolverCodeBlock(
+        name: String,
+        type: GraphQLType,
+        fieldDirectiveContainer: GraphQLDirectiveContainer
+    ): CodeBlock {
         val code = CodeBlock.builder()
 
         // Get all layers of the type.
@@ -57,7 +69,24 @@ internal class ArgumentCodeBlockGenerator(
             }
         }
 
-        code.addStatement("return layer${currentIndex - 1}(map[\"$name\"] as %T)", lastType)
+        val lastLayerIndex = currentIndex - 1
+
+        if (lastType.isNullable && DirectiveHelper.hasDoubleNullDirective(fieldDirectiveContainer))
+            code.addStatement(
+                "return if (map.containsKey(\"%L\")) %T(layer%L(map[\"%L\"] as %T)) else null",
+                name,
+                generatedMapper.getValueWrapperName(),
+                lastLayerIndex,
+                name,
+                lastType
+            )
+        else
+            code.addStatement(
+                "return layer%L(map[\"%L\"] as %T)",
+                lastLayerIndex,
+                name,
+                lastType
+            )
 
         return code.build()
     }

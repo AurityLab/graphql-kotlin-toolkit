@@ -17,6 +17,7 @@ import com.squareup.kotlinpoet.SHORT
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
+import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLObjectType
@@ -36,7 +37,7 @@ internal class KotlinTypeMapper(
      * Will try to find a corresponding [TypeName] for the given [type].
      * The returned types already assume the incoming data has been parsed.
      */
-    fun getKotlinType(type: GraphQLType): TypeName {
+    fun getKotlinType(type: GraphQLType, fieldDirectiveContainer: GraphQLDirectiveContainer? = null): TypeName {
         val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
             is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
             is GraphQLInputObjectType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
@@ -46,7 +47,17 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        return GraphQLTypeHelper.wrapType(type, res, true)
+        val wrapped = GraphQLTypeHelper.wrapType(type, res, true)
+
+        // If there is a directive container and contains the DoubleNull directive, the type will additionally
+        // be wrapped into a ValueWrapper.
+        return if (fieldDirectiveContainer != null
+            && DirectiveHelper.hasDoubleNullDirective(fieldDirectiveContainer)
+            && wrapped.isNullable
+        )
+            generatedMapper.getValueWrapperName().parameterizedBy(wrapped).copy(true)
+        else
+            wrapped
     }
 
     /**

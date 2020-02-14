@@ -82,6 +82,6 @@ internal object _TestObjects {
 
     val nameMapper = GeneratedMapper(mockOptions)
     val kotlinTypeMapper = KotlinTypeMapper(mockOptions, nameMapper)
-    val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper)
+    val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
     val implementerMapper = ImplementerMapper(mockOptions, schema)
 }

@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -19,7 +20,7 @@ internal class ValueWrapperGenerator(
         val className = generatedMapper.getValueWrapperName()
 
         // Create the Type Variable with Any as bound.
-        val parameterType = TypeVariableName("T", ClassName("kotlin", "Any").copy(true))
+        val parameterType = TypeVariableName("T", ANY.copy(true))
 
         return getFileSpecBuilder(className)
             .addType(

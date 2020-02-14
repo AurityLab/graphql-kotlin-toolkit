@@ -74,7 +74,7 @@ internal class FieldResolverGenerator(
                     typeSpec.addAnnotation(buildSpringBootIntegrationAnnotation(container, field))
 
                 field.arguments.forEach {
-                    typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
+                    typeSpec.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type, it))
                 }
 
                 typeSpec.addFunction(FunSpec.builder("get")
@@ -107,7 +107,7 @@ internal class FieldResolverGenerator(
      */
     private fun buildResolverFunArguments(field: GraphQLFieldDefinition): Collection<ParameterSpec> =
         field.arguments
-            .map { argument -> ParameterSpec(argument.name, getKotlinType(argument.type)) }
+            .map { argument -> ParameterSpec(argument.name, getKotlinType(argument.type, argument)) }
 
     /**
      * Will build the [AnnotationSpec] for the Spring Boot integration support. If the given [container] is a

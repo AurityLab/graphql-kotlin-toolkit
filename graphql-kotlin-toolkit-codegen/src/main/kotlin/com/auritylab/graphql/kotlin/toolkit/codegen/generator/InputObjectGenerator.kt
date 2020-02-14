@@ -58,7 +58,7 @@ internal class InputObjectGenerator(
         val type = TypeSpec.companionObjectBuilder()
 
         inputObject.fields.forEach {
-            type.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type))
+            type.addFunction(argumentCodeBlockGenerator.buildArgumentResolverFun(it.name, it.type, it))
         }
 
         type.addFunction(createBuilderFun(inputObject))
@@ -71,8 +71,7 @@ internal class InputObjectGenerator(
      */
     private fun buildParameters(inputObject: GraphQLInputObjectType): Collection<ParameterSpec> {
         return inputObject.fields.map { field ->
-            val kType = getKotlinType(field.type)
-                .let { /*if (it.isNullable) createWrappedValue(it) else*/ it }
+            val kType = getKotlinType(field.type, field)
 
             ParameterSpec(field.name, kType)
         }
@@ -84,8 +83,7 @@ internal class InputObjectGenerator(
      */
     private fun buildProperties(inputObject: GraphQLInputObjectType): Collection<PropertySpec> {
         return inputObject.fields.map { field ->
-            val kType = getKotlinType(field.type)
-                .let { /*if (it.isNullable) createWrappedValue(it) else*/ it }
+            val kType = getKotlinType(field.type, field)
 
             PropertySpec.builder(field.name, kType)
                 .initializer(field.name)
@@ -93,25 +91,13 @@ internal class InputObjectGenerator(
         }
     }
 
-    /**
-     * Will wrap the given [type] with a nullable value wrapper.
-     */
-    private fun createWrappedValue(type: TypeName): TypeName {
-        val wrapper = generatedMapper.getValueWrapperName()
-        return wrapper.parameterizedBy(type).copy(true)
-    }
-
     private fun createBuilderFun(inputObject: GraphQLInputObjectType): FunSpec {
         val builderMemberName = generatedMapper.getInputObjectBuilderMemberName(inputObject)
         val inputObjectClassName = generatedMapper.getGeneratedTypeClassName(inputObject)
-        val valueWrapper = generatedMapper.getValueWrapperName()
 
         return FunSpec.builder(builderMemberName.simpleName)
             .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(inputObjectClassName)
-            .also { spec ->
-                // Go through each input object field and create the according parser statement
-            }
             .also { spec ->
                 val namedParameters = inputObject.fields.joinToString(", ") {
                     "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
