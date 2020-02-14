@@ -111,7 +111,7 @@ internal class KotlinTypeMapper(
             return helperResult
 
         // Use the generated class if "generateAll" is enabled or
-        // the object type is annoated with the generate directive
+        // the object type is annotated with the generate directive
         return if (options.generateAll || DirectiveHelper.hasGenerateDirective(type)) {
             // The object has a generated type, return the generated one.
             generatedMapper.getGeneratedTypeClassName(type, false)
