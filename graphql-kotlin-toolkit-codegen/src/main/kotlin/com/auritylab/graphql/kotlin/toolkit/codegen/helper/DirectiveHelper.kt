@@ -15,6 +15,7 @@ object DirectiveHelper {
     private const val GENERATE_DIRECTIVE = "kGenerate"
     private const val RESOLVER_DIRECTIVE = "kResolver"
     private const val REPRESENTATION_DIRECTIVE = "kRepresentation"
+    private const val DOUBLE_NULL_DIRECTIVE = "kDoubleNull"
 
     /**
      * Returns if the given [container] contains the [GENERATE_DIRECTIVE].
@@ -33,6 +34,12 @@ object DirectiveHelper {
      */
     fun hasRepresentationDirective(container: GraphQLDirectiveContainer): Boolean =
         hasDirective(container, REPRESENTATION_DIRECTIVE)
+
+    /**
+     * Returns if the given [container] contains the [DOUBLE_NULL_DIRECTIVE].
+     */
+    fun hasDoubleNullDirective(container: GraphQLDirectiveContainer): Boolean =
+        hasDirective(container, DOUBLE_NULL_DIRECTIVE)
 
     /**
      * Will check if the given [container] contains the [REPRESENTATION_DIRECTIVE] and
