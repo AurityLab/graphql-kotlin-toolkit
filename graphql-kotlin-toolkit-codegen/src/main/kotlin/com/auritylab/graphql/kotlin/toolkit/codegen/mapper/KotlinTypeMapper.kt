@@ -52,7 +52,7 @@ internal class KotlinTypeMapper(
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
         return if (fieldDirectiveContainer != null
-            && DirectiveHelper.hasDoubleNullDirective(fieldDirectiveContainer)
+            && DirectiveHelper.hasDoubleNull(fieldDirectiveContainer)
             && wrapped.isNullable
         )
             generatedMapper.getValueWrapperName().parameterizedBy(wrapped).copy(true)
@@ -123,7 +123,7 @@ internal class KotlinTypeMapper(
 
         // Use the generated class if "generateAll" is enabled or
         // the object type is annotated with the generate directive
-        return if (options.generateAll || DirectiveHelper.hasGenerateDirective(type)) {
+        return if (options.generateAll || DirectiveHelper.hasGenerate(type)) {
             // The object has a generated type, return the generated one.
             generatedMapper.getGeneratedTypeClassName(type, false)
         } else

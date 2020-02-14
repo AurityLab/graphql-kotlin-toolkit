@@ -20,25 +20,25 @@ object DirectiveHelper {
     /**
      * Returns if the given [container] contains the [GENERATE_DIRECTIVE].
      */
-    fun hasGenerateDirective(container: GraphQLDirectiveContainer): Boolean =
+    fun hasGenerate(container: GraphQLDirectiveContainer): Boolean =
         hasDirective(container, GENERATE_DIRECTIVE)
 
     /**
      * Returns if the given [container] contains the [RESOLVER_DIRECTIVE].
      */
-    fun hasResolverDirective(container: GraphQLDirectiveContainer): Boolean =
+    fun hasResolver(container: GraphQLDirectiveContainer): Boolean =
         hasDirective(container, RESOLVER_DIRECTIVE)
 
     /**
      * Returns if the given [container] contains the [REPRESENTATION_DIRECTIVE].
      */
-    fun hasRepresentationDirective(container: GraphQLDirectiveContainer): Boolean =
+    fun hasRepresentation(container: GraphQLDirectiveContainer): Boolean =
         hasDirective(container, REPRESENTATION_DIRECTIVE)
 
     /**
      * Returns if the given [container] contains the [DOUBLE_NULL_DIRECTIVE].
      */
-    fun hasDoubleNullDirective(container: GraphQLDirectiveContainer): Boolean =
+    fun hasDoubleNull(container: GraphQLDirectiveContainer): Boolean =
         hasDirective(container, DOUBLE_NULL_DIRECTIVE)
 
     /**
@@ -47,7 +47,7 @@ object DirectiveHelper {
      */
     fun getRepresentationClass(container: GraphQLDirectiveContainer): ClassName? {
         // Nothing to do here...
-        if (!hasRepresentationDirective(container))
+        if (!hasRepresentation(container))
             return null
 
         // Fetch the directive, the class argument and cast the value to `String?`.

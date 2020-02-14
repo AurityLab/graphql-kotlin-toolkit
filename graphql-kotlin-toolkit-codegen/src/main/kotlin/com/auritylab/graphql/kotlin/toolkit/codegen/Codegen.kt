@@ -59,9 +59,9 @@ class Codegen(
         // Will create code for all object types.
         allTypes.filterIsInstance<GraphQLObjectType>()
             .forEach { objectType ->
-                val objectHasGenerate = DirectiveHelper.hasGenerateDirective(objectType)
+                val objectHasGenerate = DirectiveHelper.hasGenerate(objectType)
                 val objectHasRepresentation = DirectiveHelper.getRepresentationClass(objectType) != null
-                val objectHasResolver = DirectiveHelper.hasResolverDirective(objectType)
+                val objectHasResolver = DirectiveHelper.hasResolver(objectType)
 
                 // Generate for object type if the directive is given and does not have a representation class.
                 if ((options.generateAll && !objectHasRepresentation) || (objectHasGenerate && !objectHasRepresentation))
@@ -70,7 +70,7 @@ class Codegen(
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         objectHasResolver ||
-                        DirectiveHelper.hasResolverDirective(fieldDefinition)
+                        DirectiveHelper.hasResolver(fieldDefinition)
                     )
                         write(fieldResolverGenerator.getFieldResolver(objectType, fieldDefinition))
                 }
@@ -79,12 +79,12 @@ class Codegen(
         // Will create code for all interface types.
         allTypes.filterIsInstance<GraphQLInterfaceType>()
             .forEach { interfaceType ->
-                val generatedForInterface = DirectiveHelper.hasResolverDirective(interfaceType)
+                val generatedForInterface = DirectiveHelper.hasResolver(interfaceType)
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         generatedForInterface ||
-                        DirectiveHelper.hasResolverDirective(fieldDefinition)
+                        DirectiveHelper.hasResolver(fieldDefinition)
                     )
                         write(fieldResolverGenerator.getFieldResolver(interfaceType, fieldDefinition))
                 }
