@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.ParameterSpec
@@ -12,18 +13,19 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 
 internal class ObjectTypeGenerator(
+    private val objectType: GraphQLObjectType,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
     generatedMapper: GeneratedMapper
-) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    fun getObjectType(objectType: GraphQLObjectType): FileSpec {
-        return getFileSpecBuilder(getGeneratedTypeClassName(objectType))
-            .addType(buildObjectDataClass(objectType))
-            .build()
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    override val fileClassName: ClassName = getGeneratedType(objectType)
+
+    override fun build(builder: FileSpec.Builder) {
+        builder.addType(buildObjectDataClass(objectType))
     }
 
     private fun buildObjectDataClass(objectType: GraphQLObjectType): TypeSpec {
-        return TypeSpec.classBuilder(getGeneratedTypeClassName(objectType))
+        return TypeSpec.classBuilder(getGeneratedType(objectType))
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameters(buildParameters(objectType.fieldDefinitions))
@@ -47,3 +49,15 @@ internal class ObjectTypeGenerator(
         }
     }
 }
+
+/*internal class ObjectTypeGenerator(
+    options: CodegenOptions,
+    kotlinTypeMapper: KotlinTypeMapper,
+    generatedMapper: GeneratedMapper
+) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
+    fun getObjectType(objectType: GraphQLObjectType): FileSpec {
+        return getFileSpecBuilder(getGeneratedTypeClassName(objectType))
+            .addType(buildObjectDataClass(objectType))
+            .build()
+    }
+}*/

@@ -25,17 +25,18 @@ import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
 
 internal class FieldResolverGenerator(
+    private val container: GraphQLFieldsContainer,
+    private val field: GraphQLFieldDefinition,
+    private val implementerMapper: ImplementerMapper,
+    private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    private val implementorMapper: ImplementerMapper,
-    private val generatedMapper: GeneratedMapper,
-    private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
-) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    fun getFieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FileSpec {
-        val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
+    generatedMapper: GeneratedMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    override val fileClassName: ClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
 
-        return getFileSpecBuilder(fieldResolverClassName)
-            .addType(buildFieldResolverClass(container, field)).build()
+    override fun build(builder: FileSpec.Builder) {
+        builder.addType(buildFieldResolverClass(container, field))
     }
 
     private fun buildFieldResolverClass(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): TypeSpec {
@@ -126,7 +127,7 @@ internal class FieldResolverGenerator(
             )
         } else if (container is GraphQLInterfaceType) {
             // Search for the implementors of the interface and map it to the according field definitions.
-            val implementersMapping = implementorMapper
+            val implementersMapping = implementerMapper
                 .getImplementers(container)
                 .map {
                     val fieldDefinition = it.getFieldDefinition(field.name)
@@ -152,7 +153,7 @@ internal class FieldResolverGenerator(
             return getKotlinType(container)
         } else if (container is GraphQLInterfaceType) {
             // Fetch the implementers of the interface and map them to the Kotlin type.
-            val implementersTypes = implementorMapper
+            val implementersTypes = implementerMapper
                 .getImplementers(container)
                 .map { getKotlinType(it) }
 

@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
@@ -14,20 +15,19 @@ import graphql.schema.GraphQLEnumType
  * This will generate the actual `enum` which an additional [String] value.
  */
 internal class EnumGenerator(
+    private val enumType: GraphQLEnumType,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    private val generatedMapper: GeneratedMapper
-) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    fun getEnum(enum: GraphQLEnumType): FileSpec {
-        val fieldResolverClassName = generatedMapper.getGeneratedTypeClassName(enum)
+    generatedMapper: GeneratedMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    override val fileClassName: ClassName = getGeneratedType(enumType)
 
-        return getFileSpecBuilder(fieldResolverClassName)
-            .addType(buildEnumClass(enum))
-            .build()
+    override fun build(builder: FileSpec.Builder) {
+        builder.addType(buildEnumClass(enumType))
     }
 
     private fun buildEnumClass(enum: GraphQLEnumType): TypeSpec {
-        return TypeSpec.enumBuilder(getGeneratedTypeClassName(enum))
+        return TypeSpec.enumBuilder(getGeneratedType(enum))
             // Create the primary constructor with a "stringValue" parameter.
             .primaryConstructor(
                 FunSpec.constructorBuilder()

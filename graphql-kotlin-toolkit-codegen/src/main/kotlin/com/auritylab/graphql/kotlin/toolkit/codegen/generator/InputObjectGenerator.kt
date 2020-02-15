@@ -6,6 +6,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -14,7 +15,6 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
-import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLInputObjectType
 
@@ -23,24 +23,23 @@ import graphql.schema.GraphQLInputObjectType
  * It will generate the actual `data class` and a method which can parse a map to the `data class`
  */
 internal class InputObjectGenerator(
+    private val inputObjectType: GraphQLInputObjectType,
+    private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    private val generatedMapper: GeneratedMapper,
-    private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator
-) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    fun getInputObject(inputObject: GraphQLInputObjectType): FileSpec {
-        val fieldResolverName = generatedMapper.getGeneratedTypeClassName(inputObject)
+    generatedMapper: GeneratedMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    override val fileClassName: ClassName = getGeneratedType(inputObjectType)
 
-        return getFileSpecBuilder(fieldResolverName)
-            .addType(buildInputObjectTypeClass(inputObject))
-            .build()
+    override fun build(builder: FileSpec.Builder) {
+        builder.addType(buildInputObjectTypeClass(inputObjectType))
     }
 
     /**
      * Will create the [TypeSpec] which represents the `data class` for the given [inputObject].
      */
     private fun buildInputObjectTypeClass(inputObject: GraphQLInputObjectType): TypeSpec {
-        return TypeSpec.classBuilder(getGeneratedTypeClassName(inputObject))
+        return TypeSpec.classBuilder(getGeneratedType(inputObject))
             // Add the `DATA` modifier to make it a `data class`.
             .addModifiers(KModifier.DATA)
             // Create the primary constructor with all available parameters.
