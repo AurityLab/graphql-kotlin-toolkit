@@ -2,7 +2,7 @@
 ![GitHub Actions](https://github.com/AurityLab/graphql-kotlin-toolkit/workflows/Gradle/badge.svg)
 [![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
 ![Maven Central](https://img.shields.io/maven-central/v/com.auritylab.graphql-kotlin-toolkit/codegen?label=code%20generation)
-![Maven Central](https://img.shields.io/maven-central/v/com.auritylab.graphql-kotlin-toolkit/spring-boot-starter?label=spring%20boot%20starter)
+![Maven Central](https://img.shields.io/maven-central/v/com.auritylab.graphql-kotlin-toolkit/spring-boot?label=spring%20boot%20starter)
 
 A toolkit for GraphQL, specifically for [Kotlin](https://kotlinlang.org/). This toolkit provides some useful tools that are compatible with [graphql-java](https://github.com/graphql-java/graphql-java).
 
