@@ -79,12 +79,4 @@ object GraphQLTypeHelper {
             else -> kotlinType
         }
     }
-
-    /**
-     * Will search for the [GraphQLFieldDefinition] on the given [container] with the given name ([field]).
-     * If no [GraphQLFieldDefinition] were found `null` will be returned.
-     */
-    private fun getFieldDefinition(container: GraphQLFieldsContainer, field: String): GraphQLFieldDefinition? {
-        return container.getFieldDefinition(field)
-    }
 }
