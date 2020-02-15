@@ -19,7 +19,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLInputObjectType
 
 /**
- * Implements a [AbstractGenerator] which will generate the source code for a [GraphQLInputObjectType].
+ * Implements a [AbstractClassGenerator] which will generate the source code for a [GraphQLInputObjectType].
  * It will generate the actual `data class` and a method which can parse a map to the `data class`
  */
 internal class InputObjectGenerator(

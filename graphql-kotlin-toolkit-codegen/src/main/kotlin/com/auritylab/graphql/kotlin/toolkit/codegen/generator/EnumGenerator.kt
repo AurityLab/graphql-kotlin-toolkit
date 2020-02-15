@@ -11,7 +11,7 @@ import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLEnumType
 
 /**
- * Implements a [AbstractGenerator] which will generate the source code for a [GraphQLEnumType].
+ * Implements a [AbstractClassGenerator] which will generate the source code for a [GraphQLEnumType].
  * This will generate the actual `enum` which an additional [String] value.
  */
 internal class EnumGenerator(
