@@ -25,18 +25,10 @@ internal class GeneratedMapper(
     fun getGeneratedTypeClassName(graphQLType: GraphQLType, appendCompanion: Boolean = false): ClassName {
         val name = NamingHelper.uppercaseFirstLetter(graphQLType.name)
         return when (graphQLType) {
-            is GraphQLEnumType -> {
-                buildClassName(name, appendCompanion, "enum")
-            }
-            is GraphQLInputObjectType -> {
-                buildClassName(name, appendCompanion, "inputObject")
-            }
-            is GraphQLObjectType -> {
-                buildClassName(name, appendCompanion, "object")
-            }
-            else -> {
-                throw IllegalArgumentException("Unable to build name for ${graphQLType.name}")
-            }
+            is GraphQLEnumType -> buildClassName(name, appendCompanion, "enum")
+            is GraphQLInputObjectType -> buildClassName(name, appendCompanion, "inputObject")
+            is GraphQLObjectType -> buildClassName(name, appendCompanion, "object")
+            else -> throw IllegalArgumentException("Unable to build name for ${graphQLType.name}")
         }
     }
 
@@ -57,24 +49,20 @@ internal class GeneratedMapper(
     /**
      * Will return the [ClassName] for the value wrapper.
      */
-    fun getValueWrapperName(): ClassName {
-        return buildClassName("V", false, "util")
-    }
+    fun getValueWrapperName(): ClassName =
+        buildClassName("V", false, "util")
 
     /**
      * Will return the [ClassName] for the environment wrapper.
      */
-    fun getEnvironmentWrapperClassName(): ClassName {
-        return buildClassName("Env", false, "util")
-    }
+    fun getEnvironmentWrapperClassName(): ClassName =
+        buildClassName("Env", false, "util")
 
     /**
      * Will return the [MemberName] of the builder method for the given [inputObject].
      */
-    fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName {
-        // Build the MemberName.
-        return MemberName(getGeneratedTypeClassName(inputObject, true), "buildByMap")
-    }
+    fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName =
+        MemberName(getGeneratedTypeClassName(inputObject, true), "buildByMap")
 
     /**
      * Will return the [MemberName] which points to a string which contains the name of the container for the given field resolver.
