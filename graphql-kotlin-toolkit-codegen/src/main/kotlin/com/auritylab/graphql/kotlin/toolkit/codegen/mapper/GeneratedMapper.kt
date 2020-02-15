@@ -95,6 +95,15 @@ internal class GeneratedMapper(
     }
 
     /**
+     * Will return the [ClassName] which points to the Environment class for the given resolver.
+     */
+    fun getFieldResolverEnvironment(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): ClassName {
+        val resolver = getGeneratedFieldResolverClassName(container, field)
+
+        return ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Environment")
+    }
+
+    /**
      * Will build a new [ClassName] with the given [className] as identifier for the class.
      * Additional package tags will be joined with dots (.) and appended to the base package.
      */

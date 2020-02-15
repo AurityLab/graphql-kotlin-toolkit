@@ -41,6 +41,7 @@ class CodegenGradlePlugin : Plugin<Project> {
                 generatedBasePackage.set(generateExtension.generatedBasePackage)
                 generateAll.set(generateExtension.generateAll)
                 enableSpringBootIntegration.set(generateExtension.enableSpringBootIntegration)
+                globalContext.set(generateExtension.globalContext)
             }
 
             tasks.withType<KotlinCompile>() {

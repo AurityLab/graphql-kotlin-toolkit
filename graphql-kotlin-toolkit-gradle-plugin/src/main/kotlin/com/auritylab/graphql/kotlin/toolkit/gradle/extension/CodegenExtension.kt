@@ -15,4 +15,6 @@ open class CodegenExtension(objects: ObjectFactory) {
     val generateAll = objects.property<Boolean>()
 
     val enableSpringBootIntegration = objects.property<Boolean>()
+
+    val globalContext = objects.property<String?>()
 }

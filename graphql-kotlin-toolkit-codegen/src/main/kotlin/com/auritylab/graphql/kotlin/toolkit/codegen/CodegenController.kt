@@ -95,7 +95,6 @@ internal class CodegenController(
      */
     private fun buildAdditionalGenerators(): Collection<FileGenerator> {
         return listOf(
-            generatorFactory.environmentWrapper(),
             generatorFactory.valueWrapper()
         )
     }

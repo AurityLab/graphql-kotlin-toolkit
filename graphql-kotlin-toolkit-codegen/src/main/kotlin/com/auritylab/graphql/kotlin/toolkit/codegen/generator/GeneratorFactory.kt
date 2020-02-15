@@ -21,9 +21,6 @@ internal class GeneratorFactory(
     fun enum(enum: GraphQLEnumType): EnumGenerator =
         EnumGenerator(enum, options, kotlinTypeMapper, generatedMapper)
 
-    fun environmentWrapper(): EnvironmentWrapperGenerator =
-        EnvironmentWrapperGenerator(options, kotlinTypeMapper, generatedMapper)
-
     fun fieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FieldResolverGenerator =
         FieldResolverGenerator(
             container,

@@ -51,9 +51,9 @@ internal class KotlinTypeMapper(
 
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
-        return if (fieldDirectiveContainer != null
-            && DirectiveHelper.hasDoubleNull(fieldDirectiveContainer)
-            && wrapped.isNullable
+        return if (fieldDirectiveContainer != null &&
+            DirectiveHelper.hasDoubleNull(fieldDirectiveContainer) &&
+            wrapped.isNullable
         )
             generatedMapper.getValueWrapperName().parameterizedBy(wrapped).copy(true)
         else

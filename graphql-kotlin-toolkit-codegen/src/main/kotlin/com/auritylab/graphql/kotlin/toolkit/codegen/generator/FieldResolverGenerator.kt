@@ -33,6 +33,10 @@ internal class FieldResolverGenerator(
     kotlinTypeMapper: KotlinTypeMapper,
     generatedMapper: GeneratedMapper
 ) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    companion object {
+        private val dataFetchingEnvironmentClassName = ClassName("graphql.schema", "DataFetchingEnvironment")
+    }
+
     override val fileClassName: ClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
 
     override fun build(builder: FileSpec.Builder) {
@@ -52,7 +56,7 @@ internal class FieldResolverGenerator(
                 FunSpec.builder("resolve")
                     .addModifiers(KModifier.ABSTRACT)
                     .addParameters(buildResolverFunArguments(field))
-                    .addParameter("env", environmentWrapperClassName)
+                    .addParameter("env", generatedMapper.getFieldResolverEnvironment(container, field))
                     .returns(getKotlinType(field.type)).build()
             )
             .addType(
@@ -69,6 +73,7 @@ internal class FieldResolverGenerator(
                     )
                     .build()
             )
+            .addType(buildEnvironmentType())
             .also { typeSpec ->
                 // Add the resolver annotation if the spring boot integration is enabled.
                 if (options.enableSpringBootIntegration)
@@ -95,7 +100,7 @@ internal class FieldResolverGenerator(
                         getFunSpec.addStatement("val map = env.arguments")
                         getFunSpec.addStatement(
                             "return resolve(${resolveArgs}env = %T(env))",
-                            environmentWrapperClassName
+                            generatedMapper.getFieldResolverEnvironment(container, field)
                         )
                     }
                     .build())
@@ -165,5 +170,37 @@ internal class FieldResolverGenerator(
         }
 
         throw UnsupportedOperationException()
+    }
+
+    private fun buildEnvironmentType(): TypeSpec {
+        val parentType = getParentType(container).copy(false)
+        val contextType = options.globalContext?.let { ClassName.bestGuess(it) } ?: ANY
+
+        return TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field))
+            .primaryConstructor(
+                // Create the primary constructor which accepts a parameter "original" of type "DataFetchingEnvironment".
+                FunSpec.constructorBuilder()
+                    .addParameter(ParameterSpec.builder("original", dataFetchingEnvironmentClassName).build())
+                    .build()
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("original", dataFetchingEnvironmentClassName)
+                    .initializer("original")
+                    .build()
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("parent", parentType)
+                    .getter(FunSpec.getterBuilder().addCode("return original.getSource()").build())
+                    .build()
+            )
+            .addProperty(
+                PropertySpec
+                    .builder("context", contextType)
+                    .getter(FunSpec.getterBuilder().addCode("return original.getContext()").build())
+                    .build()
+            )
+            .build()
     }
 }

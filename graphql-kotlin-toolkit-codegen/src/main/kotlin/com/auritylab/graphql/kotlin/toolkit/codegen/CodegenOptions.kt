@@ -38,5 +38,10 @@ data class CodegenOptions(
      * Describes if the generated code should contain additional code
      * which can be used to simplify usage with the spring boot integration.
      */
-    var enableSpringBootIntegration: Boolean = false
+    var enableSpringBootIntegration: Boolean = false,
+
+    /**
+     * Describes the class which will be used as a global context for all resolvers.
+     */
+    var globalContext: String? = null
 )

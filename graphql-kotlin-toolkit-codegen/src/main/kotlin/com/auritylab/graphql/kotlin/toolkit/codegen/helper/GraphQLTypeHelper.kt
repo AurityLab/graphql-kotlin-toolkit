@@ -4,8 +4,6 @@ import com.squareup.kotlinpoet.COLLECTION
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
-import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLModifiedType
 import graphql.schema.GraphQLNonNull
