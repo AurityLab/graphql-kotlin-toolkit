@@ -18,7 +18,6 @@ internal class ImplementerMapper(
     fun getImplementers(input: GraphQLInterfaceType): Collection<GraphQLObjectType> {
         return schema.allTypesAsList
             .filterIsInstance<GraphQLObjectType>()
-            .filter { it != input }
-            .filter { schema.isPossibleType(input, it) }
+            .filter { it != input && schema.isPossibleType(input, it) }
     }
 }
