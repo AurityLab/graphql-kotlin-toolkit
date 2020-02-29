@@ -1,8 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
+import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FileGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.GeneratorFactory
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
@@ -52,9 +52,9 @@ internal class CodegenController(
             .flatMap { objectType ->
                 val internalGenerators = mutableListOf<FileGenerator>()
 
-                val objectHasGenerate = DirectiveHelper.hasGenerate(objectType)
-                val objectHasRepresentation = DirectiveHelper.getRepresentationClass(objectType) != null
-                val objectHasResolver = DirectiveHelper.hasResolver(objectType)
+                val objectHasGenerate = DirectiveFacade.generate[objectType]
+                val objectHasRepresentation = DirectiveFacade.representation[objectType]
+                val objectHasResolver = DirectiveFacade.resolver[objectType]
 
                 // Generate for object type if the directive is given and does not have a representation class.
                 if ((options.generateAll && !objectHasRepresentation) || (objectHasGenerate && !objectHasRepresentation))
@@ -63,7 +63,7 @@ internal class CodegenController(
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         objectHasResolver ||
-                        DirectiveHelper.hasResolver(fieldDefinition)
+                        DirectiveFacade.resolver[fieldDefinition]
                     ) internalGenerators.add(generatorFactory.fieldResolver(objectType, fieldDefinition))
                 }
 
@@ -78,12 +78,12 @@ internal class CodegenController(
             .flatMap { interfaceType ->
                 val internalGenerators = mutableListOf<FileGenerator>()
 
-                val generatedForInterface = DirectiveHelper.hasResolver(interfaceType)
+                val generatedForInterface = DirectiveFacade.resolver[interfaceType]
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         generatedForInterface ||
-                        DirectiveHelper.hasResolver(fieldDefinition)
+                        DirectiveFacade.resolver[fieldDefinition]
                     ) internalGenerators.add(generatorFactory.fieldResolver(interfaceType, fieldDefinition))
                 }
 

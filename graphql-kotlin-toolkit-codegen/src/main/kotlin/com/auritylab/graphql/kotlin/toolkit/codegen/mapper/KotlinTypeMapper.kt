@@ -1,7 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
@@ -52,7 +52,7 @@ internal class KotlinTypeMapper(
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
         return if (fieldDirectiveContainer != null &&
-            DirectiveHelper.hasDoubleNull(fieldDirectiveContainer) &&
+            DirectiveFacade.doubleNull[fieldDirectiveContainer] &&
             wrapped.isNullable
         )
             generatedMapper.getValueWrapperName().parameterizedBy(wrapped).copy(true)
@@ -107,7 +107,7 @@ internal class KotlinTypeMapper(
         if (defaultClass != null) return defaultClass
 
         // Fetch the kotlin representation class or return "Any".
-        return DirectiveHelper.getRepresentationClass(scalarTypeDefinition) ?: ANY
+        return DirectiveFacade.representation.getArguments(scalarTypeDefinition)?.className ?: ANY
     }
 
     /**
@@ -115,7 +115,7 @@ internal class KotlinTypeMapper(
      */
     private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
         // Check if the type is annotated with the "kotlinRepresentation" directive.
-        val helperResult = DirectiveHelper.getRepresentationClass(type)
+        val helperResult = DirectiveFacade.representation.getArguments(type)?.className
 
         // If the directive is available return the content.
         if (helperResult != null)
@@ -123,7 +123,7 @@ internal class KotlinTypeMapper(
 
         // Use the generated class if "generateAll" is enabled or
         // the object type is annotated with the generate directive
-        return if (options.generateAll || DirectiveHelper.hasGenerate(type)) {
+        return if (options.generateAll || DirectiveFacade.generate[type]) {
             // The object has a generated type, return the generated one.
             generatedMapper.getGeneratedTypeClassName(type, false)
         } else

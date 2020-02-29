@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.GeneratorFactory
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
@@ -27,6 +28,9 @@ class Codegen(
      * Will generate code for the types of the [schema].
      */
     fun generate() {
+        // Validate the directives.
+        DirectiveFacade.validateAllOnSchema(schema)
+
         // Build the generators using the CodegenController.
         CodegenController(options, schema.allTypesAsList, generatorFactory)
             .buildGenerators()

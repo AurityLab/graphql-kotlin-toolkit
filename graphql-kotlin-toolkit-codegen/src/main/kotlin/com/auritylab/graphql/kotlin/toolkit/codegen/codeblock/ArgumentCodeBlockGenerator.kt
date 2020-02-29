@@ -1,6 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.DirectiveHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
@@ -71,7 +71,7 @@ internal class ArgumentCodeBlockGenerator(
 
         val lastLayerIndex = currentIndex - 1
 
-        if (lastType.isNullable && DirectiveHelper.hasDoubleNull(fieldDirectiveContainer))
+        if (lastType.isNullable && DirectiveFacade.doubleNull[fieldDirectiveContainer])
             code.addStatement(
                 "return if (map.containsKey(\"%L\")) %T(layer%L(map[\"%L\"] as %T)) else null",
                 name,
