@@ -4,7 +4,6 @@ import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.auritylab.kotlin.object_path.KObjectPath
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import graphql.ExecutionResult
 import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -50,7 +49,7 @@ internal class Controller(
         @RequestParam(value = "operationName", required = false) operationName: String?,
         @RequestParam(value = "variables", required = false) variables: String?,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> =
+    ): CompletableFuture<out Any> =
         execute(Operation(query, operationName, variables?.let { parse<Map<String, String>>(it) }), request)
 
     /**
@@ -70,7 +69,7 @@ internal class Controller(
         @RequestParam(value = "query", required = false) query: String?,
         @RequestBody(required = false) body: String?,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> {
+    ): CompletableFuture<out Any> {
         // Parse the given contentType into a MediaType.
         val parsedMediaType = MediaType.parseMediaType(contentType)
 
@@ -111,7 +110,7 @@ internal class Controller(
         @RequestParam(value = "map") map: String,
         multipartRequest: MultipartRequest,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> {
+    ): CompletableFuture<out Any> {
         val parsedOperation = parse<Operation>(operations)
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
         val parsedMap = parse<Map<String, List<String>>>(map)
@@ -149,11 +148,11 @@ internal class Controller(
     private fun execute(
         operation: Operation,
         request: WebRequest
-    ): CompletableFuture<ExecutionResult> =
+    ): CompletableFuture<out Any> =
         invocation.invoke(
             GraphQLInvocation.Data(operation.query, operation.operationName, operation.variables),
             request
-        )
+        ).thenApply { it.toSpecification() }
 
     /**
      * Represents a GraphQL operation with a [query], [operationName] (optional) and [variables] (optional).

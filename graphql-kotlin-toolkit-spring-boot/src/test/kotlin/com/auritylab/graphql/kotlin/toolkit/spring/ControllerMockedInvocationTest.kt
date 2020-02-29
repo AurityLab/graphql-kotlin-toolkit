@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.reset
+import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import java.util.UUID
@@ -43,7 +43,7 @@ class ControllerMockedInvocationTest {
 
     @BeforeEach
     fun resetMock() {
-        reset(invocation)
+        clearInvocations(invocation)
     }
 
     @Test

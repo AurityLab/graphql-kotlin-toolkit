@@ -4,6 +4,10 @@ import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.auritylab.graphql.kotlin.toolkit.spring.api.schemaOfResourceFiles
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.whenever
+import graphql.ExecutionResultImpl
+import java.util.concurrent.CompletableFuture
 import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
@@ -25,5 +29,11 @@ internal class TestConfiguration {
 
     @Bean
     @Profile("graphql-invocation-mock")
-    fun invocation(): GraphQLInvocation = Mockito.mock(GraphQLInvocation::class.java)
+    fun invocation(): GraphQLInvocation {
+        val m = Mockito.mock(GraphQLInvocation::class.java)
+
+        whenever(m.invoke(any(), any())).thenReturn(CompletableFuture.completedFuture(ExecutionResultImpl(listOf())))
+
+        return m
+    }
 }
