@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
 import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FLOAT
+import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.MAP
@@ -93,7 +93,7 @@ internal class KotlinTypeMapper(
             "String" -> STRING
             "Boolean" -> BOOLEAN
             "Int" -> INT
-            "Float" -> FLOAT
+            "Float" -> DOUBLE
             "ID" -> STRING
             "Long" -> LONG
             "Short" -> SHORT
