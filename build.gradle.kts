@@ -1,7 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.3.70" apply false
     id("org.jetbrains.kotlin.plugin.spring") version "1.3.70" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
 }
 
 allprojects {
