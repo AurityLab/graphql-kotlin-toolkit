@@ -1,15 +1,15 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
-    id("org.gradle.kotlin.kotlin-dsl")
     id("maven-publish")
     id("com.gradle.plugin-publish") version "0.10.1"
+    id("org.gradle.kotlin.kotlin-dsl") version "1.3.4"
 }
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70")
     implementation(gradleApi())
     implementation(project(":graphql-kotlin-toolkit-codegen"))
 }
