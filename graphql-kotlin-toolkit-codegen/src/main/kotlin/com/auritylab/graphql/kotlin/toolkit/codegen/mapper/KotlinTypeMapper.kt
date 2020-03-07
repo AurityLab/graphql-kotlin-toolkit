@@ -20,6 +20,7 @@ import com.squareup.kotlinpoet.asClassName
 import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
@@ -43,6 +44,7 @@ internal class KotlinTypeMapper(
             is GraphQLInputObjectType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
             is GraphQLEnumType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
             is GraphQLObjectType -> getObjectKotlinType(unwrappedType)
+            is GraphQLInterfaceType -> getInterfaceKotlinType(unwrappedType)
             else -> ANY
         }
 
@@ -114,20 +116,33 @@ internal class KotlinTypeMapper(
      * Will return the [ClassName] for the given [type].
      */
     private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
-        // Check if the type is annotated with the "kotlinRepresentation" directive.
-        val helperResult = DirectiveFacade.representation.getArguments(type)?.className
+        // Try to resolve the class via the representation directive.
+        // Return the representation class if its available.
+        resolveRepresentationClass(type)
+            ?.let { return it }
 
-        // If the directive is available return the content.
-        if (helperResult != null)
-            return helperResult
-
-        // Use the generated class if "generateAll" is enabled or
-        // the object type is annotated with the generate directive
-        return if (options.generateAll || DirectiveFacade.generate[type]) {
-            // The object has a generated type, return the generated one.
-            generatedMapper.getGeneratedTypeClassName(type, false)
-        } else
-        // The object does not have a generated type, therefore return Any.
-            ANY
+        // Try to resolve the type via a generated class. This will fallback to ANY.
+        return resolveGeneratedClass(type)
     }
+
+    private fun getInterfaceKotlinType(type: GraphQLInterfaceType): ClassName =
+        // Resolve the representation and return if it's available.
+        resolveRepresentationClass(type) ?: ANY
+
+    /**
+     * Will resolve the [ClassName] for the given [container]. This will basically just check if the
+     * [DirectiveFacade.representation] directive is given, if so it will return the value of the className argument.
+     */
+    private fun resolveRepresentationClass(container: GraphQLDirectiveContainer): ClassName? =
+        // Check if the type is annotated with the "kRepresentation" directive.
+        DirectiveFacade.representation.getArguments(container)?.className
+
+    /**
+     * Will resolve the [ClassName] for the given [type]. This will check if the [CodegenOptions.generateAll] attribute
+     * is true or the type is annotated with the [DirectiveFacade.generate] directive.
+     */
+    private fun resolveGeneratedClass(type: GraphQLType): ClassName =
+        if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.generate[type]))
+            generatedMapper.getGeneratedTypeClassName(type, false)
+        else ANY
 }

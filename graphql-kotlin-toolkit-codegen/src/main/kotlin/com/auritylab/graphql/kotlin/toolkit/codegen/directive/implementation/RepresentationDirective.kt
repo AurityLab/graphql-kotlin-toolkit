@@ -15,7 +15,11 @@ class RepresentationDirective : AbstractDirective("kRepresentation", false),
     override val reference: GraphQLDirective =
         GraphQLDirective.newDirective()
             .name(name)
-            .validLocations(Introspection.DirectiveLocation.OBJECT, Introspection.DirectiveLocation.SCALAR)
+            .validLocations(
+                Introspection.DirectiveLocation.OBJECT,
+                Introspection.DirectiveLocation.SCALAR,
+                Introspection.DirectiveLocation.INTERFACE
+            )
             .argument {
                 it.name("class")
                 it.type(GraphQLNonNull(Scalars.GraphQLString))
