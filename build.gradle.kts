@@ -16,3 +16,11 @@ subprojects {
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
+
+tasks.create("allPublish") {
+    group = "publishing"
+
+    dependsOn(":graphql-kotlin-toolkit-codegen:publish")
+    dependsOn(":graphql-kotlin-toolkit-spring-boot:publish")
+    dependsOn(":graphql-kotlin-toolkit-gradle-plugin:publishPlugins")
+}
