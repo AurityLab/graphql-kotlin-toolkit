@@ -24,6 +24,7 @@ import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
+import graphql.schema.GraphQLUnionType
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -45,6 +46,7 @@ internal class KotlinTypeMapper(
             is GraphQLEnumType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
             is GraphQLObjectType -> getObjectKotlinType(unwrappedType)
             is GraphQLInterfaceType -> getInterfaceKotlinType(unwrappedType)
+            is GraphQLUnionType -> getUnionKotlinType(unwrappedType)
             else -> ANY
         }
 
@@ -125,9 +127,25 @@ internal class KotlinTypeMapper(
         return resolveGeneratedClass(type)
     }
 
+    /**
+     * Will return the [ClassName] for the given [GraphQLInterfaceType].
+     */
     private fun getInterfaceKotlinType(type: GraphQLInterfaceType): ClassName =
         // Resolve the representation and return if it's available.
         resolveRepresentationClass(type) ?: ANY
+
+    /**
+     * Will return the [ClassName] for the given [GraphQLUnionType]. This will basically just check if the types of
+     * the union have the same representation. If they do have the same representation the type will be returned.
+     * If they to do NOT have the same representation [ANY] will be returned.
+     */
+    private fun getUnionKotlinType(type: GraphQLUnionType): TypeName {
+        val mappedTypes = type.types
+            .map { getKotlinType(it, if (it is GraphQLDirectiveContainer) it else null) }
+
+        val firstType = mappedTypes.first()
+        return if (mappedTypes.all { it == firstType }) firstType else ANY
+    }
 
     /**
      * Will resolve the [ClassName] for the given [container]. This will basically just check if the
