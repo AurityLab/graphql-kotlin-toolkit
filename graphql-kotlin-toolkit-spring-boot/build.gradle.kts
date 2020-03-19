@@ -12,6 +12,8 @@ dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+    implementation(project(":graphql-kotlin-toolkit-common"))
+
     // Spring (Boot) dependencies.
     implementation("org.springframework.boot:spring-boot-autoconfigure:2.2.2.RELEASE")
     implementation("org.springframework:spring-webmvc:5.2.2.RELEASE")
