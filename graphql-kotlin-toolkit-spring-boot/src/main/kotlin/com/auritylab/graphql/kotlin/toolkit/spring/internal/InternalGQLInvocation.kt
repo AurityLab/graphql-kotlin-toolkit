@@ -1,12 +1,12 @@
-package com.auritylab.graphql.kotlin.toolkit.spring
+package com.auritylab.graphql.kotlin.toolkit.spring.internal
 
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import graphql.ExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
-import java.util.concurrent.CompletableFuture
 import org.springframework.stereotype.Component
 import org.springframework.web.context.request.WebRequest
+import java.util.concurrent.CompletableFuture
 
 @Component
 internal class InternalGQLInvocation(

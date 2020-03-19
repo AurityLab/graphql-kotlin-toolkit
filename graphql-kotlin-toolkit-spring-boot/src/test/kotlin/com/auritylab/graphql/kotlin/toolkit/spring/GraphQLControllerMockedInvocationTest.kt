@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile
 @ActiveProfiles("graphql-invocation-mock")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = [TestConfiguration::class])
-class ControllerMockedInvocationTest {
+class GraphQLControllerMockedInvocationTest {
     @Autowired
     private lateinit var mvc: MockMvc
 

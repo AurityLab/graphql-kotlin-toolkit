@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.toolkit.spring
+package com.auritylab.graphql.kotlin.toolkit.spring.configuration
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated
 @Validated
 @Configuration
 @ConfigurationProperties("graphql-kotlin-toolkit.spring")
-open class Properties {
+open class GraphQLProperties {
     /**
      * Represents the endpoint for the GraphQL controller.
      * Defaults to "graphql".
@@ -19,7 +19,8 @@ open class Properties {
     /**
      * Represents the property to access the instrumentation properties.
      */
-    var instrumentation: Properties.Instrumentation = Instrumentation()
+    var instrumentation: Instrumentation =
+        Instrumentation()
 
     /**
      * Represents all available options for instrumentations.

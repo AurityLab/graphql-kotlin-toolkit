@@ -1,5 +1,6 @@
-package com.auritylab.graphql.kotlin.toolkit.spring
+package com.auritylab.graphql.kotlin.toolkit.spring.internal
 
+import com.auritylab.graphql.kotlin.toolkit.spring.annotation.AnnotationResolver
 import com.auritylab.graphql.kotlin.toolkit.spring.provided.providedUploadScalar
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLScalarType
