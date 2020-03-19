@@ -1,8 +1,7 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation
+package com.auritylab.graphql.kotlin.toolkit.common.directive.implementation
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.AbstractDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.HasArgumentsDirective
-import com.squareup.kotlinpoet.ClassName
+import com.auritylab.graphql.kotlin.toolkit.common.directive.AbstractDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.HasArgumentsDirective
 import graphql.Scalars
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
@@ -29,7 +28,7 @@ class RepresentationDirective : AbstractDirective("kRepresentation", false),
     override fun getArguments(directive: GraphQLDirective): Model {
         val className = directive.getArgument("class").value as? String ?: ""
 
-        return Model(ClassName.bestGuess(className))
+        return Model(className)
     }
 
     override fun getArguments(container: GraphQLDirectiveContainer): Model? {
@@ -40,6 +39,6 @@ class RepresentationDirective : AbstractDirective("kRepresentation", false),
     }
 
     data class Model(
-        val className: ClassName?
+        val className: String?
     )
 }

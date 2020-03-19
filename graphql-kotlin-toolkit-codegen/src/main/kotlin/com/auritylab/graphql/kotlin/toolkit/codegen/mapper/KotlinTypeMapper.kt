@@ -1,8 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
@@ -115,7 +115,9 @@ internal class KotlinTypeMapper(
         if (defaultClass != null) return defaultClass
 
         // Fetch the kotlin representation class or return "Any".
-        return DirectiveFacade.representation.getArguments(scalarTypeDefinition)?.className ?: ANY
+        return DirectiveFacade.representation.getArguments(scalarTypeDefinition)
+            ?.className?.let { ClassName.bestGuess(it) }
+            ?: ANY
     }
 
     /**
@@ -157,7 +159,7 @@ internal class KotlinTypeMapper(
      */
     private fun resolveRepresentationClass(container: GraphQLDirectiveContainer): ClassName? =
         // Check if the type is annotated with the "kRepresentation" directive.
-        DirectiveFacade.representation.getArguments(container)?.className
+        DirectiveFacade.representation.getArguments(container)?.className?.let { ClassName.bestGuess(it) }
 
     /**
      * Will resolve the [ClassName] for the given [type]. This will check if the [CodegenOptions.generateAll] attribute

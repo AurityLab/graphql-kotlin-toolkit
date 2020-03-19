@@ -1,6 +1,6 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive.exception
+package com.auritylab.graphql.kotlin.toolkit.common.directive.exception
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.Directive
+import com.auritylab.graphql.kotlin.toolkit.common.directive.Directive
 
 /**
  * Represents a exception, which will be thrown if the directive validation was not successful

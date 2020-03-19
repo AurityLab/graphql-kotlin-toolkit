@@ -104,7 +104,6 @@ internal class PaginationFieldResolverGenerator(
                             generatedMapper.getPaginationInfoBuilderMemberName()
                         )
 
-
                         getFunSpec.addStatement("val edges = result.data.map { _buildEdge(it) }")
                         getFunSpec.addStatement("val pageInfo = _buildPageInfo(result.hasNextPage, result.hasPreviousPage, edges.first().cursor, edges.last().cursor)")
                         getFunSpec.addStatement("return _buildConnection(edges, pageInfo)")

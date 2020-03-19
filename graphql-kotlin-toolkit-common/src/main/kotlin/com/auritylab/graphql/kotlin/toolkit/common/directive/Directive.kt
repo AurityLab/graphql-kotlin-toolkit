@@ -1,6 +1,6 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive
+package com.auritylab.graphql.kotlin.toolkit.common.directive
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.exception.DirectiveValidationException
+import com.auritylab.graphql.kotlin.toolkit.common.directive.exception.DirectiveValidationException
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLDirectiveContainer
 

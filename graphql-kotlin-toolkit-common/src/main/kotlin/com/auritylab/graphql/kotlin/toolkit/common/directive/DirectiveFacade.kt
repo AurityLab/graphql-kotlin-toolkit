@@ -1,12 +1,12 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive
+package com.auritylab.graphql.kotlin.toolkit.common.directive
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.exception.DirectiveValidationException
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.DoubleNullDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.ErrorDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.GenerateDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.PaginationDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.RepresentationDirective
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation.ResolverDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.exception.DirectiveValidationException
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.DoubleNullDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.ErrorDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.GenerateDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.PaginationDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.RepresentationDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.ResolverDirective
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLSchema
 

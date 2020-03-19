@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive
+package com.auritylab.graphql.kotlin.toolkit.common.directive
 
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLDirectiveContainer

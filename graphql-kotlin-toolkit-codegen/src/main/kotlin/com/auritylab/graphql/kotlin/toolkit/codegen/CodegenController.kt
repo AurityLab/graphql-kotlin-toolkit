@@ -1,9 +1,9 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FileGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.GeneratorFactory
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer

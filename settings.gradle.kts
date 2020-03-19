@@ -12,3 +12,4 @@ rootProject.name = "graphql-kotlin-toolkit"
 include(":graphql-kotlin-toolkit-codegen")
 include(":graphql-kotlin-toolkit-gradle-plugin")
 include(":graphql-kotlin-toolkit-spring-boot")
+include(":graphql-kotlin-toolkit-common")

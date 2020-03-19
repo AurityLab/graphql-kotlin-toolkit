@@ -1,9 +1,9 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -15,7 +15,6 @@ import com.squareup.kotlinpoet.TypeName
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
-import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLModifiedType

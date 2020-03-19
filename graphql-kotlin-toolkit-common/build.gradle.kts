@@ -10,9 +10,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation("com.graphql-java:graphql-java:13.0")
-    implementation("com.squareup:kotlinpoet:1.4.4")
-
-    implementation(project(":graphql-kotlin-toolkit-common"))
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
@@ -49,7 +46,7 @@ tasks.create("javadocJar", Jar::class) {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = "codegen"
+            artifactId = "common"
             from(components["java"])
             artifact(tasks.getByName("sourceJar"))
             artifact(tasks.getByName("javadocJar"))
@@ -67,7 +64,7 @@ publishing {
             }
 
             pom {
-                name.set("GraphQL Kotlin Toolkit: Codegen")
+                name.set("GraphQL Kotlin Toolkit: Common")
                 description.set("GraphQL Code generator for Kotlin")
                 url.set("https://github.com/AurityLab/graphql-kotlin-toolkit")
 

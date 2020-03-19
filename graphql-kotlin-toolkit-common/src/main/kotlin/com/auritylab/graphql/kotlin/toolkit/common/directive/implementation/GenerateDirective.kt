@@ -1,6 +1,6 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.directive.implementation
+package com.auritylab.graphql.kotlin.toolkit.common.directive.implementation
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.directive.AbstractDirective
+import com.auritylab.graphql.kotlin.toolkit.common.directive.AbstractDirective
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
 
