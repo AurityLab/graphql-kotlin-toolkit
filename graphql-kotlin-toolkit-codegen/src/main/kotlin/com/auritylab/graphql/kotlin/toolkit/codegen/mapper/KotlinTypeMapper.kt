@@ -39,7 +39,11 @@ internal class KotlinTypeMapper(
      * Will try to find a corresponding [TypeName] for the given [type].
      * The returned types already assume the incoming data has been parsed.
      */
-    fun getKotlinType(type: GraphQLType, fieldDirectiveContainer: GraphQLDirectiveContainer? = null): TypeName {
+    fun getKotlinType(
+        type: GraphQLType,
+        fieldDirectiveContainer: GraphQLDirectiveContainer? = null,
+        listType: ClassName? = null
+    ): TypeName {
         val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
             is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
             is GraphQLInputObjectType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
@@ -51,7 +55,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        val wrapped = GraphQLTypeHelper.wrapType(type, res, true)
+        val wrapped = GraphQLTypeHelper.wrapType(type, res, true, listType)
 
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
@@ -68,7 +72,7 @@ internal class KotlinTypeMapper(
      * Will Try to find a corresponding [TypeName] for the given [type].
      * Thr returned types represent the incoming types from graphql-java.
      */
-    fun getInputKotlinType(type: GraphQLType): TypeName {
+    fun getInputKotlinType(type: GraphQLType, listType: ClassName? = null): TypeName {
         val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
             is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
             is GraphQLInputObjectType -> MAP.parameterizedBy(STRING, ANY)
@@ -78,7 +82,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        return GraphQLTypeHelper.wrapType(type, res, false)
+        return GraphQLTypeHelper.wrapType(type, res, false, listType)
     }
 
     /**

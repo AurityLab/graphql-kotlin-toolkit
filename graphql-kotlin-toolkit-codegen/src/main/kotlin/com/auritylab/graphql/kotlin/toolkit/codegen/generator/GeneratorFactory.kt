@@ -2,6 +2,10 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationConnectionGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationEdgeGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationInfoGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationPageInfoGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
@@ -32,6 +36,20 @@ internal class GeneratorFactory(
             generatedMapper
         )
 
+    fun paginationFieldResolver(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): PaginationFieldResolverGenerator =
+        PaginationFieldResolverGenerator(
+            container,
+            field,
+            implementerMapper,
+            argumentCodeBlockGenerator,
+            options,
+            kotlinTypeMapper,
+            generatedMapper
+        )
+
     fun inputObject(inputObject: GraphQLInputObjectType): InputObjectGenerator =
         InputObjectGenerator(inputObject, argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper)
 
@@ -40,4 +58,19 @@ internal class GeneratorFactory(
 
     fun valueWrapper(): ValueWrapperGenerator =
         ValueWrapperGenerator(options, kotlinTypeMapper, generatedMapper)
+
+    fun paginationInfo(): PaginationInfoGenerator =
+        PaginationInfoGenerator(
+            argumentCodeBlockGenerator,
+            options,
+            kotlinTypeMapper,
+            generatedMapper
+        )
+
+    fun paginationConnection() = PaginationConnectionGenerator(options, kotlinTypeMapper, generatedMapper)
+
+    fun paginationEdge() = PaginationEdgeGenerator(options, kotlinTypeMapper, generatedMapper)
+
+    fun paginationPageInfo() =
+        PaginationPageInfoGenerator(argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper)
 }

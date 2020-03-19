@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
 import com.squareup.kotlinpoet.COLLECTION
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeName
@@ -31,18 +32,49 @@ object GraphQLTypeHelper {
      * Will wrap the given [kotlinType] with the same wrapping of the given [type].
      * If the wrapped type will be used for a output the parameter [isOutput] shall be set to true.
      */
-    fun wrapType(type: GraphQLType, kotlinType: TypeName, isOutput: Boolean): TypeName =
-        internalWrapType(type, null, kotlinType, isOutput)
+    fun wrapType(type: GraphQLType, kotlinType: TypeName, isOutput: Boolean, listType: ClassName? = null): TypeName =
+        internalWrapType(type, null, kotlinType, isOutput, listType)
 
     /**
-     * Will wrap the given [kotlinType] with the same wrapping of the given [type].
-     * This method can be supplied with the [parentType] to define the nullability.
+     * Will check if the given [GraphQLType] is a List. This will also check if the first layer is a [GraphQLNonNull].
+     *
+     * @param type The type to check against.
+     * @return If the given type is [GraphQLList].
+     */
+    fun isList(type: GraphQLType): Boolean =
+        getListType(type) != null
+
+    /**
+     * Will check if the given [type] is a List. If it is a list, it will return the wrapped type of the list.
+     *
+     * @param type The type which is expected to be a list.
+     * @return The wrapped type of the list or null if [type] is no list.
+     */
+    fun getListType(type: GraphQLType): GraphQLType? {
+        // If the given type is a list itself.
+        if (type is GraphQLList)
+            return type.wrappedType
+
+        // If the list is wrapped with a non-null.
+        if (type is GraphQLNonNull && type.wrappedType is GraphQLList)
+            return (type.wrappedType as GraphQLList).wrappedType
+
+        return null
+    }
+
+    /**
+     * Will wrap the given [kotlinType] with the same wrapping of the given [type]. This method can be supplied with
+     * the [parentType] to define the nullability. An explicit [listType] can be defined through the parameter. As the
+     * explicit [listType] is optional it will fallback to the decision logic which relies on the [isOutput] parameter.
+     *
+     * @param listType The type to use to represent a [GraphQLList]. It is to have exactly one type variable.
      */
     private fun internalWrapType(
         type: GraphQLType,
         parentType: GraphQLType?,
         kotlinType: TypeName,
-        isOutput: Boolean
+        isOutput: Boolean,
+        listType: ClassName? = null
     ): TypeName {
         return when (type) {
             !is GraphQLModifiedType -> {
@@ -61,8 +93,10 @@ object GraphQLTypeHelper {
                 // Create the wrapped type of the wrapped type of the list.
                 val inner = internalWrapType(type.wrappedType, type, kotlinType, isOutput)
 
-                // Use a Collection if the type is used for a output type, a List of not.
-                val list = (if (isOutput) COLLECTION else LIST).parameterizedBy(inner)
+                // If there is an explicit type for the list given use it. If there is no explicit list type
+                // given use a collection if the type is used for a output type, a List if not.
+                val list = listType?.parameterizedBy(inner)
+                    ?: (if (isOutput) COLLECTION else LIST).parameterizedBy(inner)
 
                 // Check if the parent is NonNull.
                 if (parentType is GraphQLNonNull)

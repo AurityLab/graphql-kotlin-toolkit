@@ -3,7 +3,10 @@ package com.auritylab.graphql.kotlin.toolkit.codegen
 import com.auritylab.graphql.kotlin.toolkit.codegen.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FileGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.GeneratorFactory
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
 import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
@@ -26,7 +29,8 @@ internal class CodegenController(
             buildInputObjectGenerators(),
             buildObjectTypeGenerators(),
             buildInterfaceTypeGenerators(),
-            buildAdditionalGenerators()
+            buildAdditionalGenerators(),
+            buildPaginationGenerators()
         ).flatten()
     }
 
@@ -64,7 +68,7 @@ internal class CodegenController(
                     if (options.generateAll ||
                         objectHasResolver ||
                         DirectiveFacade.resolver[fieldDefinition]
-                    ) internalGenerators.add(generatorFactory.fieldResolver(objectType, fieldDefinition))
+                    ) internalGenerators.add(getSwitchedFieldResolverGenerator(objectType, fieldDefinition))
                 }
 
                 return@flatMap internalGenerators
@@ -84,11 +88,25 @@ internal class CodegenController(
                     if (options.generateAll ||
                         generatedForInterface ||
                         DirectiveFacade.resolver[fieldDefinition]
-                    ) internalGenerators.add(generatorFactory.fieldResolver(interfaceType, fieldDefinition))
+                    ) internalGenerators.add(getSwitchedFieldResolverGenerator(interfaceType, fieldDefinition))
                 }
 
                 return@flatMap internalGenerators
             }
+
+    /**
+     * Will build the field resolver [FileGenerator] for the given [container] and [field].ø
+     * This will differ if the given field has pagination or not.
+     *
+     * @return The default FieldResolver or the PaginationFieldResolver.
+     */
+    private fun getSwitchedFieldResolverGenerator(
+        container: GraphQLFieldsContainer,
+        field: GraphQLFieldDefinition
+    ): FileGenerator = if (DirectiveFacade.pagination[field] && GraphQLTypeHelper.isList(field.type))
+        generatorFactory.paginationFieldResolver(container, field)
+    else
+        generatorFactory.fieldResolver(container, field)
 
     /**
      * Will build the generators for all additionally required types.
@@ -96,6 +114,18 @@ internal class CodegenController(
     private fun buildAdditionalGenerators(): Collection<FileGenerator> {
         return listOf(
             generatorFactory.valueWrapper()
+        )
+    }
+
+    /**
+     * Will build the generators for the pagination support.
+     */
+    private fun buildPaginationGenerators(): Collection<FileGenerator> {
+        return listOf(
+            generatorFactory.paginationInfo(),
+            generatorFactory.paginationConnection(),
+            generatorFactory.paginationEdge(),
+            generatorFactory.paginationPageInfo()
         )
     }
 }

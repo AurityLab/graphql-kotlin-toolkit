@@ -103,6 +103,34 @@ internal class GeneratedMapper(
         return ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Environment")
     }
 
+    fun getPaginationInfoClassName(): ClassName {
+        return buildClassName("PaginationInfo", false, "pagination")
+    }
+
+    fun getPaginationInfoBuilderMemberName(): MemberName {
+        val paginationInfo = getPaginationInfoClassName()
+
+        return MemberName(
+            ClassName(
+                paginationInfo.packageName,
+                *paginationInfo.simpleNames.toTypedArray(),
+                "Companion"
+            ), "buildByMap"
+        )
+    }
+
+    fun getPaginationConnectionClassName(): ClassName {
+        return buildClassName("PaginationConnection", false, "pagination")
+    }
+
+    fun getPaginationEdgeClassName(): ClassName {
+        return buildClassName("PaginationEdge", false, "pagination")
+    }
+
+    fun getPaginationPageInfoClassName(): ClassName {
+        return buildClassName("PaginationPageInfo", false, "pagination")
+    }
+
     /**
      * Will build a new [ClassName] with the given [className] as identifier for the class.
      * Additional package tags will be joined with dots (.) and appended to the base package.
@@ -110,13 +138,9 @@ internal class GeneratedMapper(
     private fun buildClassName(
         className: String,
         appendCompanion: Boolean = false,
-        vararg additionalPackageTags: String
+        additionalPackage: String = ""
     ): ClassName {
-        val fullPackage = options.generatedBasePackage +
-            additionalPackageTags.joinToString(
-                separator = ".",
-                prefix = if (additionalPackageTags.isNotEmpty()) "." else ""
-            )
+        val fullPackage = options.generatedBasePackage + "." + additionalPackage
 
         val augmented =
             if (options.generatedGlobalPrefix == null) className

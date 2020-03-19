@@ -42,9 +42,10 @@ internal abstract class AbstractClassGenerator(
      */
     protected fun getKotlinType(
         type: GraphQLType,
-        fieldDirectiveContainer: GraphQLDirectiveContainer? = null
+        fieldDirectiveContainer: GraphQLDirectiveContainer? = null,
+        listType: ClassName? = null
     ): TypeName =
-        kotlinTypeMapper.getKotlinType(type, fieldDirectiveContainer)
+        kotlinTypeMapper.getKotlinType(type, fieldDirectiveContainer, listType)
 
     /**
      * Will build the corresponding [ClassName] for the given [GraphQLType].

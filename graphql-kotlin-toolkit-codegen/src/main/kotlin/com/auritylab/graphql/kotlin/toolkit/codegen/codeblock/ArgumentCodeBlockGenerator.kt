@@ -12,8 +12,10 @@ import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
+import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLModifiedType
@@ -28,13 +30,19 @@ internal class ArgumentCodeBlockGenerator(
     private val generatedMapper: GeneratedMapper
 ) {
     /**
+     * Will build a function which takes a map (parameterized by String, Any) to access the name of the given [definition].
+     */
+    fun buildResolver(definition: GraphQLArgument): FunSpec =
+        buildResolver(definition.name, definition.type, definition)
+
+    /**
      * Will build a function which takes a map (parameterized by String, Any) to access the given [argumentName] from it.
      * A [type] is also required to decide how to access the argument value.
      */
-    fun buildArgumentResolverFun(
+    fun buildResolver(
         argumentName: String,
         type: GraphQLType,
-        fieldDirectiveContainer: GraphQLDirectiveContainer
+        fieldDirectiveContainer: GraphQLDirectiveContainer?
     ): FunSpec {
         val kotlinType = typeMapper.getKotlinType(type, fieldDirectiveContainer)
 
@@ -49,7 +57,7 @@ internal class ArgumentCodeBlockGenerator(
     private fun buildArgumentResolverCodeBlock(
         name: String,
         type: GraphQLType,
-        fieldDirectiveContainer: GraphQLDirectiveContainer
+        fieldDirectiveContainer: GraphQLDirectiveContainer?
     ): CodeBlock {
         val code = CodeBlock.builder()
 
@@ -71,7 +79,7 @@ internal class ArgumentCodeBlockGenerator(
 
         val lastLayerIndex = currentIndex - 1
 
-        if (lastType.isNullable && DirectiveFacade.doubleNull[fieldDirectiveContainer])
+        if (fieldDirectiveContainer != null && lastType.isNullable && DirectiveFacade.doubleNull[fieldDirectiveContainer])
             code.addStatement(
                 "return if (map.containsKey(\"%L\")) %T(layer%L(map[\"%L\"] as %T)) else null",
                 name,
