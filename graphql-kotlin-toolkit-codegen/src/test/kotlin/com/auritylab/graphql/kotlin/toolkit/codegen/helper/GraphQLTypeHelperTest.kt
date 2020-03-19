@@ -1,5 +1,6 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -61,7 +62,7 @@ internal class GraphQLTypeHelperTest : StringSpec({
                 )
             )
         ) { a, b ->
-            GraphQLTypeHelper.wrapType(a, ANY, false).shouldBe(b)
+            GraphQLWrapTypeHelper.wrapType(a, ANY, false).shouldBe(b)
         }
     }
 })

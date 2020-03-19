@@ -1,8 +1,9 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLWrapTypeHelper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
@@ -55,7 +56,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        val wrapped = GraphQLTypeHelper.wrapType(type, res, true, listType)
+        val wrapped = GraphQLWrapTypeHelper.wrapType(type, res, true, listType)
 
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
@@ -82,7 +83,7 @@ internal class KotlinTypeMapper(
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
-        return GraphQLTypeHelper.wrapType(type, res, false, listType)
+        return GraphQLWrapTypeHelper.wrapType(type, res, false, listType)
     }
 
     /**
