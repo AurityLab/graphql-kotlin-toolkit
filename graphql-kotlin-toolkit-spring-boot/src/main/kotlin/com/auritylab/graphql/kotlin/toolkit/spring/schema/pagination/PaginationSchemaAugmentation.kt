@@ -3,6 +3,8 @@ package com.auritylab.graphql.kotlin.toolkit.spring.schema.pagination
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.toolkit.spring.schema.SchemaAugmentation
+import graphql.Scalars
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLOutputType
@@ -67,6 +69,7 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
 
                     paginationTypes.add(unwrappedType)
                     field.transform {
+                        it.arguments(field.arguments.plus(buildPaginationArguments()))
                         it.type(getConnectionType(unwrappedType))
                     }
                 }
@@ -75,5 +78,14 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
             trans.clearFields()
             trans.fields(augmentedFields)
         }, paginationTypes)
+    }
+
+    private fun buildPaginationArguments(): List<GraphQLArgument> {
+        return listOf(
+            GraphQLArgument.newArgument().name("first").type(Scalars.GraphQLInt).build(),
+            GraphQLArgument.newArgument().name("after").type(Scalars.GraphQLString).build(),
+            GraphQLArgument.newArgument().name("last").type(Scalars.GraphQLInt).build(),
+            GraphQLArgument.newArgument().name("before").type(Scalars.GraphQLString).build()
+        )
     }
 }
