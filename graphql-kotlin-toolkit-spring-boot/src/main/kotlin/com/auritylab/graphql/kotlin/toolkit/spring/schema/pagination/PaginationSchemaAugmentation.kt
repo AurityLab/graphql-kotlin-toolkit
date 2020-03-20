@@ -1,17 +1,19 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.schema.pagination
 
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.auritylab.graphql.kotlin.toolkit.spring.schema.SchemaAugmentation
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLOutputType
 import graphql.schema.GraphQLSchema
+import graphql.schema.GraphQLType
 import graphql.schema.GraphQLTypeReference
 
 class PaginationSchemaAugmentation : SchemaAugmentation {
     override fun augmentSchema(existingSchema: GraphQLSchema, schema: GraphQLSchema.Builder) {
 
-        val paginatedTypes = mutableListOf<GraphQLOutputType>()
+        val paginatedTypes = mutableListOf<GraphQLType>()
 
         val augmentedTypes = existingSchema.additionalTypes
             .map { type ->
@@ -29,7 +31,6 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
         schema.clearAdditionalTypes()
         schema.additionalTypes(augmentedTypes.toSet())
 
-        println(paginatedTypes)
         if (paginatedTypes.isNotEmpty()) {
             schema.additionalTypes(PaginationPageInfoTypeGenerator().generateTypes().toSet())
 
@@ -50,21 +51,23 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
     ): Collection<GraphQLFieldDefinition> =
         definitions.filter { DirectiveFacade.pagination[it] }
 
-    private fun getConnectionType(input: GraphQLOutputType): GraphQLOutputType {
+    private fun getConnectionType(input: GraphQLType): GraphQLOutputType {
         return GraphQLTypeReference(input.name + "Connection")
     }
 
-    private fun mapObjectType(type: GraphQLObjectType): Pair<GraphQLObjectType, Collection<GraphQLOutputType>> {
-        val paginationTypes = mutableListOf<GraphQLOutputType>()
+    private fun mapObjectType(type: GraphQLObjectType): Pair<GraphQLObjectType, Collection<GraphQLType>> {
+        val paginationTypes = mutableListOf<GraphQLType>()
 
         return Pair(type.transform { trans ->
             val augmentedFields = type.fieldDefinitions.map { field ->
                 if (!DirectiveFacade.pagination[field])
                     field
                 else {
-                    paginationTypes.add(field.type)
+                    val unwrappedType = GraphQLTypeHelper.unwrapType(field.type)
+
+                    paginationTypes.add(unwrappedType)
                     field.transform {
-                        it.type(getConnectionType(field.type))
+                        it.type(getConnectionType(unwrappedType))
                     }
                 }
             }

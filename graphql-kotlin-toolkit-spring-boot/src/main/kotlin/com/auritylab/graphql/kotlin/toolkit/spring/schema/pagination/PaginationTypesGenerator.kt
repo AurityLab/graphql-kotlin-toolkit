@@ -35,7 +35,7 @@ class PaginationTypesGenerator(
         return GraphQLObjectType.newObject()
             .name(edgeTypeName)
             .field {
-                it.name("name")
+                it.name("node")
                 it.type(objectType)
             }
             .field {
