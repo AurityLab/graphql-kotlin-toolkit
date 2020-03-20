@@ -1,7 +1,8 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.generator
+package com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.AbstractClassGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.SpringBootIntegrationHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
@@ -33,8 +34,6 @@ internal abstract class AbstractFieldResolverGenerator(
     generatedMapper: GeneratedMapper
 ) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
     protected val fieldKotlinType = getKotlinType(field.type)
-    protected open val resolveReturnType = fieldKotlinType
-    protected open val getReturnType = fieldKotlinType
 
     override val fileClassName: ClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
     protected val dataFetchingEnvironmentClassName = ClassName("graphql.schema", "DataFetchingEnvironment")
@@ -42,13 +41,27 @@ internal abstract class AbstractFieldResolverGenerator(
     protected val contextClassName = options.globalContext?.let { ClassName.bestGuess(it) } ?: ANY
 
     override fun build(builder: FileSpec.Builder) {
-        builder.addType(buildFieldResolverClass())
+        val typeBuilder = TypeSpec.interfaceBuilder(fileClassName)
+
+        // Call the build methods with the type builder.
+        buildFieldResolverClass(typeBuilder)
+
+        // Add the resolver annotation if the spring boot integration is enabled.
+        if (options.enableSpringBootIntegration)
+            typeBuilder.addAnnotation(springBootIntegrationAnnotationSpec)
+
+        // Add the common functions and types.
+        typeBuilder.addFunctions(argumentResolverFunSpecs)
+        typeBuilder.addType(metaTypeSpec)
+
+
+        builder.addType(typeBuilder.build())
     }
 
     /**
      * Will build the [TypeSpec] which represents the field resolver itself.
      */
-    protected abstract fun buildFieldResolverClass(): TypeSpec
+    protected abstract fun buildFieldResolverClass(builder: TypeSpec.Builder)
 
     /**
      * Will build the [TypeName] which for the parent type for the resolver. If the [container] is just a
@@ -80,7 +93,7 @@ internal abstract class AbstractFieldResolverGenerator(
      * a [GraphQLInterfaceType] it will return a GQLResolvers annotation which points to all all implementors
      * field definitions.
      */
-    protected val springBootIntegrationAnnotationSpec: AnnotationSpec =
+    private val springBootIntegrationAnnotationSpec: AnnotationSpec =
         when (container) {
             is GraphQLObjectType -> SpringBootIntegrationHelper.createResolverAnnotation(
                 generatedMapper.getFieldResolverContainerMemberName(container, field),
@@ -105,7 +118,7 @@ internal abstract class AbstractFieldResolverGenerator(
      * The meta type is required for the spring boot annotation, which relies on the values of the meta type.
      * As the properties of the meta type are constant they're open to use for everything.
      */
-    protected val metaTypeSpec: TypeSpec =
+    private val metaTypeSpec: TypeSpec =
         TypeSpec.companionObjectBuilder("Meta")
             .addProperty(
                 PropertySpec.builder("CONTAINER", STRING, KModifier.CONST)
@@ -118,12 +131,11 @@ internal abstract class AbstractFieldResolverGenerator(
                     .build()
             )
             .build()
+
     /**
      * Will build the [FunSpec] for all arguments on the current [field]. The returned value also holds a [MemberName]
      * which represents the resolve Method for each argument.
      */
-    protected val argumentResolverFunSpecs: Collection<FunSpec> = field.arguments
-        .map {
-            argumentCodeBlockGenerator.buildResolver(it)
-        }
+    private val argumentResolverFunSpecs: Collection<FunSpec> = field.arguments
+        .map { argumentCodeBlockGenerator.buildResolver(it) }
 }

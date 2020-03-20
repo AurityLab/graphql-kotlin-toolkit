@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.toolkit.codegen.generator
+package com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
@@ -40,18 +40,22 @@ internal class PaginationFieldResolverGenerator(
     generatedMapper
 ) {
     private val resultHolderClassName: ClassName =
-        ClassName(fileClassName.packageName, *fileClassName.simpleNames.toTypedArray(), "ResultHolder")
+        ClassName(fileClassName.packageName, *fileClassName.simpleNames.toTypedArray(), "Result")
 
     // Fetch the wrapped type of the list.
     private val unwrappedReturnType = GraphQLTypeHelper.getListType(field.type) ?: throw IllegalStateException()
     private val unwrappedReturnKotlinType = getKotlinType(unwrappedReturnType)
-    override val resolveReturnType: TypeName = getKotlinType(field.type, null, LIST)
+    private val resolveReturnType: TypeName = getKotlinType(field.type, null, LIST)
 
-    override fun buildFieldResolverClass(): TypeSpec {
-        val fieldResolverClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
-
-        return TypeSpec.classBuilder(fieldResolverClassName)
-            .addModifiers(KModifier.ABSTRACT)
+    override fun buildFieldResolverClass(builder: TypeSpec.Builder) {
+        builder
+            .addType(environmentTypeSpec)
+            .addType(resultHolderTypeSpec)
+            .addFunction(resolveCursorFunSpec)
+            .addFunction(resultFunSpec)
+            .addFunction(buildEdgeFunSpec)
+            .addFunction(buildConnectionFunSpec)
+            .addFunction(buildPageInfoFunSpec)
             .addSuperinterface(
                 ClassName(
                     "graphql.schema",
@@ -60,57 +64,48 @@ internal class PaginationFieldResolverGenerator(
                     generatedMapper.getPaginationConnectionClassName().parameterizedBy(unwrappedReturnKotlinType)
                 )
             )
-            .addFunction(
-                FunSpec.builder("resolve")
-                    .addModifiers(KModifier.ABSTRACT)
-                    .addParameters(buildResolverFunArguments())
-                    .addParameter("env", generatedMapper.getFieldResolverEnvironment(container, field))
-                    .returns(resultHolderClassName).build()
-            )
-            .addType(metaTypeSpec)
-            .addType(buildEnvironmentType())
-            .addType(resultHolderTypeSpec)
-            .addFunctions(argumentResolverFunSpecs)
-            .addFunction(resolveCursorFunSpec)
-            .addFunction(resultBuilderFunSpec)
-            .addFunction(edgeBuilderFunSpec)
-            .addFunction(connectionBuilderFunSpec)
-            .addFunction(pageInfoBuilderFunSpec)
-            .also { typeSpec ->
-                // Add the resolver annotation if the spring boot integration is enabled.
-                if (options.enableSpringBootIntegration)
-                    typeSpec.addAnnotation(springBootIntegrationAnnotationSpec)
 
-                typeSpec.addFunction(FunSpec.builder("get")
-                    .addModifiers(KModifier.OVERRIDE)
-                    .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
-                    .returns(
-                        generatedMapper.getPaginationConnectionClassName().parameterizedBy(unwrappedReturnKotlinType)
-                    )
-                    .also { getFunSpec ->
-                        val resolveArgs = field.arguments.let { args ->
-                            if (args.isEmpty())
-                                return@let ""
+        builder.addFunction(
+            FunSpec.builder("resolve")
+                .addModifiers(KModifier.ABSTRACT)
+                .addParameters(buildResolverFunArguments())
+                .addParameter("env", generatedMapper.getFieldResolverEnvironment(container, field))
+                .returns(resultHolderClassName).build()
+        )
 
-                            return@let args.joinToString(", ") {
-                                "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
-                            } + ", "
-                        }
+        builder.addFunction(FunSpec.builder("get")
+            .addModifiers(KModifier.OVERRIDE)
+            .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
+            .returns(generatedMapper.getPaginationConnectionClassName().parameterizedBy(unwrappedReturnKotlinType))
+            .also { getFunSpec ->
+                val resolveArgs = field.arguments.let { args ->
+                    if (args.isEmpty())
+                        return@let ""
 
-                        getFunSpec.addStatement("val map = env.arguments")
-                        getFunSpec.addStatement(
-                            "val result = resolve(${resolveArgs}env = %T(env, %M(map)))",
-                            generatedMapper.getFieldResolverEnvironment(container, field),
-                            generatedMapper.getPaginationInfoBuilderMemberName()
-                        )
+                    return@let args.joinToString(", ") {
+                        "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
+                    } + ", "
+                }
 
-                        getFunSpec.addStatement("val edges = result.data.map { _buildEdge(it) }")
-                        getFunSpec.addStatement("val pageInfo = _buildPageInfo(result.hasNextPage, result.hasPreviousPage, edges.first().cursor, edges.last().cursor)")
-                        getFunSpec.addStatement("return _buildConnection(edges, pageInfo)")
-                    }
-                    .build())
+                getFunSpec.addStatement("val map = env.arguments")
+                getFunSpec.addStatement(
+                    "val result = resolve(${resolveArgs}env = %T(env, %M(map)))",
+                    generatedMapper.getFieldResolverEnvironment(container, field),
+                    generatedMapper.getPaginationInfoBuilderMemberName()
+                )
+
+                getFunSpec.addStatement("val edges = result.data.map { _buildEdge(it) }")
+                getFunSpec.addStatement("val pageInfo = _buildPageInfo(result.hasNextPage, result.hasPreviousPage, edges.first().cursor, edges.last().cursor)")
+                getFunSpec.addStatement("return _buildConnection(edges, pageInfo)")
             }
-            .build()
+            .build())
+    }
+
+    /**
+     * Will build a list of [ParameterSpec] for all parameters of the given [GraphQLFieldDefinition].
+     */
+    private fun buildResolverFunArguments(): Collection<ParameterSpec> {
+        return field.arguments.map { ParameterSpec(it.name, getKotlinType(it.type, it)) }
     }
 
     /**
@@ -124,57 +119,39 @@ internal class PaginationFieldResolverGenerator(
             .returns(STRING)
             .build()
 
-    /**
-     * Will build a list of [ParameterSpec] for all parameters of the given [GraphQLFieldDefinition].
-     */
-    private fun buildResolverFunArguments(): Collection<ParameterSpec> {
-        return field.arguments.map { ParameterSpec(it.name, getKotlinType(it.type, it)) }
-    }
-
-    private fun buildEnvironmentType(): TypeSpec {
-        val parentType = parentTypeName.copy(false)
-
-        return TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field)).also { builder ->
-            builder.primaryConstructor(
+    private val environmentTypeSpec =
+        TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field))
+            .primaryConstructor(
                 // Create the primary constructor which accepts a parameter "original" of type "DataFetchingEnvironment".
-                FunSpec.constructorBuilder().also { constructorBuilder ->
-                        constructorBuilder
-                            .addParameter(
-                                ParameterSpec
-                                    .builder("original", dataFetchingEnvironmentClassName)
-                                    .build()
-                            )
-                        constructorBuilder.addParameter("pagination", generatedMapper.getPaginationInfoClassName())
-                    }
+                FunSpec.constructorBuilder()
+                    .addParameter("original", dataFetchingEnvironmentClassName)
+                    .addParameter("pagination", generatedMapper.getPaginationInfoClassName())
                     .build()
             )
-
-            builder.addProperty(
-                PropertySpec
-                    .builder("original", dataFetchingEnvironmentClassName)
+            .addProperty(
+                PropertySpec.builder("original", dataFetchingEnvironmentClassName)
                     .initializer("original")
                     .build()
             )
-            builder.addProperty(
-                PropertySpec
-                    .builder("parent", parentType)
+            .addProperty(
+                PropertySpec.builder("parent", parentTypeName.copy(false))
                     .getter(FunSpec.getterBuilder().addCode("return original.getSource()").build())
                     .build()
             )
-            builder.addProperty(
-                PropertySpec
-                    .builder("context", contextClassName)
+            .addProperty(
+                PropertySpec.builder("context", contextClassName)
                     .getter(FunSpec.getterBuilder().addCode("return original.getContext()").build())
                     .build()
             )
-            builder.addProperty(
+            .addProperty(
                 PropertySpec.builder("pagination", generatedMapper.getPaginationInfoClassName())
-                    .initializer("pagination").build()
+                    .initializer("pagination")
+                    .build()
             )
-        }.build()
-    }
+            .build()
 
-    private val resultBuilderFunSpec = FunSpec.builder("result")
+    private val resultFunSpec = FunSpec.builder("result")
+        .addModifiers()
         .addParameter("data", resolveReturnType)
         .addParameter("hasPreviousPage", BOOLEAN)
         .addParameter("hasNextPage", BOOLEAN)
@@ -183,6 +160,7 @@ internal class PaginationFieldResolverGenerator(
         .build()
 
     private val resultHolderTypeSpec = TypeSpec.classBuilder(resultHolderClassName)
+        .addModifiers()
         .primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("data", resolveReturnType)
@@ -195,13 +173,15 @@ internal class PaginationFieldResolverGenerator(
         .addProperty(PropertySpec.builder("hasNextPage", BOOLEAN).initializer("hasNextPage").build())
         .build()
 
-    private val edgeBuilderFunSpec = FunSpec.builder("_buildEdge")
+    private val buildEdgeFunSpec = FunSpec.builder("_buildEdge")
+        .addModifiers(KModifier.PRIVATE)
         .addParameter("data", unwrappedReturnKotlinType)
         .returns(generatedMapper.getPaginationEdgeClassName().parameterizedBy(unwrappedReturnKotlinType))
         .addCode(CodeBlock.of("return %T(data, resolveCursor(data))", generatedMapper.getPaginationEdgeClassName()))
         .build()
 
-    private val connectionBuilderFunSpec = FunSpec.builder("_buildConnection")
+    private val buildConnectionFunSpec = FunSpec.builder("_buildConnection")
+        .addModifiers(KModifier.PRIVATE)
         .addParameter(
             "edges",
             LIST.parameterizedBy(
@@ -213,17 +193,16 @@ internal class PaginationFieldResolverGenerator(
         .addCode(CodeBlock.of("return %T(edges, pageInfo)", generatedMapper.getPaginationConnectionClassName()))
         .build()
 
-    private val pageInfoBuilderFunSpec = FunSpec.builder("_buildPageInfo")
+    private val buildPageInfoFunSpec = FunSpec.builder("_buildPageInfo")
+        .addModifiers(KModifier.PRIVATE)
         .addParameter("hasNextPage", BOOLEAN)
         .addParameter("hasPreviousPage", BOOLEAN)
         .addParameter("startCursor", STRING)
         .addParameter("endCursor", STRING)
         .returns(generatedMapper.getPaginationPageInfoClassName())
-        .addCode(
-            CodeBlock.of(
-                "return %T(hasNextPage, hasPreviousPage, startCursor, endCursor)",
-                generatedMapper.getPaginationPageInfoClassName()
-            )
+        .addStatement(
+            "return %T(hasNextPage, hasPreviousPage, startCursor, endCursor)",
+            generatedMapper.getPaginationPageInfoClassName()
         )
         .build()
 }

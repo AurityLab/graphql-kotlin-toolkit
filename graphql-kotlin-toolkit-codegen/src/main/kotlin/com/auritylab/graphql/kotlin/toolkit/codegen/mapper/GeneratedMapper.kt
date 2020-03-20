@@ -100,7 +100,7 @@ internal class GeneratedMapper(
     fun getFieldResolverEnvironment(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): ClassName {
         val resolver = getGeneratedFieldResolverClassName(container, field)
 
-        return ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Environment")
+        return ClassName(resolver.packageName, *resolver.simpleNames.toTypedArray(), "Env")
     }
 
     fun getPaginationInfoClassName(): ClassName {

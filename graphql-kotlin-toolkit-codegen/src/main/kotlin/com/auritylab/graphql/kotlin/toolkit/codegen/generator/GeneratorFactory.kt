@@ -2,6 +2,8 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.FieldResolverGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.PaginationFieldResolverGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationConnectionGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationEdgeGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationInfoGenerator
