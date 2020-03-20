@@ -54,7 +54,6 @@ internal abstract class AbstractFieldResolverGenerator(
         typeBuilder.addFunctions(argumentResolverFunSpecs)
         typeBuilder.addType(metaTypeSpec)
 
-
         builder.addType(typeBuilder.build())
     }
 

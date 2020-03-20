@@ -27,8 +27,8 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
                 result.first
             }
 
-        schema.query(mapObjectType(existingSchema.queryType).let { paginatedTypes.addAll(it.second);it.first })
-        schema.mutation(mapObjectType(existingSchema.mutationType).let { paginatedTypes.addAll(it.second);it.first })
+        schema.query(mapObjectType(existingSchema.queryType).let { paginatedTypes.addAll(it.second); it.first })
+        schema.mutation(mapObjectType(existingSchema.mutationType).let { paginatedTypes.addAll(it.second); it.first })
 
         schema.clearAdditionalTypes()
         schema.additionalTypes(augmentedTypes.toSet())

@@ -23,7 +23,6 @@ object GraphQLTypeHelper {
         return t
     }
 
-
     /**
      * Will check if the given [GraphQLType] is a List. This will also check if the first layer is a [GraphQLNonNull].
      *

@@ -19,7 +19,6 @@ class BaseSchemaAugmentation {
             cBuilder = GraphQLSchema.newSchema(cSchema)
         }
 
-
         cSchema = cBuilder.build()
         println("After: " + cSchema.additionalTypes.size)
 
