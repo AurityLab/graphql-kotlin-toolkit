@@ -1,6 +1,5 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.helper
 
-import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -15,30 +14,7 @@ import io.kotlintest.specs.StringSpec
 import io.kotlintest.tables.row
 import kotlin.reflect.KClass
 
-internal class GraphQLTypeHelperTest : StringSpec({
-    "Should unwrap correctly" {
-        forall(
-            row(
-                createDummyWrapper(objectType, GraphQLList::class),
-                objectType
-            ),
-            row(
-                createDummyWrapper(objectType, GraphQLList::class, GraphQLList::class, GraphQLList::class),
-                objectType
-            ),
-            row(
-                createDummyWrapper(objectType, GraphQLList::class, GraphQLNonNull::class, GraphQLList::class),
-                objectType
-            ),
-            row(
-                createDummyWrapper(
-                    objectType,
-                    GraphQLNonNull::class
-                ), objectType
-            )
-        ) { a, b -> GraphQLTypeHelper.unwrapType(a).shouldBe(b) }
-    }
-
+internal class GraphQLWrapTypeHelperTest : StringSpec({
     "Should wrap correctly" {
         forall(
             row(
