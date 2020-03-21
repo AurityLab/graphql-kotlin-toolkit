@@ -168,6 +168,6 @@ internal class KotlinTypeMapper(
      */
     private fun resolveGeneratedClass(type: GraphQLType): ClassName =
         if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.generate[type]))
-            generatedMapper.getGeneratedTypeClassName(type, false)
+            generatedMapper.getGeneratedTypeClassName(type)
         else ANY
 }
