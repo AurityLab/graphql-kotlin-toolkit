@@ -55,12 +55,6 @@ internal class GeneratedMapper(
         buildClassName("V", "util")
 
     /**
-     * Will return the [ClassName] for the environment wrapper.
-     */
-    fun getEnvironmentWrapperClassName(): ClassName =
-        buildClassName("Env", "util")
-
-    /**
      * Will return the [MemberName] of the builder method for the given [inputObject].
      */
     fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName =
