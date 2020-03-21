@@ -33,15 +33,37 @@ internal abstract class AbstractFieldResolverGenerator(
     kotlinTypeMapper: KotlinTypeMapper,
     generatedMapper: GeneratedMapper
 ) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
-    protected val fieldKotlinType = getKotlinType(field.type)
-
+    /**
+     * Describes the [ClassName] for the actual class which describes the field resolver.
+     * This will be used on the [TypeSpec] of [buildFieldResolverClass].
+     */
     override val fileClassName: ClassName = generatedMapper.getGeneratedFieldResolverClassName(container, field)
+
+    /**
+     * Describes the [TypeName] for the return type of the field.
+     */
+    protected val fieldTypeName = getKotlinType(field.type)
+
+    /**
+     * Describes the actual return [TypeName] which will be returned by the "graphql.schema.DataFetcher", which will
+     * be implemented, by this field resolver interface. This can be overridden by subclasses to adjust the
+     */
+    protected open val returnTypeName: TypeName = fieldTypeName
+
     protected val dataFetchingEnvironmentClassName = ClassName("graphql.schema", "DataFetchingEnvironment")
-    protected val dataFetcherClassName = ClassName("graphql.schema", "DataFetcher").parameterizedBy(fieldKotlinType)
+
+    /**
+     * Describes the "graphql.schema.DataFetcher" [TypeName] which is parameterized by the [returnTypeName].
+     */
+    protected val parameterizedDataFetcherTypeName: TypeName
+        get() = ClassName("graphql.schema", "DataFetcher").parameterizedBy(returnTypeName)
+
     protected val contextClassName = options.globalContext?.let { ClassName.bestGuess(it) } ?: ANY
 
     override fun build(builder: FileSpec.Builder) {
         val typeBuilder = TypeSpec.interfaceBuilder(fileClassName)
+
+        typeBuilder.addSuperinterface(parameterizedDataFetcherTypeName)
 
         // Call the build methods with the type builder.
         buildFieldResolverClass(typeBuilder)
@@ -58,7 +80,8 @@ internal abstract class AbstractFieldResolverGenerator(
     }
 
     /**
-     * Will build the [TypeSpec] which represents the field resolver itself.
+     * Will continue the building of the resolver. Some types, functions, etc. have already been.
+     * This shall only be used for additionally required types, functions, etc.
      */
     protected abstract fun buildFieldResolverClass(builder: TypeSpec.Builder)
 
@@ -79,11 +102,12 @@ internal abstract class AbstractFieldResolverGenerator(
                 .getImplementers(container)
                 .map { getKotlinType(it) }
 
+            // Fetch the first type to have a reference type to check against.
             val firstType = implementersTypes.first()
-            if (implementersTypes.all { it == firstType })
-                firstType
-            else
-                ANY
+
+            // If all implementers have the same type as the first, the reference type can be returned.
+            if (implementersTypes.all { it == firstType }) firstType
+            else ANY
         } else throw UnsupportedOperationException()
 
     /**

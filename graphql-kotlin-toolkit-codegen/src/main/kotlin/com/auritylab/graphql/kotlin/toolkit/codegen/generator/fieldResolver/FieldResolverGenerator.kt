@@ -34,7 +34,6 @@ internal class FieldResolverGenerator(
 ) {
     override fun buildFieldResolverClass(builder: TypeSpec.Builder) {
         builder
-            .addSuperinterface(dataFetcherClassName)
             .addType(environmentTypeSpec)
 
         builder.addFunction(
@@ -42,7 +41,7 @@ internal class FieldResolverGenerator(
                 .addModifiers(KModifier.ABSTRACT)
                 .addParameters(field.arguments.map { ParameterSpec(it.name, getKotlinType(it.type, it)) })
                 .addParameter("env", generatedMapper.getFieldResolverEnvironment(container, field))
-                .returns(fieldKotlinType).build()
+                .returns(fieldTypeName).build()
         )
 
         builder.addFunction(FunSpec.builder("get")
