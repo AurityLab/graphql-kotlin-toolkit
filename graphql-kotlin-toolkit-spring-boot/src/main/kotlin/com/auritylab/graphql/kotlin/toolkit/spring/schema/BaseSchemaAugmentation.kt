@@ -11,7 +11,6 @@ class BaseSchemaAugmentation {
         var cSchema = schema
         var cBuilder = GraphQLSchema.newSchema(cSchema)
 
-        println("Previous: " + cSchema.additionalTypes.size)
         delegates.forEach {
             it.augmentSchema(cSchema, cBuilder)
 
@@ -20,7 +19,6 @@ class BaseSchemaAugmentation {
         }
 
         cSchema = cBuilder.build()
-        println("After: " + cSchema.additionalTypes.size)
 
         return cSchema
     }
