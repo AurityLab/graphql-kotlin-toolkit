@@ -8,19 +8,40 @@ import graphql.schema.GraphQLType
 object GraphQLTypeHelper {
     /**
      * Will unwrap the given [type] until the type is no longer instance of [GraphQLModifiedType].
-     * A [GraphQLType] can wrapped multiple times with a [GraphQLModifiedType].
+     * This will just return the non [GraphQLModifiedType] aka the most inner type.
+     *
+     * @param type The type to unwrap.
+     * @return The most inner type of the given type.
      */
-    fun unwrapType(type: GraphQLType): GraphQLType {
-        // If it's no modified type unwrapping is not necessary.
-        if (type !is GraphQLModifiedType)
-            return type
+    fun unwrapType(type: GraphQLType): GraphQLType =
+        unwrapTypeLayers(type).last()
 
-        var t = type
-        // Will unwrap until the Type is no modified type.
-        while (t is GraphQLModifiedType)
-            t = t.wrappedType
+    /**
+     * Will unwrap the given [type] until the type is no longer instance of [GraphQLModifiedType]. Each layer of the
+     * unwrapping process will be returned in the [List]. The list is sorted accordingly to the unwrapping. The final
+     * non [GraphQLModifiedType] will also be added to the last on the last index.
+     *
+     * @param type The type to unwrap.
+     * @return List of all [GraphQLType].
+     */
+    fun unwrapTypeLayers(type: GraphQLType): List<GraphQLType> {
+        val wraps = mutableListOf<GraphQLType>()
 
-        return t
+        // Start with the given type.
+        var c = type
+
+        // Iterate until there is no longer a modified type.
+        while (c is GraphQLModifiedType) {
+            // Add the current type to the layers.
+            wraps.add(c)
+            // Set the current type to the wrapped type.
+            c = c.wrappedType
+        }
+
+        // Add the non modified type to the list.
+        wraps.add(c)
+
+        return wraps
     }
 
     /**

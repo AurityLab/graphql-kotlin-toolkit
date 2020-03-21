@@ -4,6 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
@@ -17,7 +18,6 @@ import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLList
-import graphql.schema.GraphQLModifiedType
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLType
 
@@ -42,17 +42,17 @@ internal class ArgumentCodeBlockGenerator(
         argumentName: String,
         type: GraphQLType,
         fieldDirectiveContainer: GraphQLDirectiveContainer?
-    ): FunSpec {
-        val kotlinType = typeMapper.getKotlinType(type, fieldDirectiveContainer)
+    ) = FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
+        .addModifiers(KModifier.PRIVATE)
+        .addParameter("map", MAP.parameterizedBy(STRING, ANY))
+        .returns(typeMapper.getKotlinType(type, fieldDirectiveContainer))
+        .addCode(buildArgumentResolverCodeBlock(argumentName, type, fieldDirectiveContainer))
+        .build()
 
-        return FunSpec.builder("resolve${NamingHelper.uppercaseFirstLetter(argumentName)}")
-            .addModifiers(KModifier.PRIVATE)
-            .addParameter("map", MAP.parameterizedBy(STRING, ANY))
-            .returns(kotlinType)
-            .addCode(buildArgumentResolverCodeBlock(argumentName, type, fieldDirectiveContainer))
-            .build()
-    }
-
+    /**
+     * Will build the [CodeBlock], which contains all the functions to resolve each layer and build the final result
+     * for the given [type].
+     */
     private fun buildArgumentResolverCodeBlock(
         name: String,
         type: GraphQLType,
@@ -61,7 +61,7 @@ internal class ArgumentCodeBlockGenerator(
         val code = CodeBlock.builder()
 
         // Get all layers of the type.
-        val layers = unwrapTypeLayers(type).asReversed()
+        val layers = GraphQLTypeHelper.unwrapTypeLayers(type).asReversed()
 
         var currentIndex = 0
         var lastType: TypeName = ANY
@@ -99,23 +99,8 @@ internal class ArgumentCodeBlockGenerator(
     }
 
     /**
-     * A [GraphQLType] can be wrapped with unmodifiable types (e.g. List, NonNull).
-     * This method will unwrap until an actual type.
+     * Will build the [CodeBlock] which will resolve the given [type].
      */
-    private fun unwrapTypeLayers(type: GraphQLType): List<GraphQLType> {
-        val wraps = mutableListOf<GraphQLType>()
-
-        var c = type
-        while (c is GraphQLModifiedType) {
-            wraps.add(c)
-            c = c.wrappedType
-        }
-
-        wraps.add(c)
-
-        return wraps
-    }
-
     private fun buildLayerParser(
         type: GraphQLType,
         index: Int,
