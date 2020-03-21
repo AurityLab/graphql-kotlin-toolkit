@@ -67,7 +67,7 @@ internal class GeneratedMapper(
         container: GraphQLFieldsContainer,
         field: GraphQLFieldDefinition
     ): MemberName =
-        MemberName(getGeneratedFieldResolverClassName(container, field).addSimpleNames("Meta"), "CONTAINER")
+        MemberName(getGeneratedFieldResolverClassName(container, field).addSimpleNames("Companion"), "META_CONTAINER")
 
     /**
      * Will return the [MemberName] which points to a string which contains the name of the field for the given field resolver.
@@ -76,7 +76,7 @@ internal class GeneratedMapper(
         container: GraphQLFieldsContainer,
         field: GraphQLFieldDefinition
     ): MemberName =
-        MemberName(getGeneratedFieldResolverClassName(container, field).addSimpleNames("Meta"), "FIELD")
+        MemberName(getGeneratedFieldResolverClassName(container, field).addSimpleNames("Companion"), "META_FIELD")
 
     /**
      * Will return the [ClassName] which points to the Environment class for the given resolver.

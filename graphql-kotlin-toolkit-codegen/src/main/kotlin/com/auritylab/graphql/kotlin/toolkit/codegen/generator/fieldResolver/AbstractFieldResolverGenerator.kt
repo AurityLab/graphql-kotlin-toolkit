@@ -73,8 +73,12 @@ internal abstract class AbstractFieldResolverGenerator(
             typeBuilder.addAnnotation(springBootIntegrationAnnotationSpec)
 
         // Add the common functions and types.
-        typeBuilder.addFunctions(argumentResolverFunSpecs)
-        typeBuilder.addType(metaTypeSpec)
+        typeBuilder.addType(
+            TypeSpec.companionObjectBuilder()
+                .addProperties(metaPropertySpecs)
+                .addFunctions(argumentResolverFunSpecs)
+                .build()
+        )
 
         builder.addType(typeBuilder.build())
     }
@@ -141,19 +145,15 @@ internal abstract class AbstractFieldResolverGenerator(
      * The meta type is required for the spring boot annotation, which relies on the values of the meta type.
      * As the properties of the meta type are constant they're open to use for everything.
      */
-    private val metaTypeSpec: TypeSpec =
-        TypeSpec.companionObjectBuilder("Meta")
-            .addProperty(
-                PropertySpec.builder("CONTAINER", STRING, KModifier.CONST)
-                    .initializer("\"${container.name}\"")
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("FIELD", STRING, KModifier.CONST)
-                    .initializer("\"${field.name}\"")
-                    .build()
-            )
-            .build()
+    private val metaPropertySpecs: List<PropertySpec> =
+        listOf(
+            PropertySpec.builder("META_CONTAINER", STRING, KModifier.CONST)
+                .initializer("\"${container.name}\"")
+                .build(),
+            PropertySpec.builder("META_FIELD", STRING, KModifier.CONST)
+                .initializer("\"${field.name}\"")
+                .build()
+        )
 
     /**
      * Will build the [FunSpec] for all arguments on the current [field]. The returned value also holds a [MemberName]
