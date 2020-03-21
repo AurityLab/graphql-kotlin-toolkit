@@ -94,11 +94,16 @@ internal class KotlinTypeMapper(
     }
 
     /**
-     * Will take the given [scalarTypeDefinition] and check if it's a default scalar or a custom one.
+     * Will return the according [ClassName] of the given [scalar]. If the given scalar is no built-in scalar, it will
+     * check if there is a representation class and return the [ClassName] of it. If it's no built-in scalar, and no
+     * representation class is given, it will simply return Any.
+     *
+     * @param scalar The scalar for which to get the [ClassName] for.
+     * @return The [ClassName] for the given [scalar].
      */
-    private fun getScalarKotlinType(scalarTypeDefinition: GraphQLScalarType): ClassName {
+    private fun getScalarKotlinType(scalar: GraphQLScalarType): ClassName {
         // Check for the default scalars of GraphQL itself and the `graphql-java` library.
-        val defaultClass = when (scalarTypeDefinition.name) {
+        val defaultClass = when (scalar.name) {
             "String" -> STRING
             "Boolean" -> BOOLEAN
             "Int" -> INT
@@ -116,7 +121,7 @@ internal class KotlinTypeMapper(
         if (defaultClass != null) return defaultClass
 
         // Fetch the kotlin representation class or return "Any".
-        return DirectiveFacade.representation.getArguments(scalarTypeDefinition)
+        return DirectiveFacade.representation.getArguments(scalar)
             ?.className?.let { ClassName.bestGuess(it) }
             ?: ANY
     }
