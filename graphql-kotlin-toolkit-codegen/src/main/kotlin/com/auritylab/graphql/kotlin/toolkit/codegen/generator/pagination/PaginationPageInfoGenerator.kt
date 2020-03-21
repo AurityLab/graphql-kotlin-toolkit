@@ -20,7 +20,7 @@ internal class PaginationPageInfoGenerator(
     override val dataProperties: List<DataProperty> = listOf(
         DataProperty("hasNextPage", GraphQLNonNull(Scalars.GraphQLBoolean)),
         DataProperty("hasPreviousPage", GraphQLNonNull(Scalars.GraphQLBoolean)),
-        DataProperty("startCursor", GraphQLNonNull(Scalars.GraphQLString)),
-        DataProperty("endCursor", GraphQLNonNull(Scalars.GraphQLString))
+        DataProperty("startCursor", Scalars.GraphQLString),
+        DataProperty("endCursor", Scalars.GraphQLString)
     )
 }

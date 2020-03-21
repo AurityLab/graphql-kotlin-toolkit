@@ -88,12 +88,18 @@ internal class PaginationFieldResolverGenerator(
                 )
                 getFunSpec.addStatement("val result = resolve(${resolveArgs}env = internalEnv)")
 
-                getFunSpec.addStatement("val edges = result.data.map { %T(it, resolveCursor(it, internalEnv)) }", generatedMapper.getPaginationEdgeClassName())
                 getFunSpec.addStatement(
-                    "val pageInfo = %T(result.hasNextPage, result.hasPreviousPage, edges.first().cursor, edges.last().cursor)",
+                    "val edges = result.data.map { %T(it, resolveCursor(it, internalEnv)) }",
+                    generatedMapper.getPaginationEdgeClassName()
+                )
+                getFunSpec.addStatement(
+                    "val pageInfo = %T(result.hasNextPage, result.hasPreviousPage, edges.firstOrNull()?.cursor, edges.lastOrNull()?.cursor)",
                     generatedMapper.getPaginationPageInfoClassName()
                 )
-                getFunSpec.addStatement("return %T(edges, pageInfo)", generatedMapper.getPaginationConnectionClassName())
+                getFunSpec.addStatement(
+                    "return %T(edges, pageInfo)",
+                    generatedMapper.getPaginationConnectionClassName()
+                )
             }
             .build())
     }
