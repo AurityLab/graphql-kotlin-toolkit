@@ -7,7 +7,7 @@ It also creates the required sourceset for the generated code by itself.
 ```kotlin
 plugins {
   // Apply the plugin with the latest version.
-    id("com.auritylab.graphql-kotlin-toolkit.codegen") version "0.3.0"
+    id("com.auritylab.graphql-kotlin-toolkit.codegen") version "0.3.1"
 }
 
 // Configure the code generation.
