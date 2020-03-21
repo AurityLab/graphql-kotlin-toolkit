@@ -158,7 +158,7 @@ internal class PaginationFieldResolverGenerator(
         .build()
 
     private val resultHolderTypeSpec = TypeSpec.classBuilder(resultHolderClassName)
-        .addModifiers()
+        .addKdoc("@see %T.result", fileClassName)
         .primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("data", resolveReturnType)
