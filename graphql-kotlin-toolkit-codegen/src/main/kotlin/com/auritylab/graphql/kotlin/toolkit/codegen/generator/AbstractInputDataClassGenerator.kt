@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MAP
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -33,6 +34,9 @@ internal abstract class AbstractInputDataClassGenerator(
     }
 
     protected abstract val dataProperties: List<DataProperty>
+
+    protected open val buildByMapMemberName: MemberName
+        get() = MemberName(fileClassName, "buildByMap")
 
     private fun buildDataClass(): TypeSpec {
         val properties = dataProperties
@@ -70,7 +74,7 @@ internal abstract class AbstractInputDataClassGenerator(
     private fun createBuilderFun(): FunSpec {
         val namedParameters = dataProperties
             .joinToString(", ") { "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)" }
-        return FunSpec.builder("buildByMap")
+        return FunSpec.builder(buildByMapMemberName.simpleName)
             .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(fileClassName)
             .addStatement("return %T($namedParameters)", fileClassName)
