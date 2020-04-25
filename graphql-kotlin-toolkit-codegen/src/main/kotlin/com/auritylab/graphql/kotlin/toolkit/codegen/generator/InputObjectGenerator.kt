@@ -5,6 +5,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockG
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.MemberName
 import graphql.schema.GraphQLInputObjectType
 
 /**
@@ -22,4 +23,6 @@ internal class InputObjectGenerator(
 
     override val dataProperties: List<DataProperty> = inputObjectType.fields
         .map { DataProperty(it.name, it.type, it) }
+
+    override val buildByMapMemberName: MemberName = generatedMapper.getInputObjectBuilderMemberName(inputObjectType)
 }
