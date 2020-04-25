@@ -49,15 +49,3 @@ internal class ObjectTypeGenerator(
         }
     }
 }
-
-/*internal class ObjectTypeGenerator(
-    options: CodegenOptions,
-    kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractGenerator(options, kotlinTypeMapper, generatedMapper) {
-    fun getObjectType(objectType: GraphQLObjectType): FileSpec {
-        return getFileSpecBuilder(getGeneratedTypeClassName(objectType))
-            .addType(buildObjectDataClass(objectType))
-            .build()
-    }
-}*/
