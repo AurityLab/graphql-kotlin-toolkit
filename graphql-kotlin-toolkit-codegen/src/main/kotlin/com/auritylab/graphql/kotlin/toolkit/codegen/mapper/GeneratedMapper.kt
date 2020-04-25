@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.lowercaseFirst
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 import graphql.schema.GraphQLEnumType
@@ -57,8 +58,16 @@ internal class GeneratedMapper(
     /**
      * Will return the [MemberName] of the builder method for the given [inputObject].
      */
-    fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName =
-        MemberName(getGeneratedTypeClassName(inputObject).addSimpleNames("Companion"), "buildByMap")
+    fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName {
+        val uppercaseInputObject = inputObject.name.lowercaseFirst()
+        val joinedMethodNamed = uppercaseInputObject + "BuildByMap"
+
+        // Build the MemberName for with the joined method name as actual method name.
+        return MemberName(
+            getGeneratedTypeClassName(inputObject).addSimpleNames("Companion"),
+            joinedMethodNamed
+        )
+    }
 
     /**
      * Will return the [MemberName] which points to a string which contains the name of the container for the given field resolver.
