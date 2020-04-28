@@ -8,8 +8,8 @@ A toolkit for GraphQL, specifically for [Kotlin](https://kotlinlang.org/). This 
 
 ## Code generation
 This tool follows the **schema-first** approach, in which you first write your *schema.graphqls* files and implement the server-side code for it afterwards.
-This code generator additionally creates an abstract class for each resolver. 
-These can be extended to implement the resolver in a clean way. The tool also provides specific parameters for each argument, allowing a more type safe way to access the incoming data.
+This code generator additionally creates an interface for each resolver. 
+These can be used to implement each resolver in a clean way. The tool also provides specific parameters for each argument, allowing a more type safe way to access the incoming data.
 This code generator also **supports Kotlin's null safety feature**!
 
 **Getting started [here](docs/codegen/gettings-started.md)!**
