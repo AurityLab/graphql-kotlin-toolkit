@@ -15,12 +15,9 @@ abstract class AbstractDirective(
     override fun validateDefinition(directive: GraphQLDirective) {
         // Validate the arguments of the directive.
         reference.arguments.forEach {
+            // Resolve the argument by the name and throw exception if not found.
             val argOfDirective = directive.getArgument(it.name)
-
-            // Check if the reference argument exists on the given directive
-            @Suppress("FoldInitializerAndIfToElvis")
-            if (argOfDirective == null)
-                throw buildArgumentNotFoundException(it.name)
+                ?: throw buildArgumentNotFoundException(it.name)
 
             // Check if the type of the reference argument is the same as on the given directive.
             if (argOfDirective.type != it.type)
