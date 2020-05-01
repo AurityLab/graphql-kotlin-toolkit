@@ -3,9 +3,9 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractCompilationTest
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
 import graphql.schema.GraphQLEnumType
+import kotlin.reflect.full.isSubclassOf
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import kotlin.reflect.full.isSubclassOf
 
 internal class EnumGeneratorTest : AbstractCompilationTest() {
     @Test

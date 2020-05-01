@@ -5,12 +5,12 @@ import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
 import graphql.Scalars
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
+import kotlin.reflect.KClass
+import kotlin.reflect.full.memberProperties
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import kotlin.reflect.KClass
-import kotlin.reflect.full.memberProperties
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ObjectTypeGeneratorTest : AbstractCompilationTest() {

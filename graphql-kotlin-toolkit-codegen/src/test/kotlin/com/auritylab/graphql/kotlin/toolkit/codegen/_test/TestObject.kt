@@ -22,5 +22,3 @@ internal object TestObject {
             .mutation(GraphQLObjectType.newObject().name("Mutation").build())
             .build()
 }
-
-
