@@ -14,9 +14,10 @@ dependencies {
 
     implementation(project(":graphql-kotlin-toolkit-common"))
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.2.8")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 }
 
 tasks.dokka {
