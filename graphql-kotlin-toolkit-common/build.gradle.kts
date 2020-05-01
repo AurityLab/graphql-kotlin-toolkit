@@ -11,9 +11,8 @@ dependencies {
 
     implementation("com.graphql-java:graphql-java:13.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-    testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
 }
 
 tasks.dokka {
