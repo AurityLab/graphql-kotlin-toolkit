@@ -10,7 +10,7 @@ import graphql.schema.GraphQLSchema
 import java.nio.file.Path
 
 internal object TestObject {
-    val options = CodegenOptions(hashSetOf(), Path.of(""))
+    val options = CodegenOptions(hashSetOf(), Path.of(""), generateAll = false)
     val generatedMapper = GeneratedMapper(options)
     val kotlinTypeMapper = KotlinTypeMapper(options, generatedMapper)
     val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, generatedMapper)

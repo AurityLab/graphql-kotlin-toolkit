@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 abstract class AbstractCompilationTest {
 
-    protected fun compile(generator: FileGenerator): KClass<*> {
+    protected open fun compile(generator: FileGenerator): KClass<*> {
         // Generate the code of the generator.
         val fileSpec = generator.generate()
 
