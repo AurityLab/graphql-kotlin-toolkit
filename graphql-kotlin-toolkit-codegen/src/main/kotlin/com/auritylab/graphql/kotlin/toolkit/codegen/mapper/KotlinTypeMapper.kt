@@ -7,6 +7,7 @@ import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
+import com.squareup.kotlinpoet.CHAR
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.INT
@@ -118,6 +119,7 @@ internal class KotlinTypeMapper(
             "Long" -> LONG
             "Short" -> SHORT
             "Byte" -> BYTE
+            "Char" -> CHAR
             "BigDecimal" -> BigDecimal::class.asClassName()
             "BigInteger" -> BigInteger::class.asClassName()
             else -> null
