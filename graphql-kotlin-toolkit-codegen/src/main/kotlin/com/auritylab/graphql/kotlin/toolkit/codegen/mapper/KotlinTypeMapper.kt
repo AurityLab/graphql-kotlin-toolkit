@@ -37,8 +37,14 @@ internal class KotlinTypeMapper(
     private val generatedMapper: GeneratedMapper
 ) {
     /**
-     * Will try to find a corresponding [TypeName] for the given [type].
-     * The returned types already assume the incoming data has been parsed.
+     * Will resolve the [TypeName] for the given [GraphQLType]. The returned types already assume the incoming data
+     * has been parsed into internal types. You can additionally supply a [fieldDirectiveContainer] which can be for
+     * example the [graphql.schema.GraphQLFieldDefinition]. A custom [listType] can also be supplied if needed.
+     *
+     * @param type The type for which to create the [TypeName] for.
+     * @param fieldDirectiveContainer The directive container for additional specification of the type.
+     * @param listType A custom type for lists.
+     * @return The resolved [TypeName] for the given [type].
      */
     fun getKotlinType(
         type: GraphQLType,
