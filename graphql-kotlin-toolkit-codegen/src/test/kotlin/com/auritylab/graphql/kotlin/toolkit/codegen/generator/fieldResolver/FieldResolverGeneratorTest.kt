@@ -7,12 +7,6 @@ import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
@@ -22,6 +16,12 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.starProjectedType
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
@@ -116,7 +116,7 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
             val functionParameters = getFunction.parameters
             Assertions.assertEquals(2, functionParameters.size) // 2 as the first parameter is the receiver.
 
-            //Assert that the get function will return a 'String?'.
+            // Assert that the get function will return a 'String?'.
             Assertions.assertEquals(String::class.createType(nullable = true), getFunction.returnType)
         }
     }
@@ -152,8 +152,8 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
             Assertions.assertEquals(4, functionParameters.size)
 
             // Assert against the additional parameters.
-            val boolParameter = functionParameters.firstOrNull { it.name  == "bool"}
-            val intParameter = functionParameters.firstOrNull { it.name  == "int"}
+            val boolParameter = functionParameters.firstOrNull { it.name == "bool" }
+            val intParameter = functionParameters.firstOrNull { it.name == "int" }
             Assertions.assertNotNull(boolParameter)
             Assertions.assertNotNull(intParameter)
             boolParameter!!
@@ -164,7 +164,7 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
         }
 
         @Test
-        fun `should generate return type correctly` () {
+        fun `should generate return type correctly`() {
             val resolveFunction = getResolveFunction(generatedClass)
 
             val returnType = resolveFunction.returnType
@@ -196,7 +196,7 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
         }
 
         @Test
-        fun `should apply custom global context correctly` () {
+        fun `should apply custom global context correctly`() {
             val envClass = getEnvClass(generatedClass)
 
             // Assert against the properties one more time
