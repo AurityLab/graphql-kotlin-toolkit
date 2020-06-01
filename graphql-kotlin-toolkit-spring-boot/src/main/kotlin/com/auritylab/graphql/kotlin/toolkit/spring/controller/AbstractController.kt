@@ -29,7 +29,7 @@ abstract class AbstractController(
     protected data class Operation(
         val query: String = "",
         val operationName: String?,
-        val variables: Map<String, String>?
+        val variables: Map<String, Any>?
     )
 
     /**

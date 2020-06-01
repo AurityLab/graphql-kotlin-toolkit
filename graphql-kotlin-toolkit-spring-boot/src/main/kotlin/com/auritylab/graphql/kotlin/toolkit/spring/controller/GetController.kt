@@ -37,6 +37,6 @@ class GetController(
             Operation(
                 query,
                 operationName,
-                variables?.let { parse<Map<String, String>>(it) }), request
+                variables?.let { parse<Map<String, Any>>(it) }), request
         )
 }

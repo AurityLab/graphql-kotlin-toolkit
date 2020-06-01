@@ -165,6 +165,49 @@ class GraphQLControllerMockedInvocationTest {
             }, any())
     }
 
+    @Test
+    fun `(post) should handle nested variables correctly`() {
+        val inputQuery = query()
+        val inputOperation = UUID.randomUUID().toString()
+        val inputVariables = mapOf(
+            Pair("name", "test"),
+            Pair("surname", "test"),
+            Pair("meta", mapOf(Pair("surname", "true"), Pair("name", "false")))
+        )
+        val inputContent = body(inputQuery, inputOperation, inputVariables)
+
+        mvc.post("/graphql") {
+            content = inputContent
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect { status { isOk } }
+
+        verify(invocation, times(1))
+            .invoke(argThat {
+                query == inputQuery &&
+                    operationName == inputOperation &&
+                    variables == inputVariables
+            }, any())
+    }
+
+    @Test
+    fun `(get) should handle nested variables correctly`() {
+        val inputQuery = query()
+        val inputVariables = mapOf(
+            Pair("name", "test"),
+            Pair("surname", "test"),
+            Pair("meta", mapOf(Pair("surname", "true"), Pair("name", "false")))
+        )
+
+        mvc.get("/graphql") {
+            param("query", inputQuery)
+            param("variables", objectMapper.writeValueAsString(inputVariables))
+        }.andExpect { status { isOk } }
+
+        // Invocation shall be called exactly once with the input variables.
+        verify(invocation, times(1))
+            .invoke(argThat { variables == inputVariables }, any())
+    }
+
     /**
      * Will create a GraphQL Query for testing purpose.
      */
@@ -182,7 +225,7 @@ class GraphQLControllerMockedInvocationTest {
     /**
      * Will create a JSON encoded GraphQL body. The [query] must be given, [operationName] and [variables] are optional.
      */
-    private fun body(query: String, operationName: String?, variables: Map<String, String?>?): String {
+    private fun body(query: String, operationName: String?, variables: Map<String, Any?>?): String {
         val map = mutableMapOf<String, Any>()
 
         map["query"] = query
