@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen._test
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.FileGenerator
+import com.squareup.kotlinpoet.FileSpec
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import kotlin.reflect.KClass
@@ -12,6 +13,19 @@ abstract class AbstractCompilationTest {
         val fileSpec = generator.generate()
 
         // Create the source files
+        val source = SourceFile.kotlin("Generated.kt", fileSpec.toString())
+
+        val compilation = KotlinCompilation()
+
+        compilation.sources = listOf(source)
+        compilation.inheritClassPath = false
+
+        val compileResult = compilation.compile()
+
+        return compileResult.classLoader.loadClass(fileSpec.packageName + "." + fileSpec.name).kotlin
+    }
+
+    protected open fun compile(fileSpec: FileSpec): KClass<*> {
         val source = SourceFile.kotlin("Generated.kt", fileSpec.toString())
 
         val compilation = KotlinCompilation()
