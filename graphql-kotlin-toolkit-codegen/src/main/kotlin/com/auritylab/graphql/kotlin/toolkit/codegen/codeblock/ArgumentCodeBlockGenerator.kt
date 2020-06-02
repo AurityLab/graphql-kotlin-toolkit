@@ -174,7 +174,7 @@ internal class ArgumentCodeBlockGenerator(
                     )
             }
             else -> {
-                code.addStatement("val layer$index = {it: %T -> it as %T}", kType, kType)
+                code.addStatement("val layer$index = {it: %T -> it}", kType)
             }
         }
 
