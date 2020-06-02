@@ -58,7 +58,10 @@ internal class FieldResolverGenerator(
                     } + ", "
                 }
 
-                getFunSpec.addStatement("val map = env.arguments")
+                // Variable assignment is unnecessary if there are no arguments.
+                if (field.arguments.isNotEmpty())
+                    getFunSpec.addStatement("val map = env.arguments")
+
                 getFunSpec.addStatement(
                     "return resolve(${resolveArgs}env = %T(env))",
                     generatedMapper.getFieldResolverEnvironment(container, field)
