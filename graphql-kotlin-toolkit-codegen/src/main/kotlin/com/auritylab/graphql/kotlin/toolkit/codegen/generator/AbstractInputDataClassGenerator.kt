@@ -73,7 +73,7 @@ internal abstract class AbstractInputDataClassGenerator(
      */
     private fun createBuilderFun(): FunSpec {
         val namedParameters = dataProperties
-            .joinToString(", ") { "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)" }
+            .joinToString(", ") { "resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)" }
         return FunSpec.builder(buildByMapMemberName.simpleName)
             .addParameter("map", MAP.parameterizedBy(STRING, ANY))
             .returns(fileClassName)
