@@ -1,8 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
-    id("maven-publish")
     id("signing")
-    id("org.jetbrains.dokka") version "0.10.0"
 }
 
 dependencies {
@@ -13,21 +10,6 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.6.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
-}
-
-tasks.dokka {
-    outputFormat = "html"
-    outputDirectory = "$buildDir/javadoc"
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 tasks.create("sourceJar", Jar::class) {

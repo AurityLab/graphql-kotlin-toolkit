@@ -1,9 +1,6 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
     id("org.jetbrains.kotlin.kapt")
-    id("maven-publish")
     id("signing")
-    id("org.jetbrains.dokka") version "0.10.0"
     id("org.jetbrains.kotlin.plugin.spring")
 }
 
@@ -35,21 +32,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.2")
     testImplementation("me.lazmaid.kraph:kraph:0.6.0")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-}
-
-tasks.dokka {
-    outputFormat = "html"
-    outputDirectory = "$buildDir/javadoc"
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }
 
 tasks.create("sourceJar", Jar::class) {
