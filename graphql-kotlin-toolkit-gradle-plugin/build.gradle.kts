@@ -5,8 +5,6 @@ plugins {
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
     implementation(gradleApi())
     implementation(project(":graphql-kotlin-toolkit-codegen"))

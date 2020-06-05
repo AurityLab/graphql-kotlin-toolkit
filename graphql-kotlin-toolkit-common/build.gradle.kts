@@ -3,9 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
     implementation("com.graphql-java:graphql-java:13.0")
 }
 
