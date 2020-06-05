@@ -20,6 +20,12 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "maven-publish")
 
+    dependencies {
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.6.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-engine:5.6.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.6.2")
+    }
+
     // Configure the dokka plugin for all subprojects.
     tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokka") {
         outputFormat = "html"

@@ -7,9 +7,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     implementation("com.graphql-java:graphql-java:13.0")
-
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.6.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.6.2")
 }
 
 tasks.create("sourceJar", Jar::class) {
