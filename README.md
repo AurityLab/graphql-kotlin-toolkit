@@ -12,6 +12,15 @@ This code generator additionally creates an interface for each resolver.
 These can be used to implement each resolver in a clean way. The tool also provides specific parameters for each argument, allowing a more type safe way to access the incoming data.
 This code generator also **supports Kotlin's null safety feature**!
 
+Example resolver:
+```kotlin
+class MutationUpdateUser : GQLMutationUpdateUser {
+    override fun resolve(input: GQLUpdateUserInput, env: GQLMutationUpdateUser.Env): User {
+        TODO("implement your resolver")
+    }
+}
+```
+
 **Getting started [here](docs/codegen/gettings-started.md)!**
 
 
