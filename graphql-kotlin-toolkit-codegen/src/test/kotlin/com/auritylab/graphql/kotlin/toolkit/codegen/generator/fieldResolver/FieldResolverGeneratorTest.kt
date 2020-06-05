@@ -48,6 +48,7 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
         }
 
         @Test
+        @Suppress("UNCHECKED_CAST")
         fun `should generate meta properties correctly`() {
             val companionObject = generatedClass.companionObject
             val companionObjectInstance = generatedClass.companionObjectInstance

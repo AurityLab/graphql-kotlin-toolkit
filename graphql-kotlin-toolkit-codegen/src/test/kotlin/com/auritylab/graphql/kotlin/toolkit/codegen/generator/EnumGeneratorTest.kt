@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 
 internal class EnumGeneratorTest : AbstractCompilationTest() {
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun shouldGenerateCompilableCode() {
         val generator =
             EnumGenerator(testEnum, TestObject.options, TestObject.kotlinTypeMapper, TestObject.generatedMapper)
