@@ -9,7 +9,7 @@ import java.nio.file.Path
 /**
  * Represents a parser which takes the input schemas from the [CodegenOptions] and create a [GraphQLSchema]
  */
-class CodegenSchemaParser(
+internal class CodegenSchemaParser(
     private val options: CodegenOptions
 ) {
     private val parser = SchemaParser()

@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.MemberName
 /**
  * Represents a helper which provides additional code the spring boot integration.
  */
-object SpringBootIntegrationHelper {
+internal object SpringBootIntegrationHelper {
     private val directiveAnnotation = ClassName(
         "com.auritylab.graphql.kotlin.toolkit.spring.annotation",
         "GQLDirective"

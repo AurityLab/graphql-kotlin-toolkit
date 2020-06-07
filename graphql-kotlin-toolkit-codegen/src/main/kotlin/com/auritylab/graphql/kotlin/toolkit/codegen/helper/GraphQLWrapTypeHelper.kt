@@ -10,7 +10,7 @@ import graphql.schema.GraphQLModifiedType
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLType
 
-object GraphQLWrapTypeHelper {
+internal object GraphQLWrapTypeHelper {
 
     /**
      * Will wrap the given [kotlinType] with the same wrapping of the given [type].
