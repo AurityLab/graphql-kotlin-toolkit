@@ -7,6 +7,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeName
 import graphql.schema.GraphQLDirectiveContainer
+import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLType
 
 internal abstract class AbstractClassGenerator(
@@ -50,6 +51,6 @@ internal abstract class AbstractClassGenerator(
     /**
      * Will build the corresponding [ClassName] for the given [GraphQLType].
      */
-    protected fun getGeneratedType(type: GraphQLType): ClassName =
+    protected fun getGeneratedType(type: GraphQLNamedType): ClassName =
         generatedMapper.getGeneratedTypeClassName(type)
 }

@@ -9,6 +9,7 @@ import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLType
 
@@ -24,7 +25,7 @@ internal class GeneratedMapper(
      *
      * @throws IllegalArgumentException If no name can be generated for the given [graphQLType]
      */
-    fun getGeneratedTypeClassName(graphQLType: GraphQLType): ClassName {
+    fun getGeneratedTypeClassName(graphQLType: GraphQLNamedType): ClassName {
         val name = NamingHelper.uppercaseFirstLetter(graphQLType.name)
         return when (graphQLType) {
             is GraphQLEnumType -> buildClassName(name, "enum")

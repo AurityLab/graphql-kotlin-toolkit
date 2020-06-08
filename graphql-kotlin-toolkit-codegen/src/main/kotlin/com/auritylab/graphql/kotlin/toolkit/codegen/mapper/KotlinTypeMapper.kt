@@ -23,6 +23,7 @@ import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
+import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
@@ -179,7 +180,7 @@ internal class KotlinTypeMapper(
      * Will resolve the [ClassName] for the given [type]. This will check if the [CodegenOptions.generateAll] attribute
      * is true or the type is annotated with the [DirectiveFacade.generate] directive.
      */
-    private fun resolveGeneratedClass(type: GraphQLType): ClassName =
+    private fun resolveGeneratedClass(type: GraphQLNamedType): ClassName =
         if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.generate[type]))
             generatedMapper.getGeneratedTypeClassName(type)
         else ANY

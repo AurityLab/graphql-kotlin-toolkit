@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.common.directive
 import com.auritylab.graphql.kotlin.toolkit.common.directive.exception.DirectiveValidationException
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
+import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLType
 
 abstract class AbstractDirective(
@@ -51,7 +52,7 @@ abstract class AbstractDirective(
     ): DirectiveValidationException =
         DirectiveValidationException(
             this,
-            "Argument '$argumentName' is expected to be type of '${expectedType.name}'"
+            "Argument '$argumentName' is expected to be type of '${if (expectedType is GraphQLNamedType) expectedType.name else "unknown"}'"
         )
 
     /**

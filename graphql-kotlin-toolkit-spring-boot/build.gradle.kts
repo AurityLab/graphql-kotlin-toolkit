@@ -14,7 +14,7 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor:2.2.2.RELEASE")
 
     // GraphQL-Java dependency.
-    implementation("com.graphql-java:graphql-java:13.0")
+    implementation("com.graphql-java:graphql-java:15.0")
 
     implementation("com.auritylab:kotlin-object-path:1.0.0")
 

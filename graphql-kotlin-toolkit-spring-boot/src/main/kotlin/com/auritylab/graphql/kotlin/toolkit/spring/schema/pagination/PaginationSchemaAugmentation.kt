@@ -6,6 +6,7 @@ import com.auritylab.graphql.kotlin.toolkit.spring.schema.SchemaAugmentation
 import graphql.Scalars
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLOutputType
 import graphql.schema.GraphQLSchema
@@ -54,6 +55,8 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
         definitions.filter { DirectiveFacade.pagination[it] }
 
     private fun getConnectionType(input: GraphQLType): GraphQLOutputType {
+        if (input !is GraphQLNamedType)
+            throw IllegalArgumentException("Expected named type")
         return GraphQLTypeReference(input.name + "Connection")
     }
 
