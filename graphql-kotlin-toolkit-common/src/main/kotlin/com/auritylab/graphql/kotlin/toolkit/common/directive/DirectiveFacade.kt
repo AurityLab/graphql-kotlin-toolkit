@@ -2,7 +2,6 @@ package com.auritylab.graphql.kotlin.toolkit.common.directive
 
 import com.auritylab.graphql.kotlin.toolkit.common.directive.exception.DirectiveValidationException
 import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.DoubleNullDirective
-import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.ErrorDirective
 import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.GenerateDirective
 import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.PaginationDirective
 import com.auritylab.graphql.kotlin.toolkit.common.directive.implementation.RepresentationDirective
@@ -15,11 +14,10 @@ object DirectiveFacade {
     val resolver = ResolverDirective()
     val representation = RepresentationDirective()
     val doubleNull = DoubleNullDirective()
-    val error = ErrorDirective()
     val pagination = PaginationDirective()
 
     // List of all CodegenDirectives
-    private val directivesList = listOf<Directive>(generate, resolver, representation, doubleNull, error, pagination)
+    private val directivesList = listOf<Directive>(generate, resolver, representation, doubleNull, pagination)
 
     /**
      * Will validate all existing [Directive]s on the given [schema].
