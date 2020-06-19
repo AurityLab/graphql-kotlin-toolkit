@@ -1,7 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.internal
 
 import com.auritylab.graphql.kotlin.toolkit.spring.annotation.AnnotationResolver
-import com.auritylab.graphql.kotlin.toolkit.spring.provided.providedUploadScalar
+import com.auritylab.graphql.kotlin.toolkit.spring.provided.ProvidedScalars
 import graphql.schema.DataFetcher
 import graphql.schema.GraphQLScalarType
 import graphql.schema.TypeResolver
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration
 class InternalWiringFactory(
     private val annotationResolver: AnnotationResolver
 ) : WiringFactory {
-    private val providedScalars = mapOf(Pair("Upload", providedUploadScalar))
+    private val providedScalars = mapOf(Pair("Upload", ProvidedScalars.upload))
 
     override fun getDataFetcher(environment: FieldWiringEnvironment): DataFetcher<*> =
         annotationResolver.getResolver(environment)!!
