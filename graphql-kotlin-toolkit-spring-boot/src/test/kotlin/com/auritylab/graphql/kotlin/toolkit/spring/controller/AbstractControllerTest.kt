@@ -25,7 +25,6 @@ internal abstract class AbstractControllerTest {
     @Autowired
     protected lateinit var invocation: GraphQLInvocation
 
-
     @BeforeEach
     fun resetMock() {
         clearInvocations(invocation)
