@@ -102,16 +102,34 @@ internal class KotlinTypeMapper(
     }
 
     /**
-     * Will return the according [ClassName] of the given [scalar]. If the given scalar is no built-in scalar, it will
-     * check if there is a representation class and return the [ClassName] of it. If it's no built-in scalar, and no
-     * representation class is given, it will simply return Any.
+     * Will return the according [ClassName] of the given [scalar]. This will always prefer representation classes
+     * over the built-in representation. If there is no representation and it's no built-in scalar, it will
+     * simply return Any.
      *
      * @param scalar The scalar for which to get the [ClassName] for.
      * @return The [ClassName] for the given [scalar].
      */
     private fun getScalarKotlinType(scalar: GraphQLScalarType): ClassName {
-        // Check for the default scalars of GraphQL itself and the `graphql-java` library.
-        val defaultClass = when (scalar.name) {
+        // Load the default class if the given scalar is a built-in scalar.
+        val defaultClass = getBuiltInScalarKotlinType(scalar)
+
+        // Return the representation of the scalar or the default class for built-in scalars or any.
+        return DirectiveFacade.representation.getArguments(scalar)
+            ?.className?.let { ClassName.bestGuess(it) }
+            ?: defaultClass
+            ?: ANY
+    }
+
+    /**
+     * Will return the according [ClassName] for the given [scalar]. This will take care about the built-in
+     * default scalars.
+     *
+     * @see getScalarKotlinType
+     * @param scalar The scalars for which to get the [ClassName] for.
+     * @return The [ClassName] for the given [scalar].
+     */
+    private fun getBuiltInScalarKotlinType(scalar: GraphQLScalarType): ClassName? {
+        return when (scalar.name) {
             "String" -> STRING
             "Boolean" -> BOOLEAN
             "Int" -> INT
@@ -125,14 +143,6 @@ internal class KotlinTypeMapper(
             "BigInteger" -> BigInteger::class.asClassName()
             else -> null
         }
-
-        // If it's a default scalar just return its ClassName.
-        if (defaultClass != null) return defaultClass
-
-        // Fetch the kotlin representation class or return "Any".
-        return DirectiveFacade.representation.getArguments(scalar)
-            ?.className?.let { ClassName.bestGuess(it) }
-            ?: ANY
     }
 
     /**

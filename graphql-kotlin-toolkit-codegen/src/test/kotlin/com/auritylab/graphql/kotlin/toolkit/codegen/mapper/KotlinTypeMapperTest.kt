@@ -17,6 +17,7 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import graphql.Scalars
+import graphql.schema.Coercing
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLEnumType
@@ -25,11 +26,9 @@ import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
 import graphql.schema.GraphQLUnionType
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -38,6 +37,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.util.stream.Stream
 
 internal class KotlinTypeMapperTest {
     @Nested
@@ -265,6 +267,35 @@ internal class KotlinTypeMapperTest {
             Assertions.assertEquals(1, result.typeArguments.size)
             Assertions.assertEquals(STRING.copy(true), result.typeArguments[0])
         }
+
+        @Test
+        fun `should prefer representation directive over built-in scalar type correctly`() {
+            // Build a String scalar with UUID as representation.
+            val type = Scalars.GraphQLString.transform {
+                it.withDirective(
+                    GraphQLDirective.newDirective().name("kRepresentation")
+                        .argument(
+                            GraphQLArgument.newArgument()
+                                .name("class")
+                                .type(Scalars.GraphQLString)
+                                .value("java.util.UUID")
+                        )
+                )
+            }
+
+            val result = kotlinTypeMapper.getKotlinType(type)
+
+            Assertions.assertEquals(ClassName("java.util", "UUID").copy(true), result)
+        }
+
+        @Test
+        fun `should return representation for custom scalar with no representation correctly`() {
+            val type = GraphQLScalarType.newScalar().name("CustomTestScalar").coercing(DummyCoercing).build()
+
+            val result = kotlinTypeMapper.getKotlinType(type)
+
+            Assertions.assertEquals(ANY.copy(true), result)
+        }
     }
 
     private fun getDoubleNullDirective(): GraphQLDirective =
@@ -323,5 +354,11 @@ internal class KotlinTypeMapperTest {
                 Arguments.of(Scalars.GraphQLChar, CHAR.copy(true))
             )
         }
+    }
+
+    object DummyCoercing : Coercing<Any, Any> {
+        override fun parseValue(input: Any?): Any = TODO()
+        override fun parseLiteral(input: Any?): Any = TODO()
+        override fun serialize(dataFetcherResult: Any?): Any = TODO()
     }
 }
