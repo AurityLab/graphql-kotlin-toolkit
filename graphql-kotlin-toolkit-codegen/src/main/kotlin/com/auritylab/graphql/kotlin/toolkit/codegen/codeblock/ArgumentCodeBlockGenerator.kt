@@ -6,6 +6,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -47,6 +48,7 @@ internal class ArgumentCodeBlockGenerator(
         .addParameter("map", MAP.parameterizedBy(STRING, ANY))
         .returns(typeMapper.getKotlinType(type, fieldDirectiveContainer))
         .addCode(buildArgumentResolverCodeBlock(argumentName, type, fieldDirectiveContainer))
+        .addAnnotation(AnnotationSpec.builder(Suppress::class).addMember("\"UNCHECKED_CAST\"").build())
         .build()
 
     /**
