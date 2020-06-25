@@ -29,7 +29,7 @@ abstract class AbstractCompilationTest(
 
         // Configure the compilation and run the compiler.
         val result = KotlinCompilation().apply {
-            /// Add the generated sources to the compilation.
+            // / Add the generated sources to the compilation.
             sources = listOf(mainSource, *dependencySources.toTypedArray())
             inheritClassPath = true
         }.compile()
