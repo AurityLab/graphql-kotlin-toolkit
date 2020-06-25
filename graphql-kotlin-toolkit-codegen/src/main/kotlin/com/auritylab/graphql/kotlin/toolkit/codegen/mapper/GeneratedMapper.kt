@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.lowercaseFirst
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 import graphql.schema.GraphQLEnumType
@@ -44,10 +45,11 @@ internal class GeneratedMapper(
         field: GraphQLFieldDefinition
     ): ClassName {
         // Uppercase all parts of the name.
-        val containerName = NamingHelper.uppercaseFirstLetter(container.name)
-        val fieldName = NamingHelper.uppercaseFirstLetter(field.name)
+        val containerName = container.name.uppercaseFirst()
+        val containerNameLower = container.name.lowercaseFirst()
+        val fieldName = field.name.uppercaseFirst()
 
-        return buildClassName("$containerName$fieldName", "resolver")
+        return buildClassName("$containerName$fieldName", "resolver.$containerNameLower")
     }
 
     /**
