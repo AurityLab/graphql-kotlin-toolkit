@@ -1,12 +1,19 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver
 
-import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractMockCompilationTest
+import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractCompilationTest
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
 import graphql.Scalars
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty1
@@ -16,15 +23,9 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.starProjectedType
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
+internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
     @Nested
     @DisplayName("Simple field resolver")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -213,8 +214,63 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
         }
     }
 
+    @Nested
+    @DisplayName("Resolver interface clashes")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class ResolverDuplicates {
+        private val variationOne: GraphQLObjectType =
+            GraphQLObjectType.newObject()
+                .name("User")
+                .field(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                        .name("emailAddress")
+                        .type(Scalars.GraphQLString)
+                )
+                .build()
+
+        private val variationTwo: GraphQLObjectType =
+            GraphQLObjectType.newObject()
+                .name("UserEmail")
+                .field(
+                    GraphQLFieldDefinition.newFieldDefinition()
+                        .name("address")
+                        .type(Scalars.GraphQLString)
+                )
+                .build()
+
+        @Test
+        fun `similar generated resolvers should not clash because of the same package and class name`() {
+            val firstGenerator = buildGenerator(variationOne, variationOne.getFieldDefinition("emailAddress"))
+            val secondGenerator = buildGenerator(variationTwo, variationTwo.getFieldDefinition("address"))
+
+            // It's sufficient to just compile as the compilation would fail due to duplicate classes.
+            compile(firstGenerator, secondGenerator)
+        }
+
+        /**
+         * Will build a [FieldResolverGenerator] with the given [container] and [field]. This will get all other
+         * dependencies from the [TestObject].
+         */
+        private fun buildGenerator(
+            container: GraphQLFieldsContainer,
+            field: GraphQLFieldDefinition
+        ): FieldResolverGenerator =
+            FieldResolverGenerator(
+                container, field,
+                TestObject.implementerMapper,
+                TestObject.argumentCodeBlockGenerator,
+                TestObject.options.copy(globalContext = "kotlin.String"),
+                TestObject.kotlinTypeMapper,
+                TestObject.generatedMapper
+            )
+    }
+
     /**
-     * Will return the "Env" class from the current [generatedClass].
+     * Will return a reference to the "Env" class of the given [KClass] as [KClass]. The This will additionally
+     * assert against null on the search result for the class.
+     *
+     * @param generated The class of which the inner class shall be resolved.
+     * @return The [KClass] reference to the "Env" class.
      */
     private fun getEnvClass(generated: KClass<*>): KClass<*> {
         val first = generated.nestedClasses.firstOrNull { it.simpleName == "Env" }
@@ -223,7 +279,11 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
     }
 
     /**
-     * Will return the "resolve" function from the current [generatedClass].
+     * Will return a reference to the "resolve" function for the given [KClass] as [KFunction]. This will additional
+     * assert against null on the search result for the function.
+     *
+     * @param generated The class of which the function shall be resolved.
+     * @return The [KFunction] reference to the "Env" class.
      */
     private fun getResolveFunction(generated: KClass<*>): KFunction<*> {
         val first = generated.memberFunctions.firstOrNull { it.name == "resolve" }
@@ -232,20 +292,23 @@ internal class FieldResolverGeneratorTest : AbstractMockCompilationTest() {
     }
 }
 
-val testSimpleFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
-    .name("simple")
-    .type(Scalars.GraphQLString)
-    .build()
+val testSimpleFieldDefinition: GraphQLFieldDefinition =
+    GraphQLFieldDefinition.newFieldDefinition()
+        .name("simple")
+        .type(Scalars.GraphQLString)
+        .build()
 
-val testArgumentFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
-    .name("arguments")
-    .argument(GraphQLArgument.newArgument().name("bool").type(GraphQLNonNull(Scalars.GraphQLBoolean)).build())
-    .argument(GraphQLArgument.newArgument().name("int").type(GraphQLNonNull(Scalars.GraphQLInt)).build())
-    .type(GraphQLNonNull(Scalars.GraphQLString))
-    .build()
+val testArgumentFieldDefinition: GraphQLFieldDefinition =
+    GraphQLFieldDefinition.newFieldDefinition()
+        .name("arguments")
+        .argument(GraphQLArgument.newArgument().name("bool").type(GraphQLNonNull(Scalars.GraphQLBoolean)).build())
+        .argument(GraphQLArgument.newArgument().name("int").type(GraphQLNonNull(Scalars.GraphQLInt)).build())
+        .type(GraphQLNonNull(Scalars.GraphQLString))
+        .build()
 
-val testObjectType = GraphQLObjectType.newObject()
-    .name("TestObjectType")
-    .field(testSimpleFieldDefinition)
-    .field(testArgumentFieldDefinition)
-    .build()
+val testObjectType: GraphQLObjectType =
+    GraphQLObjectType.newObject()
+        .name("TestObjectType")
+        .field(testSimpleFieldDefinition)
+        .field(testArgumentFieldDefinition)
+        .build()
