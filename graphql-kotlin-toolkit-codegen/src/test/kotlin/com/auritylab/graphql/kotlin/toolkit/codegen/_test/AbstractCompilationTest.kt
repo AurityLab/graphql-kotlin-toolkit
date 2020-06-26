@@ -22,7 +22,7 @@ abstract class AbstractCompilationTest(
      * Will compile the given [main] and the given [dependencies]. This function will return the runtime reflection
      * reference to the [main] class. The [dependencies] will just be added to the compilation.
      */
-    private fun internalCompile(main: FileSpec, vararg dependencies: FileSpec): KClass<*> {
+    private fun internalCompile(main: FileSpec, vararg dependencies: FileSpec): Result {
         // Generate source files for the given file specs.
         val mainSource = buildSourceFile(main, 0)
         val dependencySources = dependencies.mapIndexed() { index, dep -> buildSourceFile(dep, index + 1) }
@@ -39,7 +39,7 @@ abstract class AbstractCompilationTest(
             throw IllegalStateException("Kotlin compilation not successful!")
 
         // Load the given main class using the ClassLoader.
-        return result.classLoader.loadClass(main.packageName + "." + main.name).kotlin
+        return Result(result.classLoader.loadClass(main.packageName + "." + main.name).kotlin, result.classLoader)
     }
 
     /**
@@ -80,4 +80,9 @@ abstract class AbstractCompilationTest(
                         .build()
                 }).build()
     }
+
+    data class Result(
+        val main: KClass<*>,
+        val classLoader: ClassLoader
+    )
 }

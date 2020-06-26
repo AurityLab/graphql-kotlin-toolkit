@@ -31,7 +31,7 @@ internal class InputObjectGeneratorTest : AbstractCompilationTest() {
     @BeforeAll
     fun compileCode() {
         // Compile the code of the generator
-        generatedClass = compile(generator)
+        generatedClass = compile(generator).main
     }
 
     @Test

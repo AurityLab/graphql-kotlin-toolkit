@@ -45,7 +45,7 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
         @BeforeAll
         fun compileCode() {
             // Compile the code of the generator
-            generatedClass = compile(generator)
+            generatedClass = compile(generator).main
         }
 
         @Test
@@ -142,7 +142,7 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
         @BeforeAll
         fun compileCode() {
             // Compile the code of the generator
-            generatedClass = compile(generator)
+            generatedClass = compile(generator).main
         }
 
         @Test
@@ -194,7 +194,7 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
         @BeforeAll
         fun compileCode() {
             // Compile the code of the generator
-            generatedClass = compile(generator)
+            generatedClass = compile(generator).main
         }
 
         @Test

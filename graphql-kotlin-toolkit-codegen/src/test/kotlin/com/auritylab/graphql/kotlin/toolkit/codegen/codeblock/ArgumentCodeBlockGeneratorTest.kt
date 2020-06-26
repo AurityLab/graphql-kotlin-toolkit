@@ -24,7 +24,7 @@ internal class ArgumentCodeBlockGeneratorTest : AbstractCompilationTest() {
         val resolver = generator.buildResolver("argument", Scalars.GraphQLString, null)
 
         // Wrap the resolver and compile the code.
-        val compiled = compile(getWrapperClass(resolver))
+        val compiled = compile(getWrapperClass(resolver)).main
 
         // There has to be exactly one function.
         Assertions.assertEquals(1, compiled.declaredFunctions.size)

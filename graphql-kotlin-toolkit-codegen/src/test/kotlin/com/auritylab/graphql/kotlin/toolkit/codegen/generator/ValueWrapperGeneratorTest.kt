@@ -15,7 +15,7 @@ internal class ValueWrapperGeneratorTest : AbstractCompilationTest() {
             ValueWrapperGenerator(TestObject.options, TestObject.kotlinTypeMapper, TestObject.generatedMapper)
 
         // Compile the generated code.
-        val generatedClass = compile(generator)
+        val generatedClass = compile(generator).main
 
         // Assert against the member properties.
         val memberProperties = generatedClass.memberProperties
