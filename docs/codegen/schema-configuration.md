@@ -5,7 +5,7 @@ By default, the code generator **will generate code for all available types**, t
 #### Directives
 ```graphql
 # Defines the representation of a object or scalar in the kotlin code.
-directive @kRepresentation(class: String!) on OBJECT | SCALAR
+directive @kRepresentation(class: String!) on OBJECT | SCALAR | INTERFACE | ENUM
 
 # Tells the code generator that a data class for the object shall be generated.
 directive @kGenerate on OBJECT
@@ -34,6 +34,25 @@ Using the `@kRepresentation` directive you can supply the class to use.
 type User @kRepresentation(class: "com.auritylab.graphql.entity.User") {
     ...
 }
+```
+
+#### Enums
+When binding existing enums using `@kRepresentation`, the generated code slightly differs to a normal object.
+The generated enum provides converter functions to convert from the generated enum to the representation enum and vice versa. 
+
+Example:
+```kotlin
+/// Will convert the DEFAULT enum constant to the matching representation enum constant.
+GQLEUserType.DEFAULT.presentation 
+// - or -
+GQLEUserType.DEFAULT()
+
+
+// Will convert the DEFAULT representation enum constant to the matching enum constant of the generated enum.
+GQLEUserType.of(EUserType.DEFAULT)
+// - or -
+GQLEUserType(EUserType.DEFAULT)
+
 ```
 
 ### Avoid generating all resolvers (`@kResolver`)
