@@ -17,7 +17,8 @@ class RepresentationDirective : AbstractDirective("kRepresentation", false),
             .validLocations(
                 Introspection.DirectiveLocation.OBJECT,
                 Introspection.DirectiveLocation.SCALAR,
-                Introspection.DirectiveLocation.INTERFACE
+                Introspection.DirectiveLocation.INTERFACE,
+                Introspection.DirectiveLocation.ENUM
             )
             .argument {
                 it.name("class")
