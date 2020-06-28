@@ -5,7 +5,7 @@ The Spring Boot starter configures most parts by it self. You just have to confi
 #### Gradle
 ```kotlin
 dependencies {
-    implementation("com.auritylab.graphql-kotlin-toolkit:spring-boot-starter:0.3.1")
+    implementation("com.auritylab.graphql-kotlin-toolkit:spring-boot-starter:0.5.0")
 }
 ```
 
@@ -14,7 +14,7 @@ dependencies {
 <dependency>
     <groupId>com.auritylab.graphql-kotlin-toolkit</groupId>
     <artifactId>spring-boot-starter</artifactId>
-    <version>0.3.1</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
