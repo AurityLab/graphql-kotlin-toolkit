@@ -1,0 +1,33 @@
+query {
+    getUsers {
+        id
+        name
+        surname
+        emails1: emails {
+            id
+            address
+            countryCode
+            countries1: countries {
+                id
+                countryCode
+            }
+
+            countries2: countries {
+                id
+                countryCode
+            }
+        }
+
+        emails2: emails {
+            countries1: countries {
+                id
+                countryCode
+            }
+
+            countries2: countries {
+                id
+                countryCode
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+directive @kEntityHint(hints: [String!]!) on FIELD_DEFINITION
+
+
+schema {
+    query: Query
+}
+
+type Query {
+    getUsers: [User]!
+    getUser: User!
+}
+
+type User {
+    id: ID!
+    name: String
+    surname: String
+
+    emails: [UserEmail]! @kEntityHint(hints: ["emails", "defaultEmails"])
+}
+
+type UserEmail {
+    id: ID!
+    address: String!
+
+    countries: [Country]! @kEntityHint(hints: ["countries"])
+    countryCode: String! @kEntityHint(hints: ["countries.code"])
+}
+
+type Country {
+    id: ID!
+    countryCode: String
+}
