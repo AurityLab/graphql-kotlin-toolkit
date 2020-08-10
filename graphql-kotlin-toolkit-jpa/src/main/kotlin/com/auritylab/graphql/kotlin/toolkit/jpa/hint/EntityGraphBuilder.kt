@@ -1,4 +1,4 @@
-package com.auritylab.graphql.kotlin.toolkit.jpa
+package com.auritylab.graphql.kotlin.toolkit.jpa.hint
 
 import javax.persistence.EntityGraph
 import javax.persistence.Subgraph
@@ -9,7 +9,12 @@ object EntityGraphBuilder {
 
         if (path.size > 1) {
             val subgraph = graph.addSubgraph<Any>(path.first())
-            populateGraph(path.copyOfRange(1, path.size), subgraph)
+            populateGraph(
+                path.copyOfRange(
+                    1,
+                    path.size
+                ), subgraph
+            )
         }
     }
 
@@ -18,7 +23,12 @@ object EntityGraphBuilder {
 
         if (path.size > 1) {
             val subgraph = graph.addSubgraph<Any>(path.first())
-            populateGraph(path.copyOfRange(1, path.size), subgraph)
+            populateGraph(
+                path.copyOfRange(
+                    1,
+                    path.size
+                ), subgraph
+            )
         }
     }
 }

@@ -1,14 +1,12 @@
-package com.auritylab.graphql.kotlin.toolkit.jpa.hint.graph
+package com.auritylab.graphql.kotlin.toolkit.jpa.hint
 
-import com.auritylab.graphql.kotlin.toolkit.jpa.hint.HintedFieldDefinition
-
-class SelectionSetGraph constructor() {
+class SelectionSetGraphNode constructor() {
     private val nodes: MutableList<HintedFieldDefinition> = mutableListOf()
-    private val graphs: MutableMap<HintedFieldDefinition, SelectionSetGraph> = mutableMapOf()
+    private val graphs: MutableMap<HintedFieldDefinition, SelectionSetGraphNode> = mutableMapOf()
 
     private constructor(
         nNodes: List<HintedFieldDefinition>,
-        nGraphs: Map<HintedFieldDefinition, SelectionSetGraph>
+        nGraphs: Map<HintedFieldDefinition, SelectionSetGraphNode>
     ) : this() {
         nodes.addAll(nNodes)
         graphs.putAll(nGraphs)
@@ -17,30 +15,36 @@ class SelectionSetGraph constructor() {
     val allNodes: List<HintedFieldDefinition>
         get() = nodes.toList()
 
-    val allGraphs: Map<HintedFieldDefinition, SelectionSetGraph>
+    val allGraphs: Map<HintedFieldDefinition, SelectionSetGraphNode>
         get() = graphs.toMap()
+
+    /**
+     * Will return if this [SelectionSetGraphNode] is empty.
+     * It's empty if [allNodes] and [allGraphs] will return empty lists.
+     */
+    fun isEmpty(): Boolean = nodes.isEmpty() && graphs.isEmpty()
 
     fun addNode(field: HintedFieldDefinition) {
         if (!nodes.contains(field))
             nodes.add(field)
     }
 
-    fun addGraph(field: HintedFieldDefinition, graph: SelectionSetGraph) {
+    fun addGraph(field: HintedFieldDefinition, graphNode: SelectionSetGraphNode) {
         val existing = graphs[field]
 
         if (existing != null)
-            graphs[field] = existing.merge(graph)
+            graphs[field] = existing.merge(graphNode)
         else
-            graphs[field] = graph
+            graphs[field] = graphNode
     }
 
-    fun merge(other: SelectionSetGraph): SelectionSetGraph {
+    fun merge(other: SelectionSetGraphNode): SelectionSetGraphNode {
         val mergedNodes = mutableListOf<HintedFieldDefinition>().also {
             it.addAll(nodes)
             it.addAll(other.nodes)
         }
 
-        val mergedGraphs = mutableMapOf<HintedFieldDefinition, SelectionSetGraph>().also { collector ->
+        val mergedGraphs = mutableMapOf<HintedFieldDefinition, SelectionSetGraphNode>().also { collector ->
             graphs.forEach { (key, value) ->
                 val otherGraph = other.graphs[key]
                 if (otherGraph != null)
@@ -55,6 +59,9 @@ class SelectionSetGraph constructor() {
             }
         }
 
-        return SelectionSetGraph(mergedNodes, mergedGraphs)
+        return SelectionSetGraphNode(
+            mergedNodes,
+            mergedGraphs
+        )
     }
 }

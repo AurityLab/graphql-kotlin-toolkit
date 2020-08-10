@@ -10,6 +10,10 @@ import graphql.schema.SchemaTraverser
 import graphql.util.TraversalControl
 import graphql.util.TraverserContext
 
+/**
+ * Implements a "graph" which indexes the given [GraphQLSchema]. The actual graph is represented by a mapping between
+ * the parent container and the hinted field definitions. The graph, once created, is immutable.
+ */
 class FullHintGraph(
     private val schemaInput: GraphQLSchema
 ) {
@@ -17,7 +21,10 @@ class FullHintGraph(
 
     init {
         // Start the traversing process.
-        traverse()
+        SchemaTraverser().depthFirst(
+            HintTraverser(this::putField),
+            listOfNotNull(schemaInput.queryType, schemaInput.mutationType)
+        )
     }
 
     /**
@@ -34,17 +41,6 @@ class FullHintGraph(
         get() = schemaInput
 
     /**
-     * Will start the traversing process over the [schemaInput]. This will basically populate the [mapping] map with
-     * hinted fields.
-     */
-    private fun traverse() {
-        SchemaTraverser().depthFirst(
-            HintTraverser(this::putField),
-            listOfNotNull(schemaInput.queryType, schemaInput.mutationType)
-        )
-    }
-
-    /**
      * Will save the given [field] in association to the given [type].
      */
     private fun putField(type: GraphQLFieldsContainer, field: HintedFieldDefinition) {
@@ -58,9 +54,10 @@ class FullHintGraph(
 
     /**
      * Implements a travers which is just interested in FieldDefinitions, as we have to check if they have the
-     * directive and save it via the [adder].
+     * entity hint directive and if so save it via the [adder]. A field definition is only valid if it has entity
+     * hints present, therefore an empty hints array will be skipped
      */
-    class HintTraverser(
+    private class HintTraverser(
         val adder: (type: GraphQLFieldsContainer, field: HintedFieldDefinition) -> Unit
     ) : GraphQLTypeVisitorStub() {
         override fun visitGraphQLFieldDefinition(
@@ -76,8 +73,10 @@ class FullHintGraph(
             if (EntityHintDirective[node]) {
                 // Load the model for the hint directive. Double check to satisfy the compiler.
                 val directiveModel = EntityHintDirective.getArguments(node)
+
+                // Only add if there are any hints set on the directive.
                 if (directiveModel?.hints != null && directiveModel.hints.isNotEmpty())
-                    adder(parent, HintedFieldDefinition(node, directiveModel))
+                    adder(parent, HintedFieldDefinition(node, directiveModel.hints.toList()))
             }
 
             // Always continue the traversal.
@@ -87,11 +86,11 @@ class FullHintGraph(
 }
 
 /**
- * Holder class, which combines the [GraphQLFieldDefinition] and the model which holds the hint.
+ * Holder class, which combines the [GraphQLFieldDefinition] and the entity hints on the field definition.
  */
 data class HintedFieldDefinition(
     val field: GraphQLFieldDefinition,
-    val hint: EntityHintDirective.Model
+    val hints: List<String>
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -100,14 +99,14 @@ data class HintedFieldDefinition(
         other as HintedFieldDefinition
 
         if (field != other.field) return false
-        if (hint != other.hint) return false
+        if (hints != other.hints) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = field.hashCode()
-        result = 31 * result + hint.hashCode()
+        result = 31 * result + hints.hashCode()
         return result
     }
 }

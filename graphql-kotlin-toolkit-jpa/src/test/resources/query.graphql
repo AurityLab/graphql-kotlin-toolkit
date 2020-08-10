@@ -1,4 +1,4 @@
-query {
+query GetUsersAdvanced {
     getUsers {
         id
         name
