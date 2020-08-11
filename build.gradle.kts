@@ -53,5 +53,6 @@ tasks.create("allPublish") {
     dependsOn(":graphql-kotlin-toolkit-codegen:publish")
     dependsOn(":graphql-kotlin-toolkit-common:publish")
     dependsOn(":graphql-kotlin-toolkit-spring-boot:publish")
+    dependsOn(":graphql-kotlin-toolkit-jpa:publish")
     dependsOn(":graphql-kotlin-toolkit-gradle-plugin:publishPlugins")
 }
