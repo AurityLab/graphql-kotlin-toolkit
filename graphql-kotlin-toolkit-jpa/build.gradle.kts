@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(project(":graphql-kotlin-toolkit-common"))
 
+    // JPA API.
     api("jakarta.persistence:jakarta.persistence-api:2.2.3")
 
     // GraphQL-Java dependency.
@@ -50,8 +51,8 @@ publishing {
             }
 
             pom {
-                name.set("GraphQL Kotlin Toolkit: Spring")
-                description.set("GraphQL integration for Spring")
+                name.set("GraphQL Kotlin Toolkit: JPA")
+                description.set("GraphQL Tools for JPA")
                 url.set("https://github.com/AurityLab/graphql-kotlin-toolkit")
 
                 organization {
