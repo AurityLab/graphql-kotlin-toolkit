@@ -70,15 +70,17 @@ abstract class AbstractCompilationTest(
 
         return TypeSpec.classBuilder(spec.name!! + "Mock")
             .addSuperinterface(classToMock)
-            .addFunctions(spec.funSpecs
-                .filter { KModifier.ABSTRACT in it.modifiers }
-                .map {
-                    it.toBuilder()
-                        .addModifiers(KModifier.OVERRIDE)
-                        .addCode("TODO()")
-                        .also { t -> t.modifiers.remove(KModifier.ABSTRACT) }
-                        .build()
-                }).build()
+            .addFunctions(
+                spec.funSpecs
+                    .filter { KModifier.ABSTRACT in it.modifiers }
+                    .map {
+                        it.toBuilder()
+                            .addModifiers(KModifier.OVERRIDE)
+                            .addCode("TODO()")
+                            .also { t -> t.modifiers.remove(KModifier.ABSTRACT) }
+                            .build()
+                    }
+            ).build()
     }
 
     data class Result(

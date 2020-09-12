@@ -6,11 +6,11 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.Scalars
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
 
 internal class ArgumentCodeBlockGeneratorTest : AbstractCompilationTest() {
 

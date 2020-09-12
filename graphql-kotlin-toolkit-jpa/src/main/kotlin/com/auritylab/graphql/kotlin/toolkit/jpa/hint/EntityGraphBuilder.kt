@@ -13,7 +13,8 @@ object EntityGraphBuilder {
                 path.copyOfRange(
                     1,
                     path.size
-                ), subgraph
+                ),
+                subgraph
             )
         }
     }
@@ -27,7 +28,8 @@ object EntityGraphBuilder {
                 path.copyOfRange(
                     1,
                     path.size
-                ), subgraph
+                ),
+                subgraph
             )
         }
     }

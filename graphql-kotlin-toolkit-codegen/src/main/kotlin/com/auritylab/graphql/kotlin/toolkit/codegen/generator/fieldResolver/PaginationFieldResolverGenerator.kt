@@ -66,42 +66,44 @@ internal class PaginationFieldResolverGenerator(
                 .returns(resultHolderClassName).build()
         )
 
-        builder.addFunction(FunSpec.builder("get")
-            .addModifiers(KModifier.OVERRIDE)
-            .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
-            .returns(generatedMapper.getPaginationConnectionClassName().parameterizedBy(unwrappedReturnKotlinType))
-            .also { getFunSpec ->
-                val resolveArgs = field.arguments.let { args ->
-                    if (args.isEmpty())
-                        return@let ""
+        builder.addFunction(
+            FunSpec.builder("get")
+                .addModifiers(KModifier.OVERRIDE)
+                .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
+                .returns(generatedMapper.getPaginationConnectionClassName().parameterizedBy(unwrappedReturnKotlinType))
+                .also { getFunSpec ->
+                    val resolveArgs = field.arguments.let { args ->
+                        if (args.isEmpty())
+                            return@let ""
 
-                    return@let args.joinToString(", ") {
-                        "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
-                    } + ", "
+                        return@let args.joinToString(", ") {
+                            "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
+                        } + ", "
+                    }
+
+                    getFunSpec.addStatement("val map = env.arguments")
+                    getFunSpec.addStatement(
+                        "val internalEnv = %T(env, %M(map))",
+                        generatedMapper.getFieldResolverEnvironment(container, field),
+                        generatedMapper.getPaginationInfoBuilderMemberName()
+                    )
+                    getFunSpec.addStatement("val result = resolve(${resolveArgs}env = internalEnv)")
+
+                    getFunSpec.addStatement(
+                        "val edges = result.data.map { %T(it, resolveCursor(it, internalEnv)) }",
+                        generatedMapper.getPaginationEdgeClassName()
+                    )
+                    getFunSpec.addStatement(
+                        "val pageInfo = %T(result.hasNextPage, result.hasPreviousPage, edges.firstOrNull()?.cursor, edges.lastOrNull()?.cursor)",
+                        generatedMapper.getPaginationPageInfoClassName()
+                    )
+                    getFunSpec.addStatement(
+                        "return %T(edges, pageInfo)",
+                        generatedMapper.getPaginationConnectionClassName()
+                    )
                 }
-
-                getFunSpec.addStatement("val map = env.arguments")
-                getFunSpec.addStatement(
-                    "val internalEnv = %T(env, %M(map))",
-                    generatedMapper.getFieldResolverEnvironment(container, field),
-                    generatedMapper.getPaginationInfoBuilderMemberName()
-                )
-                getFunSpec.addStatement("val result = resolve(${resolveArgs}env = internalEnv)")
-
-                getFunSpec.addStatement(
-                    "val edges = result.data.map { %T(it, resolveCursor(it, internalEnv)) }",
-                    generatedMapper.getPaginationEdgeClassName()
-                )
-                getFunSpec.addStatement(
-                    "val pageInfo = %T(result.hasNextPage, result.hasPreviousPage, edges.firstOrNull()?.cursor, edges.lastOrNull()?.cursor)",
-                    generatedMapper.getPaginationPageInfoClassName()
-                )
-                getFunSpec.addStatement(
-                    "return %T(edges, pageInfo)",
-                    generatedMapper.getPaginationConnectionClassName()
-                )
-            }
-            .build())
+                .build()
+        )
     }
 
     /**

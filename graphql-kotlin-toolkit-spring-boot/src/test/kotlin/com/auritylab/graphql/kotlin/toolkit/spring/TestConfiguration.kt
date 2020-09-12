@@ -7,7 +7,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import graphql.ExecutionResultImpl
-import java.util.concurrent.CompletableFuture
 import org.mockito.Mockito
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
@@ -15,6 +14,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import java.util.concurrent.CompletableFuture
 
 @Configuration
 @EnableWebMvc

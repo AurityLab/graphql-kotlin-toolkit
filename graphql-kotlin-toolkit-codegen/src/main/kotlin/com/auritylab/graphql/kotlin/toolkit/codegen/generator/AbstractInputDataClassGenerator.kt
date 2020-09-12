@@ -57,14 +57,16 @@ internal abstract class AbstractInputDataClassGenerator(
     private fun buildDataClassCompanionObject(): TypeSpec {
         return TypeSpec.companionObjectBuilder()
             .addFunction(createBuilderFun())
-            .addFunctions(dataProperties
-                .map {
-                    argumentCodeBlockGenerator.buildResolver(
-                        it.name,
-                        it.type,
-                        it.directiveContainer
-                    )
-                })
+            .addFunctions(
+                dataProperties
+                    .map {
+                        argumentCodeBlockGenerator.buildResolver(
+                            it.name,
+                            it.type,
+                            it.directiveContainer
+                        )
+                    }
+            )
             .build()
     }
 

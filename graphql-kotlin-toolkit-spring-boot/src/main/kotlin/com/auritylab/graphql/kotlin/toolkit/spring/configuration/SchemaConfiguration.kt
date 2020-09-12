@@ -74,8 +74,11 @@ class SchemaConfiguration(
     private fun fetchSchemaSuppliers(
         suppliers: Collection<GraphQLSchemaSupplier>
     ): Collection<String> =
-        suppliers.fold(mutableSetOf(), { acc, supplier ->
-            acc.addAll(supplier.schemas)
-            acc
-        })
+        suppliers.fold(
+            mutableSetOf(),
+            { acc, supplier ->
+                acc.addAll(supplier.schemas)
+                acc
+            }
+        )
 }

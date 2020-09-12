@@ -44,30 +44,32 @@ internal class FieldResolverGenerator(
                 .returns(fieldTypeName).build()
         )
 
-        builder.addFunction(FunSpec.builder("get")
-            .addModifiers(KModifier.OVERRIDE)
-            .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
-            .returns(getKotlinType(field.type))
-            .also { getFunSpec ->
-                val resolveArgs = field.arguments.let { args ->
-                    if (args.isEmpty())
-                        return@let ""
+        builder.addFunction(
+            FunSpec.builder("get")
+                .addModifiers(KModifier.OVERRIDE)
+                .addParameter("env", ClassName("graphql.schema", "DataFetchingEnvironment"))
+                .returns(getKotlinType(field.type))
+                .also { getFunSpec ->
+                    val resolveArgs = field.arguments.let { args ->
+                        if (args.isEmpty())
+                            return@let ""
 
-                    return@let args.joinToString(", ") {
-                        "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
-                    } + ", "
+                        return@let args.joinToString(", ") {
+                            "${it.name} = resolve${NamingHelper.uppercaseFirstLetter(it.name)}(map)"
+                        } + ", "
+                    }
+
+// Variable assignment is unnecessary if there are no arguments.
+                    if (field.arguments.isNotEmpty())
+                        getFunSpec.addStatement("val map = env.arguments")
+
+                    getFunSpec.addStatement(
+                        "return resolve(${resolveArgs}env = %T(env))",
+                        generatedMapper.getFieldResolverEnvironment(container, field)
+                    )
                 }
-
-                // Variable assignment is unnecessary if there are no arguments.
-                if (field.arguments.isNotEmpty())
-                    getFunSpec.addStatement("val map = env.arguments")
-
-                getFunSpec.addStatement(
-                    "return resolve(${resolveArgs}env = %T(env))",
-                    generatedMapper.getFieldResolverEnvironment(container, field)
-                )
-            }
-            .build())
+                .build()
+        )
     }
 
     private val environmentTypeSpec =

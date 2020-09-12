@@ -3,7 +3,6 @@ package com.auritylab.graphql.kotlin.toolkit.spring.controller
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.auritylab.kotlin.object_path.KObjectPath
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.multipart.MultipartRequest
 import org.springframework.web.server.ResponseStatusException
+import java.util.concurrent.CompletableFuture
 
 @RestController
 class UploadController(

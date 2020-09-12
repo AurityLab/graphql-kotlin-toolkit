@@ -27,9 +27,12 @@ internal class UploadControllerTest : AbstractControllerTest() {
             file("0", inputFileZero)
         }.andExpect { status { isOk } }
 
-        verify(invocation, times(1)).invoke(check {
-            assertEquals(inputQuery, it.query)
-            assertEquals(inputFileZero, (it.variables!!["file"] as MultipartFile).bytes)
-        }, any())
+        verify(invocation, times(1)).invoke(
+            check {
+                assertEquals(inputQuery, it.query)
+                assertEquals(inputFileZero, (it.variables!!["file"] as MultipartFile).bytes)
+            },
+            any()
+        )
     }
 }

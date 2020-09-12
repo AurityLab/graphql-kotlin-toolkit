@@ -10,9 +10,11 @@ object ProvidedScalars {
      */
     val upload = GraphQLScalarType.newScalar()
         .name("Upload")
-        .coercing(object : Coercing<String, String> {
-            override fun parseValue(input: Any?): String = ""
-            override fun parseLiteral(input: Any?): String = ""
-            override fun serialize(dataFetcherResult: Any?): String = ""
-        }).build()
+        .coercing(
+            object : Coercing<String, String> {
+                override fun parseValue(input: Any?): String = ""
+                override fun parseLiteral(input: Any?): String = ""
+                override fun serialize(dataFetcherResult: Any?): String = ""
+            }
+        ).build()
 }

@@ -3,8 +3,8 @@ package com.auritylab.graphql.kotlin.toolkit.spring.controller
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.util.concurrent.CompletableFuture
 import org.springframework.web.context.request.WebRequest
+import java.util.concurrent.CompletableFuture
 
 abstract class AbstractController(
     protected val objectMapper: ObjectMapper,

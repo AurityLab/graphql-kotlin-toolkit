@@ -8,14 +8,14 @@ import graphql.Scalars
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLEnumType
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
 
 internal class EnumGeneratorTest : AbstractCompilationTest() {
     @Test

@@ -48,7 +48,8 @@ internal class EnumGenerator(
                 // Go through all enum values and create enum constants within this enum.
                 enum.values.forEach { enum ->
                     builder.addEnumConstant(
-                        enum.name, TypeSpec.anonymousClassBuilder()
+                        enum.name,
+                        TypeSpec.anonymousClassBuilder()
                             .addSuperclassConstructorParameter("%S", enum.name)
                             .build()
                     )

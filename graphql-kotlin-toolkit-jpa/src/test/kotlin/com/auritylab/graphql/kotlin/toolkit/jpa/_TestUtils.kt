@@ -61,7 +61,8 @@ object _TestUtils {
                 FieldCoordinates.coordinates("Query", "getUsers") to DataFetcher { env ->
                     selection = env.selectionSet
                     listOf<Any>()
-                })
+                }
+            )
         )
         val gql = GraphQL.newGraphQL(schema).build()
 

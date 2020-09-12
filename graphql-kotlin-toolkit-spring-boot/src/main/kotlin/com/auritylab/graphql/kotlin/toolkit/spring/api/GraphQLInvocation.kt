@@ -1,8 +1,8 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.api
 
 import graphql.ExecutionResult
-import java.util.concurrent.CompletableFuture
 import org.springframework.web.context.request.WebRequest
+import java.util.concurrent.CompletableFuture
 
 interface GraphQLInvocation {
     /**

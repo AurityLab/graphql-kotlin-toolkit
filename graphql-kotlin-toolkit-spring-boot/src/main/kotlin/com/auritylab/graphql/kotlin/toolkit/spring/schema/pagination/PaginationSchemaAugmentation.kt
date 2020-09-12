@@ -63,24 +63,27 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
     private fun mapObjectType(type: GraphQLObjectType): Pair<GraphQLObjectType, Collection<GraphQLType>> {
         val paginationTypes = mutableListOf<GraphQLType>()
 
-        return Pair(type.transform { trans ->
-            val augmentedFields = type.fieldDefinitions.map { field ->
-                if (!DirectiveFacade.pagination[field])
-                    field
-                else {
-                    val unwrappedType = GraphQLTypeHelper.unwrapType(field.type)
+        return Pair(
+            type.transform { trans ->
+                val augmentedFields = type.fieldDefinitions.map { field ->
+                    if (!DirectiveFacade.pagination[field])
+                        field
+                    else {
+                        val unwrappedType = GraphQLTypeHelper.unwrapType(field.type)
 
-                    paginationTypes.add(unwrappedType)
-                    field.transform {
-                        it.arguments(field.arguments.plus(buildPaginationArguments()))
-                        it.type(getConnectionType(unwrappedType))
+                        paginationTypes.add(unwrappedType)
+                        field.transform {
+                            it.arguments(field.arguments.plus(buildPaginationArguments()))
+                            it.type(getConnectionType(unwrappedType))
+                        }
                     }
                 }
-            }
 
-            trans.clearFields()
-            trans.fields(augmentedFields)
-        }, paginationTypes)
+                trans.clearFields()
+                trans.fields(augmentedFields)
+            },
+            paginationTypes
+        )
     }
 
     private fun buildPaginationArguments(): List<GraphQLArgument> {

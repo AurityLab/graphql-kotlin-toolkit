@@ -8,7 +8,8 @@ import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLNonNull
 
-class RepresentationDirective : AbstractDirective("kRepresentation", false),
+class RepresentationDirective :
+    AbstractDirective("kRepresentation", false),
     HasArgumentsDirective<RepresentationDirective.Model> {
 
     override val reference: GraphQLDirective =

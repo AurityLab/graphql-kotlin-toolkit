@@ -4,12 +4,12 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.post
+import java.util.UUID
 
 @ActiveProfiles("graphql-invocation-mock")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,11 +27,14 @@ internal class PostControllerTest : AbstractControllerTest() {
         }.andExpect { status { isOk } }
 
         verify(invocation, times(1))
-            .invoke(argThat {
-                query == inputQuery &&
-                    operationName == inputOperation &&
-                    variables == inputVariables
-            }, any())
+            .invoke(
+                argThat {
+                    query == inputQuery &&
+                        operationName == inputOperation &&
+                        variables == inputVariables
+                },
+                any()
+            )
     }
 
     @Test
@@ -44,9 +47,12 @@ internal class PostControllerTest : AbstractControllerTest() {
         }.andExpect { status { isOk } }
 
         verify(invocation, times(1))
-            .invoke(argThat {
-                query == inputQuery
-            }, any())
+            .invoke(
+                argThat {
+                    query == inputQuery
+                },
+                any()
+            )
     }
 
     @Test
@@ -59,9 +65,12 @@ internal class PostControllerTest : AbstractControllerTest() {
         }.andExpect { status { isOk } }
 
         verify(invocation, times(1))
-            .invoke(argThat {
-                query == inputQuery
-            }, any())
+            .invoke(
+                argThat {
+                    query == inputQuery
+                },
+                any()
+            )
     }
 
     @Test
@@ -81,10 +90,13 @@ internal class PostControllerTest : AbstractControllerTest() {
         }.andExpect { status { isOk } }
 
         verify(invocation, times(1))
-            .invoke(argThat {
-                query == inputQuery &&
-                    operationName == inputOperation &&
-                    variables == inputVariables
-            }, any())
+            .invoke(
+                argThat {
+                    query == inputQuery &&
+                        operationName == inputOperation &&
+                        variables == inputVariables
+                },
+                any()
+            )
     }
 }

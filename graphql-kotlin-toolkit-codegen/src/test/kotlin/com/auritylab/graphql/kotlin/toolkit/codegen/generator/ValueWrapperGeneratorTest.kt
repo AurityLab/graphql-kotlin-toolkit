@@ -4,9 +4,9 @@ import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractCompilationTes
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
 import com.squareup.kotlinpoet.asTypeName
 import com.squareup.kotlinpoet.asTypeVariableName
-import kotlin.reflect.full.memberProperties
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.reflect.full.memberProperties
 
 internal class ValueWrapperGeneratorTest : AbstractCompilationTest() {
     @Test

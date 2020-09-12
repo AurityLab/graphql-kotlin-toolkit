@@ -2,13 +2,13 @@ package com.auritylab.graphql.kotlin.toolkit.spring.controller
 
 import com.auritylab.graphql.kotlin.toolkit.spring.api.GraphQLInvocation
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.util.concurrent.CompletableFuture
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.WebRequest
+import java.util.concurrent.CompletableFuture
 
 @RestController
 class GetController(
@@ -37,6 +37,8 @@ class GetController(
             Operation(
                 query,
                 operationName,
-                variables?.let { parse<Map<String, Any>>(it) }), request
+                variables?.let { parse<Map<String, Any>>(it) }
+            ),
+            request
         )
 }

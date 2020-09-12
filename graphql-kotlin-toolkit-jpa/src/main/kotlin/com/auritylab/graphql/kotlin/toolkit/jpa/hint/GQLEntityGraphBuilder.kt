@@ -105,20 +105,26 @@ object GQLEntityGraphBuilder {
         selectionSet: DataFetchingFieldSelectionSet,
         skip: Array<out String>
     ): DataFetchingFieldSelectionSet? {
-        return skip.fold(selectionSet, { acc, it ->
-            acc.getField(it)?.selectionSet ?: return null
-        })
+        return skip.fold(
+            selectionSet,
+            { acc, it ->
+                acc.getField(it)?.selectionSet ?: return null
+            }
+        )
     }
 
     private fun traverseContainer(container: GraphQLFieldsContainer, skip: Array<out String>): GraphQLFieldsContainer? {
-        return skip.fold(container, { acc, it ->
-            val field = acc.getFieldDefinition(it) ?: return null
-            val unwrapType = GraphQLTypeHelper.unwrapType(field.type)
+        return skip.fold(
+            container,
+            { acc, it ->
+                val field = acc.getFieldDefinition(it) ?: return null
+                val unwrapType = GraphQLTypeHelper.unwrapType(field.type)
 
-            if (unwrapType !is GraphQLFieldsContainer)
-                return null
+                if (unwrapType !is GraphQLFieldsContainer)
+                    return null
 
-            return unwrapType
-        })
+                return unwrapType
+            }
+        )
     }
 }

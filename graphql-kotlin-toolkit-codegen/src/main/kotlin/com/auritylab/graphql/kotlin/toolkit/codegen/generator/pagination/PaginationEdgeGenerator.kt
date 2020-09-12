@@ -30,10 +30,12 @@ internal class PaginationEdgeGenerator(
 
         return TypeSpec.classBuilder(fileClassName)
             .addTypeVariable(typeVariable)
-            .primaryConstructor(FunSpec.constructorBuilder()
-                .addParameter("node", typeVariable)
-                .addParameter("cursor", cursorType)
-                .build())
+            .primaryConstructor(
+                FunSpec.constructorBuilder()
+                    .addParameter("node", typeVariable)
+                    .addParameter("cursor", cursorType)
+                    .build()
+            )
             .addProperty(PropertySpec.builder("node", typeVariable).initializer("node").build())
             .addProperty(PropertySpec.builder("cursor", cursorType).initializer("cursor").build())
             .build()
