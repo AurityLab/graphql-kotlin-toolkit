@@ -17,6 +17,6 @@ graphqlKotlinCodegen {
 }
 ```
 
-After you've configured the plugin you may [**continue with configuring your schema**](schema-configuration.md).
+After you've configured the plugin you may [**continue with configuring your schema**](/codegen/schema-configuration.md).
 
-Further configuration options for the plugin can be found [here](advanced-configuration.md).
+Further configuration options for the plugin can be found [here](/codegen/advanced-configuration.md).
