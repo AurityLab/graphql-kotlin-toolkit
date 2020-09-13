@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -42,10 +43,12 @@ internal class ObjectTypeGenerator(
     }
 
     private fun buildProperties(fields: Collection<GraphQLFieldDefinition>): Collection<PropertySpec> {
-        return fields.map {
-            PropertySpec.builder(it.name, getKotlinType(it.type))
-                .initializer(it.name)
-                .build()
-        }
+        return fields
+            .filter { !DirectiveFacade.resolver[it] }
+            .map {
+                PropertySpec.builder(it.name, getKotlinType(it.type))
+                    .initializer(it.name)
+                    .build()
+            }
     }
 }
