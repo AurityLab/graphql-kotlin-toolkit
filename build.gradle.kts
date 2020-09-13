@@ -13,7 +13,7 @@ allprojects {
 
 subprojects {
     group = "com.auritylab.graphql-kotlin-toolkit"
-    version = "0.6.0"
+    version = "0.6.1"
 
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "org.jetbrains.dokka")
