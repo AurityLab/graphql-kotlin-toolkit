@@ -40,8 +40,8 @@ internal class ObjectTypeGenerator(
         return fields
             .filter { !DirectiveFacade.resolver[it] }
             .map {
-            ParameterSpec.builder(it.name, getKotlinType(it.type)).build()
-        }
+                ParameterSpec.builder(it.name, getKotlinType(it.type)).build()
+            }
     }
 
     private fun buildProperties(fields: Collection<GraphQLFieldDefinition>): Collection<PropertySpec> {
