@@ -58,7 +58,7 @@ subprojects {
 
     tasks.create("sourceJar", Jar::class) {
         archiveClassifier.set("sources")
-        doLast {
+        afterEvaluate {
             from(the<SourceSetContainer>().getByName("main").allSource)
         }
     }
