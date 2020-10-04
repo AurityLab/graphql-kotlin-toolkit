@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.spring.provided
 
 import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
+import org.springframework.web.multipart.MultipartFile
 
 object ProvidedScalars {
     /**
@@ -11,10 +12,19 @@ object ProvidedScalars {
     val upload = GraphQLScalarType.newScalar()
         .name("Upload")
         .coercing(
-            object : Coercing<String, String> {
-                override fun parseValue(input: Any?): String = ""
-                override fun parseLiteral(input: Any?): String = ""
-                override fun serialize(dataFetcherResult: Any?): String = ""
+            object : Coercing<MultipartFile, MultipartFile?> {
+                override fun parseValue(input: Any?): MultipartFile? {
+                    // We can only parse if we got a MultipartFile.
+                    if (input is MultipartFile) {
+                        return input
+                    }
+
+                    // By default return null.
+                    return null
+                }
+
+                override fun parseLiteral(input: Any?): MultipartFile? = null
+                override fun serialize(dataFetcherResult: Any?): MultipartFile? = null
             }
         ).build()
 }
