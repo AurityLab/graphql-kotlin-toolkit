@@ -50,12 +50,6 @@ subprojects {
         }
     }
 
-    configure<SigningExtension> {
-        the<PublishingExtension>().publications
-            .findByName("maven")
-            ?.let { sign(it) }
-    }
-
     tasks.create("sourceJar", Jar::class) {
         archiveClassifier.set("sources")
         afterEvaluate {
@@ -136,6 +130,12 @@ subprojects {
                     }
                 }
             }
+        }
+
+        configure<SigningExtension> {
+            the<PublishingExtension>().publications
+                .findByName("maven")
+                ?.let { sign(it) }
         }
     }
 }
