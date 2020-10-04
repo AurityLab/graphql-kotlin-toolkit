@@ -8,7 +8,7 @@ type Query {
 }
 
 type Mutation {
-    createUser(name: String!, surname: String!): User
+    createUser(name: String!, surname: String!, upload: Upload): User
 }
 
 type User {
@@ -16,3 +16,6 @@ type User {
     name: String
     surname: String
 }
+
+# Simple definition of the Upload scalar.
+scalar Upload

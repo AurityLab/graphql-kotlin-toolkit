@@ -1,21 +1,20 @@
 package com.auritylab.graphql.kotlin.toolkit.spring.controller
 
+import com.auritylab.graphql.kotlin.toolkit.spring.TestOperations
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.get
 import java.util.UUID
 
-@ActiveProfiles("graphql-invocation-mock")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-internal class GetControllerTest : AbstractControllerTest() {
+internal class GetControllerTest : AbstractInvocationControllerTest() {
     @Test
     fun `(get) should call invocation correctly`() {
-        val inputQuery = query()
+        val inputQuery = TestOperations.getUserQuery
 
         mvc.get("/graphql") {
             param("query", inputQuery)
@@ -28,7 +27,7 @@ internal class GetControllerTest : AbstractControllerTest() {
 
     @Test
     fun `(get) should call invocation with variables correctly`() {
-        val inputQuery = query()
+        val inputQuery = TestOperations.getUserQuery
         val inputVariables = mapOf(Pair("name", "test"), Pair("surname", "test"))
 
         mvc.get("/graphql") {
@@ -43,7 +42,7 @@ internal class GetControllerTest : AbstractControllerTest() {
 
     @Test
     fun `(get) should call invocation with operation name correctly`() {
-        val inputQuery = query()
+        val inputQuery = TestOperations.getUserQuery
         val inputOperationName = UUID.randomUUID().toString()
 
         mvc.get("/graphql") {
@@ -64,7 +63,7 @@ internal class GetControllerTest : AbstractControllerTest() {
 
     @Test
     fun `(get) should handle nested variables correctly`() {
-        val inputQuery = query()
+        val inputQuery = TestOperations.getUserQuery
         val inputVariables = mapOf(
             Pair("name", "test"),
             Pair("surname", "test"),
