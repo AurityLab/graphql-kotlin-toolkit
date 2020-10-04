@@ -3,7 +3,6 @@ package com.auritylab.graphql.kotlin.toolkit.spring.controller
 import com.auritylab.graphql.kotlin.toolkit.spring.TestOperations
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

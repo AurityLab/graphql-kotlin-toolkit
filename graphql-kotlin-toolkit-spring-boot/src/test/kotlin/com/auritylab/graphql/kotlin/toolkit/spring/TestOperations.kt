@@ -15,7 +15,7 @@ object TestOperations {
 
     val createUserMutation_withoutUpload = Kraph {
         mutation {
-            //val uploadVar = variable("upload", "Upload", "")
+            // val uploadVar = variable("upload", "Upload", "")
             fieldObject("createUser", args = mapOf("name" to "test", "surname" to "test")) {
                 field("id")
                 field("name")
