@@ -5,6 +5,9 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java_version: [8, 11, 15]
     steps:
     - uses: actions/checkout@v1
     - name: Restore cache
@@ -16,7 +19,7 @@ jobs:
           ${{ runner.os }}-gradle-
     - uses: actions/setup-java@v1
       with:
-        java-version: 11
+        java-version: ${{ matrix.java_version }}
     - name: Build
       uses: eskatos/gradle-command-action@v1
       with:
