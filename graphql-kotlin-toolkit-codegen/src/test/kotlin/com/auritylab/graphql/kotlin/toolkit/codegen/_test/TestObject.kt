@@ -7,10 +7,11 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLSchema
+import java.io.File
 import java.nio.file.Path
 
 internal object TestObject {
-    val options = CodegenOptions(hashSetOf(), Path.of(""), generateAll = false)
+    val options = CodegenOptions(hashSetOf(), File("").toPath(), generateAll = false)
     val generatedMapper = GeneratedMapper(options)
     val kotlinTypeMapper = KotlinTypeMapper(options, generatedMapper)
     val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, generatedMapper)
