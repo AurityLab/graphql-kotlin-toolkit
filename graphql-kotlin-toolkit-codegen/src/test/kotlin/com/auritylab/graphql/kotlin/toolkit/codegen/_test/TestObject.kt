@@ -8,7 +8,6 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLSchema
 import java.io.File
-import java.nio.file.Path
 
 internal object TestObject {
     val options = CodegenOptions(hashSetOf(), File("").toPath(), generateAll = false)
