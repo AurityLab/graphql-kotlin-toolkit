@@ -11,6 +11,6 @@ dependencies {
 
     implementation(project(":graphql-kotlin-toolkit-common"))
 
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.0")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.1")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 }
