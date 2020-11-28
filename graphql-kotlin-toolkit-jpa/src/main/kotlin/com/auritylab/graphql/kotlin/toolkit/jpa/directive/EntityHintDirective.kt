@@ -24,6 +24,7 @@ object EntityHintDirective : AbstractDirective("kEntityHint", false), HasArgumen
             )
             .build()
 
+    @Suppress("UNCHECKED_CAST")
     override fun getArguments(directive: GraphQLDirective): Model {
         val hints = directive.getArgument("hints").value as? List<String>
 
