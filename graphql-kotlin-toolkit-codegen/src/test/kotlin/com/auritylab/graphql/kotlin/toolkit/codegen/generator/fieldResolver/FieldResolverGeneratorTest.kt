@@ -6,6 +6,7 @@ import graphql.Scalars
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import org.junit.jupiter.api.Assertions
@@ -266,6 +267,30 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
             )
     }
 
+    @Nested
+    @DisplayName("Unimplemented interface")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class UnimplementedInterface {
+        @Test
+        fun `should correctly build generator for not implemented interface`() {
+            val compiled = compile(buildGenerator()).main
+
+            Assertions.assertNotNull(compiled)
+        }
+
+        fun buildGenerator(): FieldResolverGenerator {
+            return FieldResolverGenerator(
+                testInterfaceType,
+                testSimpleFieldDefinition,
+                TestObject.implementerMapper,
+                TestObject.argumentCodeBlockGenerator,
+                TestObject.options,
+                TestObject.kotlinTypeMapper,
+                TestObject.generatedMapper
+            )
+        }
+    }
+
     /**
      * Will return a reference to the "Env" class of the given [KClass] as [KClass]. The This will additionally
      * assert against null on the search result for the class.
@@ -312,4 +337,10 @@ val testObjectType: GraphQLObjectType =
         .name("TestObjectType")
         .field(testSimpleFieldDefinition)
         .field(testArgumentFieldDefinition)
+        .build()
+
+val testInterfaceType: GraphQLInterfaceType =
+    GraphQLInterfaceType.newInterface()
+        .name("TestInterfaceType")
+        .field(testSimpleFieldDefinition)
         .build()

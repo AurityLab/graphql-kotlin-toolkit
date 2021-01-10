@@ -107,11 +107,16 @@ internal abstract class AbstractFieldResolverGenerator(
                 .map { getKotlinType(it) }
 
             // Fetch the first type to have a reference type to check against.
-            val firstType = implementersTypes.first()
+            val firstType = implementersTypes.firstOrNull()
 
-            // If all implementers have the same type as the first, the reference type can be returned.
-            if (implementersTypes.all { it == firstType }) firstType
-            else ANY
+            // If there is no implementation, just return ANY.
+            if (firstType == null) {
+                ANY
+            } else {
+                // If all implementers have the same type as the first, the reference type can be returned.
+                if (implementersTypes.all { it == firstType }) firstType
+                else ANY
+            }
         } else throw UnsupportedOperationException()
 
     /**
