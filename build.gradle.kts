@@ -2,8 +2,8 @@ version = "0.6.3"
 group = "com.auritylab.graphql-kotlin-toolkit"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.4.10" apply false
-    id("org.jetbrains.kotlin.plugin.spring") version "1.4.10" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.4.20" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "1.4.20" apply false
     id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
     id("org.jetbrains.dokka") version "0.10.1" apply false
 }
