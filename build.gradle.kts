@@ -2,15 +2,16 @@ version = "0.6.3"
 group = "com.auritylab.graphql-kotlin-toolkit"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.4.20" apply false
-    id("org.jetbrains.kotlin.plugin.spring") version "1.4.20" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
-    id("org.jetbrains.dokka") version "0.10.1" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.4.31" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "1.4.31" apply false
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jetbrains.dokka") version "1.4.30" apply false
 }
 
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
     }
 }
 
@@ -31,12 +32,6 @@ subprojects {
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.0")
         "testImplementation"("org.junit.jupiter:junit-jupiter-engine:5.7.0")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.0")
-    }
-
-    // Configure the dokka plugin for all subprojects.
-    tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokka") {
-        outputFormat = "html"
-        outputDirectory = "$buildDir/javadoc"
     }
 
     // Configure the test tasks to use the JUnit platform for all subprojects.
@@ -61,7 +56,7 @@ subprojects {
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         description = "Assembles Kotlin docs with Dokka"
         archiveClassifier.set("javadoc")
-        from(tasks.getByName("dokka"))
+        from(tasks.getByName("dokkaJavadoc"))
     }
 
     afterEvaluate {
