@@ -29,7 +29,7 @@ internal class GeneratedMapper(
     fun getGeneratedTypeClassName(graphQLType: GraphQLNamedType): ClassName {
         val name = NamingHelper.uppercaseFirstLetter(graphQLType.name)
         return when (graphQLType) {
-            is GraphQLEnumType -> buildClassName(name, "enum")
+            is GraphQLEnumType -> buildClassName(name, "enumerations")
             is GraphQLInputObjectType -> buildClassName(name, "inputObject")
             is GraphQLObjectType -> buildClassName(name, "object")
             else -> throw IllegalArgumentException("Unable to build name for ${graphQLType.name}")
