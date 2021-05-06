@@ -40,8 +40,6 @@ internal abstract class AbstractDataFetcherControllerTest : AbstractControllerTe
 
             // Always return null.
             whenever(m.get(any())).then {
-                println("tt")
-
                 null
             }
 
