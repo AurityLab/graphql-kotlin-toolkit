@@ -96,6 +96,15 @@ internal class GeneratedMapper(
     fun getFieldResolverEnvironment(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): ClassName =
         getGeneratedFieldResolverClassName(container, field).addSimpleNames("Env")
 
+    /**
+     * Will return the [ClassName] which defines the meta information class for the given [GraphQLObjectType].
+     */
+    fun getObjectTypeMetaClassName(objectType: GraphQLObjectType): ClassName {
+        return buildClassName("Meta" + NamingHelper.uppercaseFirstLetter(objectType.name), "meta.objectType")
+    }
+
+    fun getMetaObjectTypeField(): ClassName = buildClassName("MetaObjectTypeField", "meta.abstracts")
+
     fun getPaginationInfoClassName(): ClassName {
         return buildClassName("PaginationInfo", "pagination")
     }

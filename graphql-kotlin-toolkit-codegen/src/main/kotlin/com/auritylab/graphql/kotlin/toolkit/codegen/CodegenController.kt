@@ -30,8 +30,9 @@ internal class CodegenController(
             buildObjectTypeGenerators(),
             buildInterfaceTypeGenerators(),
             buildAdditionalGenerators(),
-            buildPaginationGenerators()
-        ).flatten()
+            buildPaginationGenerators(),
+
+            ).flatten()
     }
 
     /**
@@ -70,6 +71,9 @@ internal class CodegenController(
                         DirectiveFacade.resolver[fieldDefinition]
                     ) internalGenerators.add(getSwitchedFieldResolverGenerator(objectType, fieldDefinition))
                 }
+
+                // Generator for the meta information about the object type.
+                internalGenerators.add(generatorFactory.objectTypeMeta(objectType))
 
                 return@flatMap internalGenerators
             }
@@ -113,7 +117,8 @@ internal class CodegenController(
      */
     private fun buildAdditionalGenerators(): Collection<FileGenerator> {
         return listOf(
-            generatorFactory.valueWrapper()
+            generatorFactory.valueWrapper(),
+            generatorFactory.metaObjectTypeField()
         )
     }
 
