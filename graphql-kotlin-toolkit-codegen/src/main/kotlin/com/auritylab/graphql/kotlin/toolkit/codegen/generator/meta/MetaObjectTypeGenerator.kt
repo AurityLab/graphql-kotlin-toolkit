@@ -7,12 +7,15 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.NOTHING
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.SET
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import graphql.schema.GraphQLFieldDefinition
@@ -39,6 +42,9 @@ internal class MetaObjectTypeGenerator(
         objectType.fieldDefinitions.forEach {
             type.addProperty(buildFieldProperty(it))
         }
+
+        // As we depend on the fields, this property has to go after the field properties.
+        type.addProperty(buildAllFieldsProperty())
 
         builder.addType(type.build())
     }
@@ -185,4 +191,32 @@ internal class MetaObjectTypeGenerator(
 
         return property.build()
     }
+
+    /**
+     * Will build the property which returns all available fields within this ObjectType. They're all in a [Set].
+     */
+    private fun buildAllFieldsProperty(): PropertySpec {
+        // Create the return type which is a Set parameterized with the MetaObjectTypeField.
+        val returnType = SET.parameterizedBy(
+            generatedMapper.getMetaObjectTypeField().parameterizedBy(STAR, STAR)
+        )
+
+        // Create the initializer with a basic "setOf(..)". All fields will be added to the set on the runtime.
+        val codeBlock = CodeBlock.builder()
+        codeBlock.add("setOf(")
+        objectType.fieldDefinitions.forEach {
+            codeBlock.add(getFieldPropertyName(it) + ",")
+        }
+        codeBlock.add(")")
+
+        // Create the actual property with the previously created CodeBlock.
+        return PropertySpec.builder("allFields", returnType)
+            .initializer(codeBlock.build())
+            .build()
+    }
+
+    /**
+     * Returns the name of the field meta information property for the given [field].
+     */
+    private fun getFieldPropertyName(field: GraphQLFieldDefinition) = "field" + field.name.uppercaseFirst()
 }

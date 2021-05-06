@@ -105,6 +105,39 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
         assertEquals(metaReferenced.objectInstance!!, referencedObject)
     }
 
+    @Test
+    fun `should provide all fields through allFields property`() {
+        // Create the test ObjectType with exactly 3 fields.
+        val testObjectType = GraphQLObjectType.newObject()
+            .name("TestObject")
+            .field {
+                it.name("id")
+                it.type(Scalars.GraphQLID)
+            }
+            .field {
+                it.name("name")
+                it.type(Scalars.GraphQLString)
+            }
+            .field {
+                it.name("surname")
+                it.type(Scalars.GraphQLString)
+            }
+            .build()
+
+        // Compile it...
+        val generated = compile(
+            createDefaultGenerator(testObjectType),
+            metaObjectTypeFieldGenerator
+        ).main
+
+        // Load the allFields Set instance...
+        val allFieldsInstance = getFieldMetaValue<Set<*>>(generated.objectInstance!!, "allFields")
+        assertNotNull(allFieldsInstance)
+
+        // Assert against the size...
+        assertEquals(3, allFieldsInstance!!.size)
+    }
+
     /**
      * Will try to resolve the field with the given [name] on the given [clazz]. This internally asserts that the
      * field must exist. The return value is [Any] because the return type is generated and is therefore not on
