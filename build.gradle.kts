@@ -4,7 +4,6 @@ group = "com.auritylab.graphql-kotlin-toolkit"
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.31" apply false
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.31" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("org.jetbrains.dokka") version "1.4.30" apply false
 }
 
@@ -19,7 +18,6 @@ subprojects {
     group = parent!!.group
     version = parent!!.version
 
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "maven-publish")
