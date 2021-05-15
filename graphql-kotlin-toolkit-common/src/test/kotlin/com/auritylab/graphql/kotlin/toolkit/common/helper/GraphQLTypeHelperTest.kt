@@ -112,7 +112,8 @@ internal class GraphQLTypeHelperTest {
     }
 
     companion object {
-        const val shouldUnwrapTypeCorrectly_source_pointer = "com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelperTest#shouldUnwrapTypeCorrectly_source"
+        const val shouldUnwrapTypeCorrectly_source_pointer =
+            "com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelperTest#shouldUnwrapTypeCorrectly_source"
 
         @JvmStatic
         fun shouldUnwrapTypeCorrectly_source(): Stream<Arguments> {

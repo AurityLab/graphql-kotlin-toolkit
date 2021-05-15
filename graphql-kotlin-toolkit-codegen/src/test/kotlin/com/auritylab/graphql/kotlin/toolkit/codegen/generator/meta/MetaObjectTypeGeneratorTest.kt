@@ -5,7 +5,9 @@ import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
 import graphql.Scalars
 import graphql.schema.GraphQLObjectType
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.reflect.InvocationTargetException

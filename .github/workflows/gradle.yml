@@ -1,27 +1,27 @@
 name: Gradle
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java_version: [11, 15]
+        java_version: [ 11, 15 ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
-    - name: Restore cache
-      uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-    - uses: actions/setup-java@v1
-      with:
-        java-version: ${{ matrix.java_version }}
-    - name: Build
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: build
+      - uses: actions/checkout@v1
+      - name: Restore cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java_version }}
+      - name: Build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build

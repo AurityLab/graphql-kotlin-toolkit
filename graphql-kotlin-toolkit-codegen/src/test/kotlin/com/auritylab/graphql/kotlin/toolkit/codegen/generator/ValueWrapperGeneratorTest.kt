@@ -26,6 +26,9 @@ internal class ValueWrapperGeneratorTest : AbstractCompilationTest() {
         Assertions.assertEquals(1, typeParameters.size)
 
         // Assert that the return type of the property is equal to the type parameter of the class.
-        Assertions.assertEquals(typeParameters[0].asTypeVariableName(), memberProperties.first().returnType.asTypeName())
+        Assertions.assertEquals(
+            typeParameters[0].asTypeVariableName(),
+            memberProperties.first().returnType.asTypeName()
+        )
     }
 }
