@@ -2,7 +2,6 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.AbstractClassGenerator
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
@@ -43,7 +42,6 @@ internal class MetaObjectTypeGenerator(
         )
 
         // Add the basic properties for ObjectType itself.
-        type.addProperty(buildNameProperty())
         type.addProperty(buildRuntimeTypeProperty())
 
         // Create the property for each field.
@@ -55,16 +53,6 @@ internal class MetaObjectTypeGenerator(
         type.addProperty(buildAllFieldsProperty())
 
         builder.addType(type.build())
-    }
-
-    /**
-     * Will build the property which represents the name of the object type.
-     */
-    private fun buildNameProperty(): PropertySpec {
-        return PropertySpec.builder("name", String::class)
-            .initializer("\"" + objectType.name + "\"")
-            .addModifiers(KModifier.CONST)
-            .build()
     }
 
     /**
@@ -106,7 +94,7 @@ internal class MetaObjectTypeGenerator(
             .build()
 
         // Create the actual property.
-        return PropertySpec.builder("field" + field.name.uppercaseFirst(), returnType)
+        return PropertySpec.builder(getFieldPropertyName(field), returnType)
             .initializer("%L", fieldImpl)
             .build()
     }
@@ -226,7 +214,22 @@ internal class MetaObjectTypeGenerator(
     }
 
     /**
-     * Returns the name of the field meta information property for the given [field].
+     * Returns the name of the field meta information property for the given [field]. This might append an underscore
+     * to the name of the field if the name is reserved.
      */
-    private fun getFieldPropertyName(field: GraphQLFieldDefinition) = "field" + field.name.uppercaseFirst()
+    private fun getFieldPropertyName(field: GraphQLFieldDefinition): String {
+        // If the name of the field is a reserved name, then append an underscore.
+        if (RESERVED_NAMES.contains(field.name))
+            return "${field.name}_"
+
+        // Just return the name of the field if it's no reserved name.
+        return field.name
+    }
+
+    companion object {
+        /**
+         * Defines all reserved names, which can not be used for field meta values.
+         */
+        private val RESERVED_NAMES = setOf("fields", "runtimeType")
+    }
 }
