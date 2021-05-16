@@ -183,6 +183,10 @@ tasks.create<JacocoReport>("jacocoMergeReport") {
     // Additional function to avoid scope clash in the closures.
     val addSourceSet = { input: SourceSet -> sourceSets(input) }
 
+    reports {
+        xml.isEnabled = true
+    }
+
     // Add the merged JaCoCo execution file as execution data for this report.
     executionData(project.file("${project.buildDir}/jacoco/jacocoMerge.exec"))
 
