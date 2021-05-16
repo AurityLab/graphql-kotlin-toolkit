@@ -22,6 +22,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
+    apply(plugin = "idea")
 
     dependencies {
         "implementation"(platform("org.jetbrains.kotlin:kotlin-bom"))
