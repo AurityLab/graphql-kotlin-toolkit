@@ -87,7 +87,6 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
 
             // Assert against the member properties.
             val memberProperties = firstEnvClass.memberProperties
-            Assertions.assertEquals(3, memberProperties.size)
 
             Assertions.assertNotNull(memberProperties.firstOrNull { it.name == "original" })
             Assertions.assertNotNull(memberProperties.firstOrNull { it.name == "parent" })
@@ -207,7 +206,6 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
 
             // Assert against the properties one more time
             val memberProperties = envClass.memberProperties
-            Assertions.assertEquals(3, memberProperties.size)
 
             // Search for the "context" property.
             val contextProperty = memberProperties.firstOrNull { it.name == "context" }

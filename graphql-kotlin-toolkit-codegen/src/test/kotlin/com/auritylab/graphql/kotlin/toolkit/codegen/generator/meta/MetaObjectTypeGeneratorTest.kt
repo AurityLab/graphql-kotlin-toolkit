@@ -131,7 +131,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
         ).main
 
         // Load the allFields Set instance...
-        val allFieldsInstance = getFieldMetaValue<Set<*>>(generated.objectInstance!!, "allFields")
+        val allFieldsInstance = getFieldMetaValue<Set<*>>(generated.objectInstance!!, "fields")
         assertNotNull(allFieldsInstance)
 
         // Assert against the size...
@@ -147,7 +147,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
     private fun getFieldInstance(clazz: KClass<*>, name: String): Any {
         // Search for the property by the given name on the given class..
         val found = clazz.memberProperties
-            .firstOrNull { it.name == "field" + name.uppercaseFirst() }
+            .firstOrNull { it.name == name }
             as? KProperty1<Any, Any>
 
         // Assert that there the property exists.
