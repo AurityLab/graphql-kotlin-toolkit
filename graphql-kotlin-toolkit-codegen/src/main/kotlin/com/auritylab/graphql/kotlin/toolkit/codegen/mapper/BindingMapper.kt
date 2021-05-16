@@ -12,4 +12,6 @@ class BindingMapper {
     val abstractEnvType: ClassName = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "AbstractEnv")
 
     val metaObjectTypeFieldType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaObjectTypeField")
+
+    val metaObjectTypeType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaObjectType")
 }

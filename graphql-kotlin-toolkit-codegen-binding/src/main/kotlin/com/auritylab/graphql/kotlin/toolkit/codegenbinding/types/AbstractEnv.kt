@@ -10,7 +10,10 @@ import graphql.schema.DataFetchingEnvironment
  * @param original The original [DataFetchingEnvironment] provided by graphql-java.
  */
 @Suppress("unused")
-abstract class AbstractEnv<P : Any, C : Any>(@Suppress("CanBeParameter") val original: DataFetchingEnvironment) {
+abstract class AbstractEnv<P : Any, C : Any, T>(
+    @Suppress("CanBeParameter") val original: DataFetchingEnvironment,
+    val type: T
+) {
     /**
      * Provides the parent of this resolver.
      */

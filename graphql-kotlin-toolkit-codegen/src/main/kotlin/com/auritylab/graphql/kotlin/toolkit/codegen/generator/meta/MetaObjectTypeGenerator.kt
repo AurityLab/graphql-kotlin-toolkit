@@ -3,9 +3,9 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.AbstractClassGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -35,6 +35,12 @@ internal class MetaObjectTypeGenerator(
 
     override fun build(builder: FileSpec.Builder) {
         val type = TypeSpec.objectBuilder(fileClassName)
+
+        type.addSuperinterface(
+            bindingMapper.metaObjectTypeType.parameterizedBy(
+                kotlinTypeMapper.getKotlinType(objectType).copy(nullable = false)
+            )
+        )
 
         // Add the basic properties for ObjectType itself.
         type.addProperty(buildNameProperty())
@@ -75,6 +81,7 @@ internal class MetaObjectTypeGenerator(
         // Create the actual property.
         return PropertySpec.builder("runtimeType", returnType)
             .initializer("%T::class", runtimeType)
+            .addModifiers(KModifier.OVERRIDE)
             .build()
     }
 
@@ -212,8 +219,9 @@ internal class MetaObjectTypeGenerator(
         codeBlock.add(")")
 
         // Create the actual property with the previously created CodeBlock.
-        return PropertySpec.builder("allFields", returnType)
+        return PropertySpec.builder("fields", returnType)
             .initializer(codeBlock.build())
+            .addModifiers(KModifier.OVERRIDE)
             .build()
     }
 

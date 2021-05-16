@@ -3,18 +3,22 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
-import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.NOTHING
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLObjectType
 
 internal class FieldResolverGenerator(
     container: GraphQLFieldsContainer,
@@ -76,12 +80,34 @@ internal class FieldResolverGenerator(
 
     private val environmentTypeSpec =
         TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field))
-            .superclass(bindingMapper.abstractEnvType.parameterizedBy(parentTypeName.copy(false), contextClassName))
-            .addSuperclassConstructorParameter("original")
+            .superclass(
+                bindingMapper.abstractEnvType.parameterizedBy(
+                    parentTypeName.copy(false),
+                    contextClassName,
+                    resolveEnvMetaType(),
+                )
+            )
+            .addSuperclassConstructorParameter("original, %L", resolveTypeMeta())
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .addParameter("original", dataFetchingEnvironmentClassName)
                     .build()
             )
             .build()
+
+    private fun resolveEnvMetaType(): TypeName {
+        val fieldType = GraphQLTypeHelper.unwrapType(field.type)
+        if (fieldType !is GraphQLObjectType)
+            return NOTHING.copy(true)
+
+        return generatedMapper.getObjectTypeMetaClassName(fieldType)
+    }
+
+    private fun resolveTypeMeta(): String {
+        val fieldType = GraphQLTypeHelper.unwrapType(field.type)
+        if (fieldType !is GraphQLObjectType)
+            return "null"
+
+        return generatedMapper.getObjectTypeMetaClassName(fieldType).toString()
+    }
 }
