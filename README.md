@@ -1,6 +1,6 @@
 # GraphQL Kotlin Toolkit
 [![GitHub Actions](https://github.com/AurityLab/graphql-kotlin-toolkit/workflows/Gradle/badge.svg)](https://github.com/AurityLab/graphql-kotlin-toolkit/actions)
-[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
+[![codecov](https://codecov.io/gh/AurityLab/graphql-kotlin-toolkit/branch/master/graph/badge.svg?token=e8c5dSYCAS)](https://codecov.io/gh/AurityLab/graphql-kotlin-toolkit)
 [![Maven Central](https://img.shields.io/maven-central/v/com.auritylab.graphql-kotlin-toolkit/codegen?label=codegen)](https://mvnrepository.com/artifact/com.auritylab.graphql-kotlin-toolkit/codegen)
 [![Maven Central](https://img.shields.io/maven-central/v/com.auritylab.graphql-kotlin-toolkit/spring-boot?label=spring%20boot%20integration)](https://mvnrepository.com/artifact/com.auritylab.graphql-kotlin-toolkit/spring-boot)
 
