@@ -6,6 +6,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.ClassName
@@ -29,15 +30,17 @@ internal class PaginationFieldResolverGenerator(
     argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper
 ) : AbstractFieldResolverGenerator(
     container,
     field,
-    implementerMapper,
     argumentCodeBlockGenerator,
+    implementerMapper,
     options,
     kotlinTypeMapper,
-    generatedMapper
+    generatedMapper,
+    bindingMapper
 ) {
     private val resultHolderClassName: ClassName =
         ClassName(fileClassName.packageName, *fileClassName.simpleNames.toTypedArray(), "Result")
@@ -127,26 +130,12 @@ internal class PaginationFieldResolverGenerator(
 
     private val environmentTypeSpec =
         TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field))
+            .superclass(bindingMapper.abstractEnvType.parameterizedBy(parentTypeName.copy(false), contextClassName))
+            .addSuperclassConstructorParameter("original")
             .primaryConstructor(
-                // Create the primary constructor which accepts a parameter "original" of type "DataFetchingEnvironment".
                 FunSpec.constructorBuilder()
                     .addParameter("original", dataFetchingEnvironmentClassName)
                     .addParameter("pagination", generatedMapper.getPaginationInfoClassName())
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("original", dataFetchingEnvironmentClassName)
-                    .initializer("original")
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("parent", parentTypeName.copy(false))
-                    .getter(FunSpec.getterBuilder().addCode("return original.getSource()").build())
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("context", contextClassName)
-                    .getter(FunSpec.getterBuilder().addCode("return original.getContext()").build())
                     .build()
             )
             .addProperty(

@@ -36,7 +36,8 @@ import java.math.BigInteger
  */
 internal class KotlinTypeMapper(
     private val options: CodegenOptions,
-    private val generatedMapper: GeneratedMapper
+    private val generatedMapper: GeneratedMapper,
+    private val bindingMapper: BindingMapper,
 ) {
     /**
      * Will resolve the [TypeName] for the given [GraphQLType]. The returned types already assume the incoming data
@@ -72,7 +73,7 @@ internal class KotlinTypeMapper(
             DirectiveFacade.doubleNull[fieldDirectiveContainer] &&
             wrapped.isNullable
         )
-            generatedMapper.getValueWrapperName().parameterizedBy(wrapped).copy(true)
+            bindingMapper.valueType.parameterizedBy(wrapped).copy(true)
         else
             wrapped
     }

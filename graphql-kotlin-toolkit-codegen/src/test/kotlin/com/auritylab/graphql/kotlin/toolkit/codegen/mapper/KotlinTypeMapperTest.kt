@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
+import com.auritylab.graphql.kotlin.toolkit.codegenbinding.types.Value
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
@@ -43,10 +44,15 @@ import java.util.stream.Stream
 
 internal class KotlinTypeMapperTest {
     @Nested
+    @Suppress("ClassName")
     @DisplayName("getKotlinType()")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class GetKotlinType_Scalars {
-        val kotlinTypeMapper = KotlinTypeMapper(TestObject.options.copy(generateAll = true), TestObject.generatedMapper)
+        val kotlinTypeMapper = KotlinTypeMapper(
+            TestObject.options.copy(generateAll = true),
+            TestObject.generatedMapper,
+            TestObject.supportMapper
+        )
 
         @ParameterizedTest
         @MethodSource(provideScalarTestTypesPointer)
@@ -227,7 +233,7 @@ internal class KotlinTypeMapperTest {
 
             val rawType = (result as ParameterizedTypeName).rawType
 
-            Assertions.assertEquals("V", rawType.simpleName)
+            Assertions.assertEquals(Value::class.java.canonicalName, rawType.canonicalName)
             Assertions.assertTrue(result.isNullable)
 
             Assertions.assertEquals(1, result.typeArguments.size)
@@ -301,11 +307,6 @@ internal class KotlinTypeMapperTest {
     private fun getDoubleNullDirective(): GraphQLDirective =
         GraphQLDirective.newDirective()
             .name("kDoubleNull")
-            .build()
-
-    private fun getGenerateDirective(): GraphQLDirective =
-        GraphQLDirective.newDirective()
-            .name("kGenerate")
             .build()
 
     /**

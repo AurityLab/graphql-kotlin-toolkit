@@ -4,7 +4,6 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.FieldResolverGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.PaginationFieldResolverGenerator
-import com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta.MetaObjectTypeFieldGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta.MetaObjectTypeGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationConnectionGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationEdgeGenerator
@@ -13,6 +12,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.Paginat
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
@@ -24,10 +24,11 @@ internal class GeneratorFactory(
     private val kotlinTypeMapper: KotlinTypeMapper,
     private val generatedMapper: GeneratedMapper,
     private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
-    private val implementerMapper: ImplementerMapper
+    private val implementerMapper: ImplementerMapper,
+    private val bindingMapper: BindingMapper
 ) {
     fun enum(enum: GraphQLEnumType): EnumGenerator =
-        EnumGenerator(enum, options, kotlinTypeMapper, generatedMapper)
+        EnumGenerator(enum, options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
     fun fieldResolver(container: GraphQLFieldsContainer, field: GraphQLFieldDefinition): FieldResolverGenerator =
         FieldResolverGenerator(
@@ -37,7 +38,8 @@ internal class GeneratorFactory(
             argumentCodeBlockGenerator,
             options,
             kotlinTypeMapper,
-            generatedMapper
+            generatedMapper,
+            bindingMapper,
         )
 
     fun paginationFieldResolver(
@@ -51,36 +53,46 @@ internal class GeneratorFactory(
             argumentCodeBlockGenerator,
             options,
             kotlinTypeMapper,
-            generatedMapper
+            generatedMapper,
+            bindingMapper,
         )
 
     fun inputObject(inputObject: GraphQLInputObjectType): InputObjectGenerator =
-        InputObjectGenerator(inputObject, argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper)
+        InputObjectGenerator(
+            inputObject,
+            argumentCodeBlockGenerator,
+            options,
+            kotlinTypeMapper,
+            generatedMapper,
+            bindingMapper,
+        )
 
     fun objectType(objectType: GraphQLObjectType): ObjectTypeGenerator =
-        ObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper)
-
-    fun valueWrapper(): ValueWrapperGenerator =
-        ValueWrapperGenerator(options, kotlinTypeMapper, generatedMapper)
+        ObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
     fun objectTypeMeta(objectType: GraphQLObjectType): MetaObjectTypeGenerator =
-        MetaObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper)
-
-    fun metaObjectTypeField(): MetaObjectTypeFieldGenerator =
-        MetaObjectTypeFieldGenerator(options, kotlinTypeMapper, generatedMapper)
+        MetaObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
     fun paginationInfo(): PaginationInfoGenerator =
         PaginationInfoGenerator(
             argumentCodeBlockGenerator,
             options,
             kotlinTypeMapper,
-            generatedMapper
+            generatedMapper,
+            bindingMapper,
         )
 
-    fun paginationConnection() = PaginationConnectionGenerator(options, kotlinTypeMapper, generatedMapper)
+    fun paginationConnection() =
+        PaginationConnectionGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
-    fun paginationEdge() = PaginationEdgeGenerator(options, kotlinTypeMapper, generatedMapper)
+    fun paginationEdge() = PaginationEdgeGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
     fun paginationPageInfo() =
-        PaginationPageInfoGenerator(argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper)
+        PaginationPageInfoGenerator(
+            argumentCodeBlockGenerator,
+            options,
+            kotlinTypeMapper,
+            generatedMapper,
+            bindingMapper,
+        )
 }

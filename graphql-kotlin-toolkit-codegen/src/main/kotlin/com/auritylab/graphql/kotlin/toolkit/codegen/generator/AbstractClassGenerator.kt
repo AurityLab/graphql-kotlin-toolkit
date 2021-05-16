@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeName
@@ -13,7 +14,8 @@ import graphql.schema.GraphQLType
 internal abstract class AbstractClassGenerator(
     protected val options: CodegenOptions,
     protected val kotlinTypeMapper: KotlinTypeMapper,
-    protected val generatedMapper: GeneratedMapper
+    protected val generatedMapper: GeneratedMapper,
+    protected val bindingMapper: BindingMapper,
 ) : FileGenerator {
     /**
      * Defines the [ClassName] which is used to defined the [FileSpec.packageName] and the [FileSpec.name]

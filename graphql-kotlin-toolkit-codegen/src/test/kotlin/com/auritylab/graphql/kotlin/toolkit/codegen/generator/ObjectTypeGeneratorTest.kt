@@ -19,7 +19,8 @@ internal class ObjectTypeGeneratorTest : AbstractCompilationTest() {
         testObjectType,
         TestObject.options,
         TestObject.kotlinTypeMapper,
-        TestObject.generatedMapper
+        TestObject.generatedMapper,
+        TestObject.supportMapper,
     )
 
     lateinit var generatedClass: KClass<*>
@@ -42,7 +43,7 @@ internal class ObjectTypeGeneratorTest : AbstractCompilationTest() {
     }
 }
 
-val testObjectType = GraphQLObjectType.newObject()
+val testObjectType: GraphQLObjectType = GraphQLObjectType.newObject()
     .name("TestObjectType")
     .field(
         GraphQLFieldDefinition.newFieldDefinition()

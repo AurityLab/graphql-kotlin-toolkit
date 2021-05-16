@@ -4,6 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 import graphql.schema.GraphQLInputObjectType
@@ -17,8 +18,11 @@ internal class InputObjectGenerator(
     argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractInputDataClassGenerator(argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper
+) : AbstractInputDataClassGenerator(
+    argumentCodeBlockGenerator, options, kotlinTypeMapper, generatedMapper, bindingMapper
+) {
     override val fileClassName: ClassName = getGeneratedType(inputObjectType)
 
     override val dataProperties: List<DataProperty> = inputObjectType.fields

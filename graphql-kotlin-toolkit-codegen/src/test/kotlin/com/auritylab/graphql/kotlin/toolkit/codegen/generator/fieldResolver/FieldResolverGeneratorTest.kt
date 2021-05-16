@@ -38,7 +38,8 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
             TestObject.argumentCodeBlockGenerator,
             TestObject.options,
             TestObject.kotlinTypeMapper,
-            TestObject.generatedMapper
+            TestObject.generatedMapper,
+            TestObject.supportMapper,
         )
 
         lateinit var generatedClass: KClass<*>
@@ -135,7 +136,8 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
             TestObject.argumentCodeBlockGenerator,
             TestObject.options,
             TestObject.kotlinTypeMapper,
-            TestObject.generatedMapper
+            TestObject.generatedMapper,
+            TestObject.supportMapper,
         )
 
         lateinit var generatedClass: KClass<*>
@@ -187,7 +189,8 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
             TestObject.argumentCodeBlockGenerator,
             TestObject.options.copy(globalContext = "kotlin.String"),
             TestObject.kotlinTypeMapper,
-            TestObject.generatedMapper
+            TestObject.generatedMapper,
+            TestObject.supportMapper,
         )
 
         lateinit var generatedClass: KClass<*>
@@ -263,7 +266,8 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
                 TestObject.argumentCodeBlockGenerator,
                 TestObject.options.copy(globalContext = "kotlin.String"),
                 TestObject.kotlinTypeMapper,
-                TestObject.generatedMapper
+                TestObject.generatedMapper,
+                TestObject.supportMapper,
             )
     }
 
@@ -286,7 +290,8 @@ internal class FieldResolverGeneratorTest : AbstractCompilationTest(true) {
                 TestObject.argumentCodeBlockGenerator,
                 TestObject.options,
                 TestObject.kotlinTypeMapper,
-                TestObject.generatedMapper
+                TestObject.generatedMapper,
+                TestObject.supportMapper,
             )
         }
     }

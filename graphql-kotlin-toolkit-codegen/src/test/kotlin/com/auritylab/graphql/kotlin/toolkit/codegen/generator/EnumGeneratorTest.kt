@@ -22,7 +22,13 @@ internal class EnumGeneratorTest : AbstractCompilationTest() {
     @Suppress("UNCHECKED_CAST")
     fun `should generate compilable code`() {
         val generator =
-            EnumGenerator(testEnum, TestObject.options, TestObject.kotlinTypeMapper, TestObject.generatedMapper)
+            EnumGenerator(
+                testEnum,
+                TestObject.options,
+                TestObject.kotlinTypeMapper,
+                TestObject.generatedMapper,
+                TestObject.supportMapper
+            )
 
         // Compile the generator output.
         val generatedClass = compile(generator).main
@@ -47,7 +53,8 @@ internal class EnumGeneratorTest : AbstractCompilationTest() {
             testEnumWithRepresentation,
             TestObject.options,
             TestObject.kotlinTypeMapper,
-            TestObject.generatedMapper
+            TestObject.generatedMapper,
+            TestObject.supportMapper,
         )
 
         // Compile the generator output and add the TestEnum file as dependency.

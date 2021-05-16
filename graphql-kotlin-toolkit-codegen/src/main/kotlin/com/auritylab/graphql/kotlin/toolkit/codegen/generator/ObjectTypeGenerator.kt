@@ -3,6 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -17,8 +18,9 @@ internal class ObjectTypeGenerator(
     private val objectType: GraphQLObjectType,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper,
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
     override val fileClassName: ClassName = getGeneratedType(objectType)
 
     override fun build(builder: FileSpec.Builder) {

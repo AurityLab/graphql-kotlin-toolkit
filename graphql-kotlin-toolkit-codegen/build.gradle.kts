@@ -13,4 +13,6 @@ dependencies {
 
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.3.1")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    testImplementation(project(":graphql-kotlin-toolkit-codegen-binding"))
 }

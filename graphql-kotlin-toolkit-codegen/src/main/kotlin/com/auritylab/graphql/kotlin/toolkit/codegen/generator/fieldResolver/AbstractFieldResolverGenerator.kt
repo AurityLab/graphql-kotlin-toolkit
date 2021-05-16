@@ -7,6 +7,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.SpringBootIntegration
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -27,12 +28,13 @@ import graphql.schema.GraphQLObjectType
 internal abstract class AbstractFieldResolverGenerator(
     protected val container: GraphQLFieldsContainer,
     protected val field: GraphQLFieldDefinition,
-    protected val implementerMapper: ImplementerMapper,
     protected val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
+    implementerMapper: ImplementerMapper,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
     /**
      * Describes the [ClassName] for the actual class which describes the field resolver.
      * This will be used on the [TypeSpec] of [buildFieldResolverClass].
@@ -55,7 +57,7 @@ internal abstract class AbstractFieldResolverGenerator(
     /**
      * Describes the "graphql.schema.DataFetcher" [TypeName] which is parameterized by the [returnTypeName].
      */
-    protected val parameterizedDataFetcherTypeName: TypeName
+    private val parameterizedDataFetcherTypeName: TypeName
         get() = ClassName("graphql.schema", "DataFetcher").parameterizedBy(returnTypeName)
 
     protected val contextClassName = options.globalContext?.let { ClassName.bestGuess(it) } ?: ANY

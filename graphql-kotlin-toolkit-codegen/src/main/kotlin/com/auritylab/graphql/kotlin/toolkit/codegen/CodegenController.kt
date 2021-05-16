@@ -29,7 +29,6 @@ internal class CodegenController(
             buildInputObjectGenerators(),
             buildObjectTypeGenerators(),
             buildInterfaceTypeGenerators(),
-            buildAdditionalGenerators(),
             buildPaginationGenerators(),
 
             ).flatten()
@@ -111,16 +110,6 @@ internal class CodegenController(
         generatorFactory.paginationFieldResolver(container, field)
     else
         generatorFactory.fieldResolver(container, field)
-
-    /**
-     * Will build the generators for all additionally required types.
-     */
-    private fun buildAdditionalGenerators(): Collection<FileGenerator> {
-        return listOf(
-            generatorFactory.valueWrapper(),
-            generatorFactory.metaObjectTypeField()
-        )
-    }
 
     /**
      * Will build the generators for the pagination support.

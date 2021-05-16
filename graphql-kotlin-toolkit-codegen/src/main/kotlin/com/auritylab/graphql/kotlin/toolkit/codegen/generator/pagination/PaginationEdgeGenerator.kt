@@ -4,6 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.AbstractClassGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
@@ -16,8 +17,9 @@ import com.squareup.kotlinpoet.TypeVariableName
 internal class PaginationEdgeGenerator(
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
     override val fileClassName: ClassName = generatedMapper.getPaginationEdgeClassName()
 
     override fun build(builder: FileSpec.Builder) {

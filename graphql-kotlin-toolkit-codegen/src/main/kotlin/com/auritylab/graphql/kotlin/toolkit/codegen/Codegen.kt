@@ -5,6 +5,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.GeneratorFactory
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import java.nio.file.Files
 import java.nio.file.Path
@@ -16,13 +17,21 @@ class Codegen(
     private val options: CodegenOptions
 ) {
     private val schema = CodegenSchemaParser(options).parseSchemas(options.schemas)
+    private val supportMapper = BindingMapper()
     private val nameMapper = GeneratedMapper(options)
-    private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper)
+    private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, supportMapper)
     private val implementerMapper = ImplementerMapper(options, schema)
     private val outputDirectory = getOutputDirectory()
-    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, nameMapper)
+    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, supportMapper)
     private val generatorFactory =
-        GeneratorFactory(options, kotlinTypeMapper, nameMapper, argumentCodeBlockGenerator, implementerMapper)
+        GeneratorFactory(
+            options,
+            kotlinTypeMapper,
+            nameMapper,
+            argumentCodeBlockGenerator,
+            implementerMapper,
+            supportMapper
+        )
 
     /**
      * Will generate code for the types of the [schema].

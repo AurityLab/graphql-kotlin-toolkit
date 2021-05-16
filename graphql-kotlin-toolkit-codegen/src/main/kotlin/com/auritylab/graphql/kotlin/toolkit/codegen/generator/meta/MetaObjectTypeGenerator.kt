@@ -5,6 +5,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.generator.AbstractClassGener
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -27,8 +28,9 @@ internal class MetaObjectTypeGenerator(
     private val objectType: GraphQLObjectType,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper,
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
     override val fileClassName: ClassName = generatedMapper.getObjectTypeMetaClassName(objectType)
 
     override fun build(builder: FileSpec.Builder) {
@@ -85,7 +87,7 @@ internal class MetaObjectTypeGenerator(
         val refType =
             if (unwrapped is GraphQLObjectType) generatedMapper.getObjectTypeMetaClassName(unwrapped) else NOTHING
         val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped).copy(nullable = false)
-        val returnType = generatedMapper.getMetaObjectTypeField().parameterizedBy(refType, runtimeType)
+        val returnType = bindingMapper.metaObjectTypeFieldType.parameterizedBy(refType, runtimeType)
 
         // Create the implementation of the field meta and add all required properties.
         val fieldImpl = TypeSpec.anonymousClassBuilder()
@@ -198,7 +200,7 @@ internal class MetaObjectTypeGenerator(
     private fun buildAllFieldsProperty(): PropertySpec {
         // Create the return type which is a Set parameterized with the MetaObjectTypeField.
         val returnType = SET.parameterizedBy(
-            generatedMapper.getMetaObjectTypeField().parameterizedBy(STAR, STAR)
+            bindingMapper.metaObjectTypeFieldType.parameterizedBy(STAR, STAR)
         )
 
         // Create the initializer with a basic "setOf(..)". All fields will be added to the set on the runtime.

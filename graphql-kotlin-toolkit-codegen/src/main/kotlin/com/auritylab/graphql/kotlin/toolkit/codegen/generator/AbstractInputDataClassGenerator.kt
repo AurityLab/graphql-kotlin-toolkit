@@ -5,6 +5,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockG
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -27,8 +28,8 @@ internal abstract class AbstractInputDataClassGenerator(
     private val argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
-) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper) {
+    generatedMapper: GeneratedMapper, bindingMapper: BindingMapper
+) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
     override fun build(builder: FileSpec.Builder) {
         builder.addType(buildDataClass())
     }

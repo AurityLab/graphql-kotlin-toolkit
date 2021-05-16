@@ -23,7 +23,8 @@ internal class InputObjectGeneratorTest : AbstractCompilationTest() {
         TestObject.argumentCodeBlockGenerator,
         TestObject.options,
         TestObject.kotlinTypeMapper,
-        TestObject.generatedMapper
+        TestObject.generatedMapper,
+        TestObject.supportMapper,
     )
 
     lateinit var generatedClass: KClass<*>
@@ -67,7 +68,7 @@ internal class InputObjectGeneratorTest : AbstractCompilationTest() {
     }
 }
 
-val testInputObject = GraphQLInputObjectType.newInputObject()
+val testInputObject: GraphQLInputObjectType = GraphQLInputObjectType.newInputObject()
     .name("TestInput")
     .field(
         GraphQLInputObjectField.newInputObjectField()

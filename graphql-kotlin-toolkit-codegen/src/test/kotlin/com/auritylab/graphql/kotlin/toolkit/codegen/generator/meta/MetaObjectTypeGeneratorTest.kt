@@ -28,7 +28,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
             .build()
 
         // Compile the generated class.
-        val generated = compile(createDefaultGenerator(testObjectType), metaObjectTypeFieldGenerator).main
+        val generated = compile(createDefaultGenerator(testObjectType)).main
 
         // Assert that the generated type is an object.
         assertNotNull(generated.objectInstance)
@@ -45,7 +45,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
             }
             .build()
 
-        val generated = compile(createDefaultGenerator(testObjectType), metaObjectTypeFieldGenerator).main
+        val generated = compile(createDefaultGenerator(testObjectType)).main
 
         // Load the meta object of the "id" field.
         val idField = getFieldInstance(generated, "id")
@@ -84,7 +84,6 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
         val generated = compile(
             createDefaultGenerator(testObjectType),
             createDefaultGenerator(referencedObjectType),
-            metaObjectTypeFieldGenerator
         )
 
         // Load the field.
@@ -129,7 +128,6 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
         // Compile it...
         val generated = compile(
             createDefaultGenerator(testObjectType),
-            metaObjectTypeFieldGenerator
         ).main
 
         // Load the allFields Set instance...
@@ -194,11 +192,6 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
             objectType, TestObject.options,
             TestObject.kotlinTypeMapper,
             TestObject.generatedMapper,
+            TestObject.supportMapper,
         )
-
-    /**
-     * Provides the default MetaObjectTypeField generator.
-     */
-    private val metaObjectTypeFieldGenerator =
-        MetaObjectTypeFieldGenerator(TestObject.options, TestObject.kotlinTypeMapper, TestObject.generatedMapper)
 }

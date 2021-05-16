@@ -1,7 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
-import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
@@ -27,7 +27,7 @@ import graphql.schema.GraphQLType
  */
 internal class ArgumentCodeBlockGenerator(
     private val typeMapper: KotlinTypeMapper,
-    private val generatedMapper: GeneratedMapper
+    private val bindingMapper: BindingMapper,
 ) {
     /**
      * Will build a function which takes a map (parameterized by String, Any) to access the name of the given [definition].
@@ -84,7 +84,7 @@ internal class ArgumentCodeBlockGenerator(
             code.addStatement(
                 "return if (map.containsKey(\"%L\")) %T(layer%L(map[\"%L\"] as %T)) else null",
                 name,
-                generatedMapper.getValueWrapperName(),
+                bindingMapper.valueType,
                 lastLayerIndex,
                 name,
                 lastType

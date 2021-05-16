@@ -53,12 +53,6 @@ internal class GeneratedMapper(
     }
 
     /**
-     * Will return the [ClassName] for the value wrapper.
-     */
-    fun getValueWrapperName(): ClassName =
-        buildClassName("V", "util")
-
-    /**
      * Will return the [MemberName] of the builder method for the given [inputObject].
      */
     fun getInputObjectBuilderMemberName(inputObject: GraphQLInputObjectType): MemberName {
@@ -102,8 +96,6 @@ internal class GeneratedMapper(
     fun getObjectTypeMetaClassName(objectType: GraphQLObjectType): ClassName {
         return buildClassName("Meta" + NamingHelper.uppercaseFirstLetter(objectType.name), "meta.objectType")
     }
-
-    fun getMetaObjectTypeField(): ClassName = buildClassName("MetaObjectTypeField", "meta.abstracts")
 
     fun getPaginationInfoClassName(): ClassName {
         return buildClassName("PaginationInfo", "pagination")

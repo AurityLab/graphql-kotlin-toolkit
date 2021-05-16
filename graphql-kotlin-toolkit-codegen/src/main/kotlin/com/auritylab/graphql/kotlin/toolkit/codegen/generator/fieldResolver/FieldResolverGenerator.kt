@@ -6,11 +6,12 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.ImplementerMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
@@ -22,15 +23,16 @@ internal class FieldResolverGenerator(
     argumentCodeBlockGenerator: ArgumentCodeBlockGenerator,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
-    generatedMapper: GeneratedMapper
+    generatedMapper: GeneratedMapper,
+    bindingMapper: BindingMapper
 ) : AbstractFieldResolverGenerator(
     container,
     field,
-    implementerMapper,
     argumentCodeBlockGenerator,
+    implementerMapper,
     options,
     kotlinTypeMapper,
-    generatedMapper
+    generatedMapper, bindingMapper
 ) {
     override fun buildFieldResolverClass(builder: TypeSpec.Builder) {
         builder
@@ -59,7 +61,7 @@ internal class FieldResolverGenerator(
                         } + ", "
                     }
 
-// Variable assignment is unnecessary if there are no arguments.
+                    // Variable assignment is unnecessary if there are no arguments.
                     if (field.arguments.isNotEmpty())
                         getFunSpec.addStatement("val map = env.arguments")
 
@@ -74,25 +76,11 @@ internal class FieldResolverGenerator(
 
     private val environmentTypeSpec =
         TypeSpec.classBuilder(generatedMapper.getFieldResolverEnvironment(container, field))
+            .superclass(bindingMapper.abstractEnvType.parameterizedBy(parentTypeName.copy(false), contextClassName))
+            .addSuperclassConstructorParameter("original")
             .primaryConstructor(
-                // Create the primary constructor which accepts a parameter "original" of type "DataFetchingEnvironment".
                 FunSpec.constructorBuilder()
                     .addParameter("original", dataFetchingEnvironmentClassName)
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("original", dataFetchingEnvironmentClassName)
-                    .initializer("original")
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("parent", parentTypeName.copy(false))
-                    .getter(FunSpec.getterBuilder().addCode("return original.getSource()").build())
-                    .build()
-            )
-            .addProperty(
-                PropertySpec.builder("context", contextClassName)
-                    .getter(FunSpec.getterBuilder().addCode("return original.getContext()").build())
                     .build()
             )
             .build()
