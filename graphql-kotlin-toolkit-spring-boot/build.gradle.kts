@@ -8,6 +8,7 @@ ext {
     this["publication.artifactId"] = "spring-boot"
     this["publication.name"] = "GraphQL Kotlin Toolkit: Spring"
     this["publication.description"] = "GraphQL integration for Spring"
+    this["jacoco.merge.enabled"] = true
 }
 
 dependencies {

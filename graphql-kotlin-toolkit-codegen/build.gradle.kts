@@ -3,6 +3,7 @@ ext {
     this["publication.artifactId"] = "codegen"
     this["publication.name"] = "GraphQL Kotlin Toolkit: Codegen"
     this["publication.description"] = "GraphQL Code generator for Kotlin"
+    this["jacoco.merge.enabled"] = true
 }
 
 dependencies {
@@ -16,3 +17,4 @@ dependencies {
 
     testImplementation(project(":graphql-kotlin-toolkit-codegen-binding"))
 }
+

@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.31" apply false
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.31" apply false
     id("org.jetbrains.dokka") version "1.4.30" apply false
+    id("jacoco")
 }
 
 allprojects {
@@ -23,6 +24,7 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
     apply(plugin = "idea")
+    apply(plugin = "jacoco")
 
     dependencies {
         "implementation"(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -142,4 +144,60 @@ tasks.create("allPublish") {
     dependsOn(":graphql-kotlin-toolkit-spring-boot:publish")
     dependsOn(":graphql-kotlin-toolkit-jpa:publish")
     dependsOn(":graphql-kotlin-toolkit-gradle-plugin:publishPlugins")
+}
+
+/**
+ * Task which will collect all JaCoCo execution files and merge it into one execution file. This depends on
+ * the **jacoco.merge.enabled** extension property on each project. Each subproject may define this property if it
+ * should be included in the merge.
+ */
+val jacocoMergeTask = tasks.create("jacocoMerge", JacocoMerge::class) {
+    group = "jacoco"
+
+    // Additional function to avoid scope clash in the closures.
+    val addExecutionData = { task: Task -> executionData(task) }
+
+    subprojects {
+        afterEvaluate {
+            // Load the value of the property which defines if the JaCoCo merge is enabled.
+            val enabled = ext.properties["jacoco.merge.enabled"]?.let { it as? Boolean } ?: false
+
+            // If it's enabled, then add the Test task as execution data.
+            if (enabled)
+                tasks.withType<Test>().forEach {
+                    addExecutionData(it)
+                }
+        }
+    }
+}
+
+/**
+ * Task which will create a JaCoCo report based on the merged execution file. This depends on the **jacocoMerge** task.
+ */
+tasks.create<JacocoReport>("jacocoMergeReport") {
+    group = "jacoco"
+
+    // Depend on the merge task.
+    dependsOn(jacocoMergeTask)
+
+    // Additional function to avoid scope clash in the closures.
+    val addSourceSet = { input: SourceSet -> sourceSets(input) }
+
+    // Add the merged JaCoCo execution file as execution data for this report.
+    executionData(project.file("${project.buildDir}/jacoco/jacocoMerge.exec"))
+
+    subprojects {
+        afterEvaluate {
+            // Load the value of the property which defines if the JaCoCo merge is enabled.
+            val enabled = ext.properties["jacoco.merge.enabled"]?.let { it as? Boolean } ?: false
+
+            if (enabled) {
+                // Load the SourceSets of the project and add it to the report task.
+                val sourceSetContainer = extensions.getByName("sourceSets") as SourceSetContainer
+                sourceSetContainer.forEach { containerSourceSet ->
+                    addSourceSet(containerSourceSet)
+                }
+            }
+        }
+    }
 }

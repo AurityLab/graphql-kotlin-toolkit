@@ -3,6 +3,7 @@ ext {
     this["publication.artifactId"] = "common"
     this["publication.name"] = "GraphQL Kotlin Toolkit: Common"
     this["publication.description"] = "GraphQL Code generator for Kotlin"
+    this["jacoco.merge.enabled"] = true
 }
 
 dependencies {
