@@ -199,7 +199,8 @@ tasks.create<JacocoReport>("jacocoMergeReport") {
                 // Load the SourceSets of the project and add it to the report task.
                 val sourceSetContainer = extensions.getByName("sourceSets") as SourceSetContainer
                 sourceSetContainer.forEach { containerSourceSet ->
-                    addSourceSet(containerSourceSet)
+                    if (containerSourceSet.name == "main")
+                        addSourceSet(containerSourceSet)
                 }
             }
         }
