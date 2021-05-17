@@ -4,7 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.codeblock.ArgumentCodeBlockGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.FieldResolverGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.fieldResolver.PaginationFieldResolverGenerator
-import com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta.MetaObjectTypeGenerator
+import com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta.MetaFieldsContainerGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationConnectionGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationEdgeGenerator
 import com.auritylab.graphql.kotlin.toolkit.codegen.generator.pagination.PaginationInfoGenerator
@@ -70,8 +70,8 @@ internal class GeneratorFactory(
     fun objectType(objectType: GraphQLObjectType): ObjectTypeGenerator =
         ObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
-    fun objectTypeMeta(objectType: GraphQLObjectType): MetaObjectTypeGenerator =
-        MetaObjectTypeGenerator(objectType, options, kotlinTypeMapper, generatedMapper, bindingMapper)
+    fun fieldsContainerMeta(fieldsContainer: GraphQLFieldsContainer): MetaFieldsContainerGenerator =
+        MetaFieldsContainerGenerator(fieldsContainer, options, kotlinTypeMapper, generatedMapper, bindingMapper)
 
     fun paginationInfo(): PaginationInfoGenerator =
         PaginationInfoGenerator(

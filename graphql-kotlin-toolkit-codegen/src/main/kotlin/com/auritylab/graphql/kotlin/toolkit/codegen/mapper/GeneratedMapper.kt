@@ -10,6 +10,7 @@ import graphql.schema.GraphQLEnumType
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLFieldsContainer
 import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLType
@@ -95,6 +96,10 @@ internal class GeneratedMapper(
      */
     fun getObjectTypeMetaClassName(objectType: GraphQLObjectType): ClassName {
         return buildClassName("Meta" + NamingHelper.uppercaseFirstLetter(objectType.name), "meta.objectType")
+    }
+
+    fun getInterfaceTypeMetaClassName(interfaceType: GraphQLInterfaceType): ClassName {
+        return buildClassName("Meta" + NamingHelper.uppercaseFirstLetter(interfaceType.name), "meta.interfaceType")
     }
 
     fun getPaginationInfoClassName(): ClassName {

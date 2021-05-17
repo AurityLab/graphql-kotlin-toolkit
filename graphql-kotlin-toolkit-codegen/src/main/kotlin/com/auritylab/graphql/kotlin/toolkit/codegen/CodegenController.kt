@@ -72,7 +72,7 @@ internal class CodegenController(
                 }
 
                 // Generator for the meta information about the object type.
-                internalGenerators.add(generatorFactory.objectTypeMeta(objectType))
+                internalGenerators.add(generatorFactory.fieldsContainerMeta(objectType))
 
                 return@flatMap internalGenerators
             }
@@ -93,6 +93,9 @@ internal class CodegenController(
                         DirectiveFacade.resolver[fieldDefinition]
                     ) internalGenerators.add(getSwitchedFieldResolverGenerator(interfaceType, fieldDefinition))
                 }
+
+                // Generator for the meta information about the object type.
+                internalGenerators.add(generatorFactory.fieldsContainerMeta(interfaceType))
 
                 return@flatMap internalGenerators
             }

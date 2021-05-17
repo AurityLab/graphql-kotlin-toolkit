@@ -19,25 +19,38 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLFieldsContainer
+import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLNamedType
 import graphql.schema.GraphQLObjectType
 import kotlin.reflect.KClass
 
-internal class MetaObjectTypeGenerator(
-    private val objectType: GraphQLObjectType,
+internal class MetaFieldsContainerGenerator(
+    private val fieldsContainer: GraphQLFieldsContainer,
     options: CodegenOptions,
     kotlinTypeMapper: KotlinTypeMapper,
     generatedMapper: GeneratedMapper,
     bindingMapper: BindingMapper,
 ) : AbstractClassGenerator(options, kotlinTypeMapper, generatedMapper, bindingMapper) {
-    override val fileClassName: ClassName = generatedMapper.getObjectTypeMetaClassName(objectType)
+    override val fileClassName: ClassName
+        get() = when (fieldsContainer) {
+            is GraphQLObjectType -> generatedMapper.getObjectTypeMetaClassName(fieldsContainer)
+            is GraphQLInterfaceType -> generatedMapper.getInterfaceTypeMetaClassName(fieldsContainer)
+            else -> throw IllegalStateException("Unmapped GraphQLFieldsContainer type")
+        }
 
     override fun build(builder: FileSpec.Builder) {
         val type = TypeSpec.objectBuilder(fileClassName)
 
+        val baseSuperinterface = when (fieldsContainer) {
+            is GraphQLObjectType -> bindingMapper.metaObjectType
+            is GraphQLInterfaceType -> bindingMapper.metaInterfaceType
+            else -> throw IllegalStateException("Unmapped GraphQLFieldsContainer type")
+        }
+
         type.addSuperinterface(
-            bindingMapper.metaObjectTypeType.parameterizedBy(
-                kotlinTypeMapper.getKotlinType(objectType).copy(nullable = false)
+            baseSuperinterface.parameterizedBy(
+                kotlinTypeMapper.getKotlinType(fieldsContainer).copy(nullable = false)
             )
         )
 
@@ -45,7 +58,7 @@ internal class MetaObjectTypeGenerator(
         type.addProperty(buildRuntimeTypeProperty())
 
         // Create the property for each field.
-        objectType.fieldDefinitions.forEach {
+        fieldsContainer.fieldDefinitions.forEach {
             type.addProperty(buildFieldProperty(it))
         }
 
@@ -61,7 +74,7 @@ internal class MetaObjectTypeGenerator(
     private fun buildRuntimeTypeProperty(): PropertySpec {
         // Resolve the ObjectType to an actual Kotlin type. We need to copy it with non nullable because otherwise it
         // would lead to syntax errors.
-        val runtimeType = kotlinTypeMapper.getKotlinType(objectType).copy(nullable = false)
+        val runtimeType = kotlinTypeMapper.getKotlinType(fieldsContainer).copy(nullable = false)
 
         // The return type is basically just a KClass parameterized with the previously resolved runtime type.
         val returnType = KClass::class.asTypeName().parameterizedBy(runtimeType)
@@ -82,7 +95,11 @@ internal class MetaObjectTypeGenerator(
         val refType =
             if (unwrapped is GraphQLObjectType) generatedMapper.getObjectTypeMetaClassName(unwrapped) else NOTHING
         val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped).copy(nullable = false)
-        val returnType = bindingMapper.metaObjectTypeFieldType.parameterizedBy(refType, runtimeType)
+
+        val returnType = when (unwrapped) {
+            is GraphQLFieldsContainer -> bindingMapper.metaFieldWithReference.parameterizedBy(refType, runtimeType)
+            else -> bindingMapper.metaField.parameterizedBy(runtimeType)
+        }
 
         // Create the implementation of the field meta and add all required properties.
         val fieldImpl = TypeSpec.anonymousClassBuilder()
@@ -90,7 +107,7 @@ internal class MetaObjectTypeGenerator(
             .addProperty(buildFieldNameProperty(field))
             .addProperty(buildFieldTypeProperty(field))
             .addProperty(buildFieldRuntimeTypeProperty(field))
-            .addProperty(buildFieldRefProperty(field))
+            .also { buildFieldRefProperty(field)?.let { property -> it.addProperty(property) } }
             .build()
 
         // Create the actual property.
@@ -154,13 +171,19 @@ internal class MetaObjectTypeGenerator(
      * This might also just throw an exception if the type does not have a meta object.
      * The property also contains the 'override' modifier.
      */
-    private fun buildFieldRefProperty(field: GraphQLFieldDefinition): PropertySpec {
+    private fun buildFieldRefProperty(field: GraphQLFieldDefinition): PropertySpec? {
         // Unwrap the type of the field as we're not interested in arrays etc.
         val unwrapped = GraphQLTypeHelper.unwrapType(field.type)
 
+        if (unwrapped !is GraphQLFieldsContainer)
+            return null
+
         // Resolve the actual reference type. To determine a reference the return type must be an ObjectType.
-        val refType =
-            if (unwrapped is GraphQLObjectType) generatedMapper.getObjectTypeMetaClassName(unwrapped) else NOTHING
+        val refType = when (unwrapped) {
+            is GraphQLObjectType -> generatedMapper.getObjectTypeMetaClassName(unwrapped)
+            is GraphQLInterfaceType -> generatedMapper.getInterfaceTypeMetaClassName(unwrapped)
+            else -> throw IllegalStateException("Unmapped GraphQLFieldsContainer type")
+        }
 
         // Build the basic property.
         val property = PropertySpec.builder("ref", refType)
@@ -195,13 +218,13 @@ internal class MetaObjectTypeGenerator(
     private fun buildAllFieldsProperty(): PropertySpec {
         // Create the return type which is a Set parameterized with the MetaObjectTypeField.
         val returnType = SET.parameterizedBy(
-            bindingMapper.metaObjectTypeFieldType.parameterizedBy(STAR, STAR)
+            bindingMapper.metaField.parameterizedBy(STAR)
         )
 
         // Create the initializer with a basic "setOf(..)". All fields will be added to the set on the runtime.
         val codeBlock = CodeBlock.builder()
         codeBlock.add("setOf(")
-        objectType.fieldDefinitions.forEach {
+        fieldsContainer.fieldDefinitions.forEach {
             codeBlock.add(getFieldPropertyName(it) + ",")
         }
         codeBlock.add(")")

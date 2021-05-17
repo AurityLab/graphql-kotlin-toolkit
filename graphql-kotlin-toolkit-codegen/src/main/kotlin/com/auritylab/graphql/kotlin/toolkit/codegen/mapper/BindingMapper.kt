@@ -1,6 +1,5 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
-import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.squareup.kotlinpoet.ClassName
 
 /**
@@ -9,9 +8,13 @@ import com.squareup.kotlinpoet.ClassName
 class BindingMapper {
     val valueType: ClassName = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "Value")
 
-    val abstractEnvType: ClassName = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "AbstractEnv")
+    val abstractEnvType: ClassName =
+        ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "AbstractEnv")
 
-    val metaObjectTypeFieldType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaObjectTypeField")
+    val metaField = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaField")
+    val metaFieldWithReference =
+        ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaFieldWithReference")
 
-    val metaObjectTypeType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaObjectType")
+    val metaObjectType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaObjectType")
+    val metaInterfaceType = ClassName("com.auritylab.graphql.kotlin.toolkit.codegenbinding.types", "MetaInterfaceType")
 }

@@ -2,7 +2,6 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta
 
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractCompilationTest
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
-import com.auritylab.graphql.kotlin.toolkit.codegen.helper.uppercaseFirst
 import graphql.Scalars
 import graphql.schema.GraphQLObjectType
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -15,7 +14,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 
-internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
+internal class MetaFieldsContainerGeneratorTest : AbstractCompilationTest() {
     @Test
     fun `should generate compilable code`() {
         // Create a simple ObjectType for this basic test.
@@ -56,7 +55,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
         assertEquals(String::class, getFieldMetaValue<KClass<*>>(idField, "runtimeType"))
 
         // There is no ref available as its just a scalar type...
-        assertThrows<IllegalStateException> {
+        assertThrows<NullPointerException> {
             getFieldMetaValue<Any>(idField, "ref")
         }
     }
@@ -188,7 +187,7 @@ internal class MetaObjectTypeGeneratorTest : AbstractCompilationTest() {
      * Will create a generator with default settings with the given [objectType].
      */
     private fun createDefaultGenerator(objectType: GraphQLObjectType) =
-        MetaObjectTypeGenerator(
+        MetaFieldsContainerGenerator(
             objectType, TestObject.options,
             TestObject.kotlinTypeMapper,
             TestObject.generatedMapper,
