@@ -92,8 +92,11 @@ internal class MetaFieldsContainerGenerator(
     private fun buildFieldProperty(field: GraphQLFieldDefinition): PropertySpec {
         // Resolve all required types...
         val unwrapped = GraphQLTypeHelper.unwrapType(field.type)
-        val refType =
-            if (unwrapped is GraphQLObjectType) generatedMapper.getObjectTypeMetaClassName(unwrapped) else NOTHING
+        val refType = when (unwrapped) {
+            is GraphQLObjectType -> generatedMapper.getObjectTypeMetaClassName(unwrapped)
+            is GraphQLInterfaceType -> generatedMapper.getInterfaceTypeMetaClassName(unwrapped)
+            else -> NOTHING
+        }
         val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped).copy(nullable = false)
 
         val returnType = when (unwrapped) {
