@@ -4,7 +4,7 @@ group = "com.auritylab.graphql-kotlin-toolkit"
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.4.31" apply false
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.31" apply false
-    id("org.jetbrains.dokka") version "1.4.30" apply false
+    id("org.jetbrains.dokka") version "1.4.32" apply false
     id("jacoco")
 }
 
