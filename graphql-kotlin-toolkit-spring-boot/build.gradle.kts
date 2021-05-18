@@ -31,6 +31,6 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 
-    testImplementation("me.lazmaid.kraph:kraph:0.6.1")
+    testImplementation("com.github.VerachadW:kraph:v.0.6.1")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 }

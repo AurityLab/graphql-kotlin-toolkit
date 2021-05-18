@@ -10,8 +10,10 @@ plugins {
 
 allprojects {
     repositories {
-        jcenter()
         mavenCentral()
+
+        // JitPack repository (https://jitpack.io/) - Currently required for Kraph.
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -40,9 +42,12 @@ subprojects {
         useJUnitPlatform()
     }
 
+    // Configure the Kotlin compile task.
+    // Until Kotlin 1.5.0 the IR backend must be explicitly enabled (shall be enabled by default in 1.5.0).
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
+            useIR = true
         }
     }
 
@@ -136,13 +141,18 @@ subprojects {
     }
 }
 
+/**
+ * Task which will publish all artifacts.
+ */
 tasks.create("allPublish") {
     group = "publishing"
 
     dependsOn(":graphql-kotlin-toolkit-codegen:publish")
+    dependsOn(":graphql-kotlin-toolkit-codegen-binding:publish")
     dependsOn(":graphql-kotlin-toolkit-common:publish")
     dependsOn(":graphql-kotlin-toolkit-spring-boot:publish")
-    dependsOn(":graphql-kotlin-toolkit-jpa:publish")
+    dependsOn(":graphql-kotlin-toolkit-util:publish")
+
     dependsOn(":graphql-kotlin-toolkit-gradle-plugin:publishPlugins")
 }
 
@@ -183,6 +193,7 @@ tasks.create<JacocoReport>("jacocoMergeReport") {
     // Additional function to avoid scope clash in the closures.
     val addSourceSet = { input: SourceSet -> sourceSets(input) }
 
+    // CodeCov depends on the XML report, therefore we need to explicitly enabled it.
     reports {
         xml.isEnabled = true
     }
