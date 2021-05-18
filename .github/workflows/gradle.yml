@@ -11,25 +11,30 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v1
-      - name: Restore cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+
+      # Configure the Java version based on the current matrix value.
       - uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java_version }}
+
+      # Build the entire project (includes unit tests)
       - name: Build
-        uses: eskatos/gradle-command-action@v1
+        uses: burrunan/gradle-cache-action@v1
         with:
+          job-id: ${{ matrix.java_version }}
           arguments: build
-      - name: JaCoCo merge
-        uses: eskatos/gradle-command-action@v1
+
+      # Merge the JaCoCo execution data from all modules and create one report for all.
+      - name: Jacoco merge
+        uses: burrunan/gradle-cache-action@v1
         with:
+          job-id: ${{ matrix.java_version }}
           arguments: jacocoMergeReport
-      - uses: codecov/codecov-action@v1
+          execution-only-caches: true
+
+      # Upload the JaCoCo report to CodeCov.
+      - name: CodeCov upload
+        uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/reports/jacoco/jacocoMergeReport/jacocoMergeReport.xml
