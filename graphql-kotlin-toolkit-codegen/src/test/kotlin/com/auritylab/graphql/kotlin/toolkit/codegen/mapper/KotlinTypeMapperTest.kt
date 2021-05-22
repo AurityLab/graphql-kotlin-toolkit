@@ -13,7 +13,9 @@ import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
@@ -26,6 +28,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLList
+import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
@@ -48,7 +51,7 @@ internal class KotlinTypeMapperTest {
     @DisplayName("getKotlinType()")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class GetKotlinType_Scalars {
-        val kotlinTypeMapper = KotlinTypeMapper(
+        private val kotlinTypeMapper = KotlinTypeMapper(
             TestObject.options.copy(generateAll = true),
             TestObject.generatedMapper,
             TestObject.supportMapper
@@ -279,13 +282,7 @@ internal class KotlinTypeMapperTest {
             // Build a String scalar with UUID as representation.
             val type = Scalars.GraphQLString.transform {
                 it.withDirective(
-                    GraphQLDirective.newDirective().name("kRepresentation")
-                        .argument(
-                            GraphQLArgument.newArgument()
-                                .name("class")
-                                .type(Scalars.GraphQLString)
-                                .value("java.util.UUID")
-                        )
+                    getRepresentationDirective("java.util.UUID")
                 )
             }
 
@@ -302,6 +299,47 @@ internal class KotlinTypeMapperTest {
 
             Assertions.assertEquals(ANY.copy(true), result)
         }
+
+        @Test
+        fun `should return parameterized type if representation contains parameters`() {
+            val type = getDummyObjectType(
+                "Test",
+                getRepresentationDirective("kotlin.Pair", listOf("java.util.UUID", "kotlin.String"))
+            )
+
+            val result = kotlinTypeMapper.getKotlinType(type)
+
+            Assertions.assertEquals(
+                ClassName.bestGuess("kotlin.Pair")
+                    .parameterizedBy(ClassName.bestGuess("java.util.UUID"), ClassName.bestGuess("kotlin.String"))
+                    .copy(true), result
+            )
+        }
+
+        @Test
+        fun `should throw exception on invalid parameter on kRepresentation`() {
+            val type = getDummyObjectType(
+                "Test",
+                getRepresentationDirective("kotlin.Pair", listOf("this is not a valid class", "kotlin.String"))
+            )
+
+            Assertions.assertThrows(IllegalArgumentException::class.java) {
+                kotlinTypeMapper.getKotlinType(type)
+            }
+        }
+
+        @Test
+        fun `should return parameterized type with star if set on kRepresentation`() {
+            val type = getDummyObjectType("Test", getRepresentationDirective("kotlin.Pair", listOf("*", "*")))
+
+            val result = kotlinTypeMapper.getKotlinType(type)
+
+            Assertions.assertEquals(
+                ClassName.bestGuess("kotlin.Pair")
+                    .parameterizedBy(STAR, STAR)
+                    .copy(true), result
+            )
+        }
     }
 
     private fun getDoubleNullDirective(): GraphQLDirective =
@@ -312,15 +350,21 @@ internal class KotlinTypeMapperTest {
     /**
      * Will build a 'kRepresentation' directive with the given [clazz] as value for the class argument.
      */
-    private fun getRepresentationDirective(clazz: String = "kotlin.String"): GraphQLDirective =
-        GraphQLDirective.newDirective()
-            .name("kRepresentation")
-            .argument(
-                GraphQLArgument.newArgument()
-                    .name("class")
-                    .type(Scalars.GraphQLString)
-                    .value(clazz)
-            )
+    private fun getRepresentationDirective(
+        clazz: String = "kotlin.String",
+        parameters: List<String>? = null
+    ): GraphQLDirective =
+        GraphQLDirective.newDirective().name("kRepresentation")
+            .argument { arg ->
+                arg.name("class")
+                arg.type(Scalars.GraphQLString)
+                arg.value(clazz)
+            }
+            .argument { arg ->
+                arg.name("parameters")
+                arg.type(GraphQLList(GraphQLNonNull(Scalars.GraphQLString)))
+                arg.value(parameters)
+            }
             .build()
 
     /**

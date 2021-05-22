@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.CodegenOptions
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.GraphQLWrapTypeHelper
+import com.auritylab.graphql.kotlin.toolkit.codegen.helper.toReadableName
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
 import com.squareup.kotlinpoet.ANY
@@ -16,6 +17,7 @@ import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
+import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
@@ -149,7 +151,7 @@ internal class KotlinTypeMapper(
     /**
      * Will return the [ClassName] for the given [type].
      */
-    private fun getObjectKotlinType(type: GraphQLObjectType): ClassName {
+    private fun getObjectKotlinType(type: GraphQLObjectType): TypeName {
         // Try to resolve the class via the representation directive.
         // Return the representation class if its available.
         resolveRepresentationClass(type)
@@ -162,7 +164,7 @@ internal class KotlinTypeMapper(
     /**
      * Will return the [ClassName] for the given [GraphQLInterfaceType].
      */
-    private fun getInterfaceKotlinType(type: GraphQLInterfaceType): ClassName =
+    private fun getInterfaceKotlinType(type: GraphQLInterfaceType): TypeName =
         // Resolve the representation and return if it's available.
         resolveRepresentationClass(type) ?: ANY
 
@@ -183,9 +185,34 @@ internal class KotlinTypeMapper(
      * Will resolve the [ClassName] for the given [container]. This will basically just check if the
      * [DirectiveFacade.representation] directive is given, if so it will return the value of the className argument.
      */
-    private fun resolveRepresentationClass(container: GraphQLDirectiveContainer): ClassName? =
-        // Check if the type is annotated with the "kRepresentation" directive.
-        DirectiveFacade.representation.getArguments(container)?.className?.let { ClassName.bestGuess(it) }
+    private fun resolveRepresentationClass(container: GraphQLDirectiveContainer): TypeName? {
+        // Check if the representation directive is present on the container.
+        val arguments = DirectiveFacade.representation.getArguments(container)
+            ?: return null
+
+        val className = arguments.className
+        val parameters = arguments.parameters
+
+        // If no class argument is set, just return null
+        if (className.isNullOrBlank())
+            return null
+
+        // Try to take a guess on the class name.
+        val resolvedClassName = try {
+            ClassName.bestGuess(className)
+        } catch (ex: IllegalArgumentException) {
+            // Wrap the exception of "bestGuess" with an more detailed Exception.
+            val message = String.format("Invalid class (%s) has been set on %s", className, container.toReadableName())
+            throw IllegalArgumentException(message, ex)
+        }
+
+        // If there are no parameters set, then just return the resolved ClassName.
+        if (parameters.isNullOrEmpty())
+            return resolvedClassName
+
+        // Build the parameterized types and parameterize the resolved type.
+        return resolvedClassName.parameterizedBy(buildParameters(parameters, container))
+    }
 
     /**
      * Will resolve the [ClassName] for the given [type]. This will check if the [CodegenOptions.generateAll] attribute
@@ -195,4 +222,38 @@ internal class KotlinTypeMapper(
         if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.generate[type]))
             generatedMapper.getGeneratedTypeClassName(type)
         else ANY
+
+    /**
+     * Will build a [List] of type parameters based on the given [raw] input. The [raw] input consists of FQN names
+     * of classes (Or literal stars for a star-projection).
+     * This might throw an exception if the raw input can't resolve to an actual class or is simply and invalid value.
+     *
+     * @param raw List of raw parameters. Consists of FQN classes or literal stars for star-projections.
+     * @param origin Directive container which contains the kRepresentation directive (required for better error messages).
+     * @return The [List] of resolved [TypeName] by the [raw] list. The order is the same as the [raw] List.
+     */
+    private fun buildParameters(raw: List<String>, origin: GraphQLDirectiveContainer): List<TypeName> {
+        return raw.mapIndexed { index, it ->
+            when (it) {
+                // Map a literal star to the star-projection
+                "*" -> STAR
+                else -> {
+                    // Try to guess the class name by the given string.
+                    // If it fails, an according exception will be thrown.
+                    try {
+                        ClassName.bestGuess(it)
+                    } catch (ex: IllegalArgumentException) {
+                        throw IllegalArgumentException(
+                            String.format(
+                                "Invalid class (%s) has been set as parameter on index %d on %s",
+                                it,
+                                index,
+                                origin.toReadableName()
+                            ), ex
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
