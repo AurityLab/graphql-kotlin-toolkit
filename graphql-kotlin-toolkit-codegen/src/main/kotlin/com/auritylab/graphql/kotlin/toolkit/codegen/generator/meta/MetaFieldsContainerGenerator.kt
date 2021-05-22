@@ -50,7 +50,7 @@ internal class MetaFieldsContainerGenerator(
 
         type.addSuperinterface(
             baseSuperinterface.parameterizedBy(
-                kotlinTypeMapper.getKotlinType(fieldsContainer).copy(nullable = false)
+                kotlinTypeMapper.getKotlinType(fieldsContainer, withStarProjectionsOnly = true).copy(nullable = false)
             )
         )
 
@@ -74,10 +74,12 @@ internal class MetaFieldsContainerGenerator(
     private fun buildRuntimeTypeProperty(): PropertySpec {
         // Resolve the ObjectType to an actual Kotlin type. We need to copy it with non nullable because otherwise it
         // would lead to syntax errors.
-        val runtimeType = kotlinTypeMapper.getKotlinType(fieldsContainer).copy(nullable = false)
+        val runtimeType = kotlinTypeMapper.getKotlinType(fieldsContainer, withParameters = false).copy(nullable = false)
 
         // The return type is basically just a KClass parameterized with the previously resolved runtime type.
-        val returnType = KClass::class.asTypeName().parameterizedBy(runtimeType)
+        val returnType = KClass::class.asTypeName().parameterizedBy(
+            kotlinTypeMapper.getKotlinType(fieldsContainer, withStarProjectionsOnly = true).copy(nullable = false)
+        )
 
         // Create the actual property.
         return PropertySpec.builder("runtimeType", returnType)
@@ -97,7 +99,9 @@ internal class MetaFieldsContainerGenerator(
             is GraphQLInterfaceType -> generatedMapper.getInterfaceTypeMetaClassName(unwrapped)
             else -> NOTHING
         }
-        val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped).copy(nullable = false)
+
+        val runtimeType =
+            kotlinTypeMapper.getKotlinType(unwrapped, withStarProjectionsOnly = true).copy(nullable = false)
 
         val returnType = when (unwrapped) {
             is GraphQLFieldsContainer -> bindingMapper.metaFieldWithReference.parameterizedBy(refType, runtimeType)
@@ -157,10 +161,12 @@ internal class MetaFieldsContainerGenerator(
         val unwrapped = GraphQLTypeHelper.unwrapType(field.type)
 
         // Resolve the actual Kotlin type of the field. We need to copy it as non-nullable to avoid syntax errors.
-        val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped).copy(nullable = false)
+        val runtimeType = kotlinTypeMapper.getKotlinType(unwrapped, withParameters = false).copy(nullable = false)
 
         // Create the return type which is basically just a KClass parameterized by the resolved runtime type.
-        val returnType = KClass::class.asTypeName().parameterizedBy(runtimeType)
+        val returnType = KClass::class.asTypeName().parameterizedBy(
+            kotlinTypeMapper.getKotlinType(unwrapped, withStarProjectionsOnly = true).copy(nullable = false)
+        )
 
         // Build the actual property.
         return PropertySpec.builder("runtimeType", returnType)

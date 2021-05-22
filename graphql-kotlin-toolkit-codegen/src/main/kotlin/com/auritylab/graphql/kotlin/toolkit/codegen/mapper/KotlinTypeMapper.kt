@@ -14,7 +14,7 @@ import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.INT
 import com.squareup.kotlinpoet.LONG
 import com.squareup.kotlinpoet.MAP
-import com.squareup.kotlinpoet.MemberName
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
 import com.squareup.kotlinpoet.STAR
@@ -42,21 +42,48 @@ internal class KotlinTypeMapper(
     private val bindingMapper: BindingMapper,
 ) {
     /**
-     * Will resolve the [TypeName] for the given [GraphQLType]. The returned types already assume the incoming data
-     * has been parsed into internal types. You can additionally supply a [fieldDirectiveContainer] which can be for
-     * example the [graphql.schema.GraphQLFieldDefinition]. A custom [listType] can also be supplied if needed.
+     * Will resolve the [TypeName] for the given [GraphQLType]. This will always return a [TypeName], but in the worst
+     * case you'll get [ANY]. If type information for a specific type is available, depends on the schema.
+     *
+     * The following subtypes of [GraphQLType] are supported:
+     * * [GraphQLScalarType]: Built-in scalars can be resolved automatically, but custom scalars need
+     *   a "@kRepresentation" directive.
+     * * [GraphQLInputObjectType]: Provides the type which will be generated for it.
+     * * [GraphQLEnumType]: Provides the type which will be generated for it.
+     * * [GraphQLObjectType]: Provides the matching "@kPresentation" type or the generated type. (Generated type may
+     *   not be available).
+     * * [GraphQLInterfaceType]: Provides the matching "@kPresentation" type or [ANY] if there's none.
+     * * [GraphQLUnionType]: If all types of the union are of the same Kotlin type, then the according type will be
+     *   returned, otherwise [ANY] will be returned.
+     *
+     * You can additionally supply a [fieldDirectiveContainer] which contains directives relevant for type generation.
+     * The only use-case at the moment is to detect the kDoubleNull directive to internally wrap the type with
+     *  the value-wrapper.
+     *
+     * A custom [listType] can also be supplied if needed. By default, a [Collection] will be used for GraphQL lists.
+     * Attention: The given [ClassName] will be parameterized with the inner type. Therefore make sure the type
+     * defines exactly one type parameter.
+     *
+     * As a type can also be parameterized, there are two options to define define the behavior.
+     * * If a type is parameterized, then you can set [withParameters] to false, to explicitly remove them.
+     * * If a type is parameterized, then you can set [withStarProjectionsOnly] to replace all given parameters with
+     *   star-projects. This is useful in some cases where you cant provide type information.
      *
      * @param type The type for which to create the [TypeName] for.
      * @param fieldDirectiveContainer The directive container for additional specification of the type.
-     * @param listType A custom type for lists.
+     * @param listType A custom type for lists. Type must have exactly one parameter.
+     * @param withParameters If type parameters shall be included. By default true.
+     * @param withStarProjectionsOnly If all available parameters shall be replaced with star-projections.
      * @return The resolved [TypeName] for the given [type].
      */
     fun getKotlinType(
         type: GraphQLType,
         fieldDirectiveContainer: GraphQLDirectiveContainer? = null,
-        listType: ClassName? = null
+        listType: ClassName? = null,
+        withParameters: Boolean = true,
+        withStarProjectionsOnly: Boolean = false
     ): TypeName {
-        val res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
+        var res = when (val unwrappedType = GraphQLTypeHelper.unwrapType(type)) {
             is GraphQLScalarType -> getScalarKotlinType(unwrappedType)
             is GraphQLInputObjectType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
             is GraphQLEnumType -> generatedMapper.getGeneratedTypeClassName(unwrappedType)
@@ -64,6 +91,17 @@ internal class KotlinTypeMapper(
             is GraphQLInterfaceType -> getInterfaceKotlinType(unwrappedType)
             is GraphQLUnionType -> getUnionKotlinType(unwrappedType)
             else -> ANY
+        }
+
+        // If the caller explicitly DOES NOT want parameterized types, then just remove them.
+        if (!withParameters && res is ParameterizedTypeName) {
+            res = res.rawType
+        }
+
+        // If parameters shall be included, but each parameter shall be converted to a star-projection, then
+        // just take all parameters and map them to star-projections.
+        if (withParameters && withStarProjectionsOnly && res is ParameterizedTypeName) {
+            res = replaceParametersWithStarProjections(res)
         }
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
@@ -95,13 +133,6 @@ internal class KotlinTypeMapper(
 
         // Apply the wrapping of the GraphQL type to the Kotlin type.
         return GraphQLWrapTypeHelper.wrapType(type, res, false, listType)
-    }
-
-    /**
-     * Will build a [MemberName] which points to the builder function of the given [inputObject].
-     */
-    fun getInputObjectBuilder(inputObject: GraphQLInputObjectType): MemberName {
-        return generatedMapper.getInputObjectBuilderMemberName(inputObject)
     }
 
     /**
@@ -255,5 +286,13 @@ internal class KotlinTypeMapper(
                 }
             }
         }
+    }
+
+    companion object {
+        /**
+         * Will replace all parameters defined in the given [ParameterizedTypeName] with star-projections ([STAR]).
+         */
+        fun replaceParametersWithStarProjections(type: ParameterizedTypeName): TypeName =
+            type.rawType.parameterizedBy(type.typeArguments.map { STAR })
     }
 }

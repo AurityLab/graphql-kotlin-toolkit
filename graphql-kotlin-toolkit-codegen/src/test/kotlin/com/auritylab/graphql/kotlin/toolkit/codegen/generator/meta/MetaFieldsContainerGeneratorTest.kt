@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.generator.meta
 
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.AbstractCompilationTest
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
+import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestUtils
 import graphql.Scalars
 import graphql.schema.GraphQLObjectType
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -135,6 +136,38 @@ internal class MetaFieldsContainerGeneratorTest : AbstractCompilationTest() {
 
         // Assert against the size...
         assertEquals(3, allFieldsInstance!!.size)
+    }
+
+    @Test
+    fun `should process parameterized type properly`() {
+        val subType = TestUtils.getDummyObjectType(
+            "Test",
+            TestUtils.getRepresentationDirective("kotlin.Pair", listOf("kotlin.String", "java.util.UUID"))
+        )
+
+        val testObjectType = GraphQLObjectType.newObject()
+            .name("TestObject")
+            .withDirective(
+                TestUtils.getRepresentationDirective(
+                    "kotlin.Pair",
+                    listOf("kotlin.String", "kotlin.String")
+                )
+            )
+            .field {
+                it.name("id")
+                it.type(Scalars.GraphQLID)
+            }
+            .field {
+                it.name("name")
+                it.type(Scalars.GraphQLString)
+            }
+            .field {
+                it.name("surname")
+                it.type(subType)
+            }
+            .build()
+
+        val generated = compile(createDefaultGenerator(testObjectType), createDefaultGenerator(subType)).main
     }
 
     /**

@@ -15,7 +15,7 @@ internal object TestObject {
     val generatedMapper = GeneratedMapper(options)
     val supportMapper = BindingMapper()
     val kotlinTypeMapper = KotlinTypeMapper(options, generatedMapper, supportMapper)
-    val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, supportMapper)
+    val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, supportMapper, generatedMapper)
     val implementerMapper = ImplementerMapper(options, schema)
 
     val schema: GraphQLSchema

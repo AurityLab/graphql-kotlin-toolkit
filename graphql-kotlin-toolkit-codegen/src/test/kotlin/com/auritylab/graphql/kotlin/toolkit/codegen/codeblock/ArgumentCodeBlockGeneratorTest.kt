@@ -19,6 +19,7 @@ internal class ArgumentCodeBlockGeneratorTest : AbstractCompilationTest() {
         val generator = ArgumentCodeBlockGenerator(
             TestObject.kotlinTypeMapper,
             TestObject.supportMapper,
+            TestObject.generatedMapper,
         )
 
         val resolver = generator.buildResolver("argument", Scalars.GraphQLString, null)

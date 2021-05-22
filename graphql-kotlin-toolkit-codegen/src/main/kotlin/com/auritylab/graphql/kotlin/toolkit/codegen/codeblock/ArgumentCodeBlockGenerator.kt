@@ -2,6 +2,7 @@ package com.auritylab.graphql.kotlin.toolkit.codegen.codeblock
 
 import com.auritylab.graphql.kotlin.toolkit.codegen.helper.NamingHelper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.BindingMapper
+import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.GeneratedMapper
 import com.auritylab.graphql.kotlin.toolkit.codegen.mapper.KotlinTypeMapper
 import com.auritylab.graphql.kotlin.toolkit.common.directive.DirectiveFacade
 import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLTypeHelper
@@ -28,6 +29,7 @@ import graphql.schema.GraphQLType
 internal class ArgumentCodeBlockGenerator(
     private val typeMapper: KotlinTypeMapper,
     private val bindingMapper: BindingMapper,
+    private val generatedMapper: GeneratedMapper,
 ) {
     /**
      * Will build a function which takes a map (parameterized by String, Any) to access the name of the given [definition].
@@ -161,7 +163,7 @@ internal class ArgumentCodeBlockGenerator(
                     )
             }
             is GraphQLInputObjectType -> {
-                val inputObjectBuilder = typeMapper.getInputObjectBuilder(type)
+                val inputObjectBuilder = generatedMapper.getInputObjectBuilderMemberName(type)
                 if (kType.isNullable)
                     code.addStatement(
                         "val layer$index = {it: %T -> if(it == null) null else %M(it)}",

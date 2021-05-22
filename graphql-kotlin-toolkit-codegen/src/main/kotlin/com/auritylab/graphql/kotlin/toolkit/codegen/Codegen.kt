@@ -22,7 +22,7 @@ class Codegen(
     private val kotlinTypeMapper = KotlinTypeMapper(options, nameMapper, supportMapper)
     private val implementerMapper = ImplementerMapper(options, schema)
     private val outputDirectory = getOutputDirectory()
-    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, supportMapper)
+    private val argumentCodeBlockGenerator = ArgumentCodeBlockGenerator(kotlinTypeMapper, supportMapper, nameMapper)
     private val generatorFactory =
         GeneratorFactory(
             options,

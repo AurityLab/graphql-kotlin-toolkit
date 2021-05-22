@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.codegen.mapper
 
 import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestObject
+import com.auritylab.graphql.kotlin.toolkit.codegen._test.TestUtils
 import com.auritylab.graphql.kotlin.toolkit.codegenbinding.types.Value
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
@@ -28,7 +29,6 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectType
 import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLList
-import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLScalarType
 import graphql.schema.GraphQLType
@@ -162,7 +162,7 @@ internal class KotlinTypeMapperTest {
         fun `should generate interface type with generated correctly`() {
             val testInterfaceType = GraphQLInterfaceType.newInterface()
                 .name("TestInterfaceType")
-                .withDirective(getRepresentationDirective())
+                .withDirective(TestUtils.getRepresentationDirective())
                 .build()
 
             val result = kotlinTypeMapper.getKotlinType(testInterfaceType)
@@ -174,10 +174,10 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should generate union type with same types correctly`() {
-            val representationDirective = getRepresentationDirective()
-            val firstPossibleType = getDummyObjectType("FirstObjectType", representationDirective)
-            val secondPossibleType = getDummyObjectType("SecondObjectType", representationDirective)
-            val thirdPossibleType = getDummyObjectType("ThirdObjectType", representationDirective)
+            val representationDirective = TestUtils.getRepresentationDirective()
+            val firstPossibleType = TestUtils.getDummyObjectType("FirstObjectType", representationDirective)
+            val secondPossibleType = TestUtils.getDummyObjectType("SecondObjectType", representationDirective)
+            val thirdPossibleType = TestUtils.getDummyObjectType("ThirdObjectType", representationDirective)
 
             val testUnionType = GraphQLUnionType.newUnionType()
                 .name("TestUnion")
@@ -191,9 +191,9 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should generate union type with no representation correctly`() {
-            val firstPossibleType = getDummyObjectType("FirstObjectType")
-            val secondPossibleType = getDummyObjectType("SecondObjectType")
-            val thirdPossibleType = getDummyObjectType("ThirdObjectType")
+            val firstPossibleType = TestUtils.getDummyObjectType("FirstObjectType")
+            val secondPossibleType = TestUtils.getDummyObjectType("SecondObjectType")
+            val thirdPossibleType = TestUtils.getDummyObjectType("ThirdObjectType")
 
             val testUnionType = GraphQLUnionType.newUnionType()
                 .name("TestUnion")
@@ -207,9 +207,10 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should generate union type with different representations correctly`() {
-            val firstPossibleType = getDummyObjectType("FirstObjectType")
-            val secondPossibleType = getDummyObjectType("SecondObjectType", getRepresentationDirective("kotlin.String"))
-            val thirdPossibleType = getDummyObjectType("ThirdObjectType")
+            val firstPossibleType = TestUtils.getDummyObjectType("FirstObjectType")
+            val secondPossibleType =
+                TestUtils.getDummyObjectType("SecondObjectType", TestUtils.getRepresentationDirective("kotlin.String"))
+            val thirdPossibleType = TestUtils.getDummyObjectType("ThirdObjectType")
 
             val testUnionType = GraphQLUnionType.newUnionType()
                 .name("TestUnion")
@@ -282,7 +283,7 @@ internal class KotlinTypeMapperTest {
             // Build a String scalar with UUID as representation.
             val type = Scalars.GraphQLString.transform {
                 it.withDirective(
-                    getRepresentationDirective("java.util.UUID")
+                    TestUtils.getRepresentationDirective("java.util.UUID")
                 )
             }
 
@@ -302,9 +303,9 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should return parameterized type if representation contains parameters`() {
-            val type = getDummyObjectType(
+            val type = TestUtils.getDummyObjectType(
                 "Test",
-                getRepresentationDirective("kotlin.Pair", listOf("java.util.UUID", "kotlin.String"))
+                TestUtils.getRepresentationDirective("kotlin.Pair", listOf("java.util.UUID", "kotlin.String"))
             )
 
             val result = kotlinTypeMapper.getKotlinType(type)
@@ -318,9 +319,12 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should throw exception on invalid parameter on kRepresentation`() {
-            val type = getDummyObjectType(
+            val type = TestUtils.getDummyObjectType(
                 "Test",
-                getRepresentationDirective("kotlin.Pair", listOf("this is not a valid class", "kotlin.String"))
+                TestUtils.getRepresentationDirective(
+                    "kotlin.Pair",
+                    listOf("this is not a valid class", "kotlin.String")
+                )
             )
 
             Assertions.assertThrows(IllegalArgumentException::class.java) {
@@ -330,7 +334,10 @@ internal class KotlinTypeMapperTest {
 
         @Test
         fun `should return parameterized type with star if set on kRepresentation`() {
-            val type = getDummyObjectType("Test", getRepresentationDirective("kotlin.Pair", listOf("*", "*")))
+            val type = TestUtils.getDummyObjectType(
+                "Test",
+                TestUtils.getRepresentationDirective("kotlin.Pair", listOf("*", "*"))
+            )
 
             val result = kotlinTypeMapper.getKotlinType(type)
 
@@ -340,43 +347,42 @@ internal class KotlinTypeMapperTest {
                     .copy(true), result
             )
         }
+
+        @Test
+        fun `should replace all parameters with star-projections if option is enabled`() {
+            val type = TestUtils.getDummyObjectType(
+                "Test", TestUtils.getRepresentationDirective(
+                    "kotlin.Pair",
+                    listOf("kotlin.String", "kotlin.String")
+                )
+            )
+
+            val result = kotlinTypeMapper.getKotlinType(type, withStarProjectionsOnly = true)
+
+            Assertions.assertEquals(
+                ClassName.bestGuess("kotlin.Pair").parameterizedBy(STAR, STAR).copy(true),
+                result
+            )
+        }
+
+        @Test
+        fun `should remove all parameters if option is enabled`() {
+            val type = TestUtils.getDummyObjectType(
+                "Test", TestUtils.getRepresentationDirective(
+                    "kotlin.Pair",
+                    listOf("kotlin.String", "kotlin.String")
+                )
+            )
+
+            val result = kotlinTypeMapper.getKotlinType(type, withParameters = false)
+
+            Assertions.assertEquals(ClassName.bestGuess("kotlin.Pair").copy(true), result)
+        }
     }
 
     private fun getDoubleNullDirective(): GraphQLDirective =
         GraphQLDirective.newDirective()
             .name("kDoubleNull")
-            .build()
-
-    /**
-     * Will build a 'kRepresentation' directive with the given [clazz] as value for the class argument.
-     */
-    private fun getRepresentationDirective(
-        clazz: String = "kotlin.String",
-        parameters: List<String>? = null
-    ): GraphQLDirective =
-        GraphQLDirective.newDirective().name("kRepresentation")
-            .argument { arg ->
-                arg.name("class")
-                arg.type(Scalars.GraphQLString)
-                arg.value(clazz)
-            }
-            .argument { arg ->
-                arg.name("parameters")
-                arg.type(GraphQLList(GraphQLNonNull(Scalars.GraphQLString)))
-                arg.value(parameters)
-            }
-            .build()
-
-    /**
-     * Will create a new dummy ObjectType with the givne [name] and the given [directives].
-     */
-    private fun getDummyObjectType(
-        name: String = "TestObjectType",
-        vararg directives: GraphQLDirective
-    ): GraphQLObjectType =
-        GraphQLObjectType.newObject()
-            .name(name)
-            .withDirectives(*directives)
             .build()
 
     companion object {
