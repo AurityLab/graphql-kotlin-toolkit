@@ -1,6 +1,7 @@
 package com.auritylab.graphql.kotlin.toolkit.common.directive
 
 import com.auritylab.graphql.kotlin.toolkit.common.directive.exception.DirectiveValidationException
+import com.auritylab.graphql.kotlin.toolkit.common.helper.GraphQLEqualityHelper
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLNamedType
@@ -21,7 +22,7 @@ abstract class AbstractDirective(
                 ?: throw buildArgumentNotFoundException(it.name)
 
             // Check if the type of the reference argument is the same as on the given directive.
-            if (argOfDirective.type != it.type)
+            if (!GraphQLEqualityHelper.isEqual(argOfDirective.type, it.type))
                 throw buildInvalidArgumentTypeException(it.name, it.type)
         }
 

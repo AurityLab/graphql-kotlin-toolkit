@@ -1,0 +1,12 @@
+directive @kRepresentation(class: String!, parameters: [String!]) on OBJECT | SCALAR | INTERFACE | ENUM
+directive @kGenerate on OBJECT
+directive @kResolver on FIELD_DEFINITION | OBJECT | INTERFACE
+directive @kDoubleNull on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+directive @kPagination on FIELD_DEFINITION
+
+schema {
+    query: Query
+}
+type Query {
+    test: String
+}
