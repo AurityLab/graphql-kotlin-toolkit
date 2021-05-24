@@ -7,5 +7,5 @@ ext {
 }
 
 dependencies {
-    implementation("com.graphql-java:graphql-java:15.0")
+    implementation("com.graphql-java:graphql-java:16.2")
 }

@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":graphql-kotlin-toolkit-common"))
 
     // GraphQL-Java dependency.
-    implementation("com.graphql-java:graphql-java:15.0")
+    implementation("com.graphql-java:graphql-java:16.2")
 
     // Test dependencies.
     testImplementation("com.github.VerachadW:kraph:v.0.6.1")

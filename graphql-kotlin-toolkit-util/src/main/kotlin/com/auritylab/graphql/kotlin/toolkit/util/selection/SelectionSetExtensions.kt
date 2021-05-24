@@ -11,10 +11,6 @@ import com.auritylab.graphql.kotlin.toolkit.util.selection.steps.SelectionSetSte
 import graphql.schema.SelectedField
 
 @Experimental
-inline fun <reified T : MetaObjectType<*>> EnhancedDataFetchingFieldSelectionSet<T>.getField(builder: SelectionSetRootStep<T>.() -> SelectionSetSingleOutputStep): SelectedField =
-    getField(builder(SelectionSetStep.start(type)).buildPattern())
-
-@Experimental
 inline fun <reified T : MetaObjectType<*>> EnhancedDataFetchingFieldSelectionSet<T>.getFields(builder: SelectionSetRootStep<T>.() -> SelectionSetMultiOutputStep): List<SelectedField> =
     getFields(builder(SelectionSetStep.start(type)).buildPattern())
 
@@ -25,10 +21,6 @@ inline fun <reified T : MetaObjectType<*>> EnhancedDataFetchingFieldSelectionSet
 @Experimental
 val <T : MetaObjectType<*>> AbstractEnv<*, *, T>.selectionSet: EnhancedDataFetchingFieldSelectionSet<T>
     get() = EnhancedDataFetchingFieldSelectionSet(this.original.selectionSet, this.type)
-
-@Experimental
-inline fun <reified T : MetaObjectType<*>> AbstractEnv<*, *, T>.selectionField(builder: SelectionSetRootStep<T>.() -> SelectionSetSingleOutputStep): SelectedField? =
-    selectionSet.getField(builder)
 
 @Experimental
 inline fun <reified T : MetaObjectType<*>> AbstractEnv<*, *, T>.selectionFields(builder: SelectionSetRootStep<T>.() -> SelectionSetMultiOutputStep): List<SelectedField> =
