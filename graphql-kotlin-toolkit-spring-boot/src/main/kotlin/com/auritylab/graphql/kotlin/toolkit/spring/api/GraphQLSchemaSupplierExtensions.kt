@@ -1,3 +1,6 @@
+// Ignore for entire file, because this is a public API.
+@file:Suppress("unused")
+
 package com.auritylab.graphql.kotlin.toolkit.spring.api
 
 import org.springframework.core.io.DefaultResourceLoader
