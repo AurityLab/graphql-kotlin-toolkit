@@ -50,4 +50,29 @@ internal class GraphQLEqualityHelperTest {
     fun `should compare one list wrapped type with non list wrapped type properly`() {
         assertFalse(GraphQLEqualityHelper.isEqual(GraphQLList(Scalars.GraphQLString), Scalars.GraphQLString))
     }
+
+    @Test
+    fun `should compare simple unequal types properly`() {
+        assertFalse(GraphQLEqualityHelper.isEqual(Scalars.GraphQLString, Scalars.GraphQLInt))
+    }
+
+    @Test
+    fun `should compare non matching modifier types properly`() {
+        assertFalse(
+            GraphQLEqualityHelper.isEqual(
+                GraphQLNonNull(Scalars.GraphQLString),
+                GraphQLList(Scalars.GraphQLString)
+            )
+        )
+    }
+
+    @Test
+    fun `should compare multiple non matching modifier types properly`() {
+        assertFalse(
+            GraphQLEqualityHelper.isEqual(
+                GraphQLList(GraphQLNonNull(Scalars.GraphQLString)),
+                GraphQLNonNull(GraphQLList(Scalars.GraphQLString))
+            )
+        )
+    }
 }
