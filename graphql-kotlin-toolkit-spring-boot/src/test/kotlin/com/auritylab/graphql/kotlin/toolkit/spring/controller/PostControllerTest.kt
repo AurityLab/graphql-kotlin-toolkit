@@ -98,4 +98,20 @@ internal class PostControllerTest : AbstractInvocationControllerTest() {
                 any()
             )
     }
+
+    @Test
+    fun `(post) should handle invalid request body properly`() {
+        mvc.post("/graphql") {
+            content = "invalid json..."
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            // Expect an unprocessable entity status because the entity couldn't be parsed...
+            status { isUnprocessableEntity }
+        }
+    }
+
+    @Test
+    fun `(post) should handle empty post request properly`() {
+        mvc.post("/graphql").andExpect { status { isBadRequest } }
+    }
 }
