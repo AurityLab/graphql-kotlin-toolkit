@@ -46,10 +46,10 @@ class PostController(
         // Parse the given contentType into a MediaType.
         val parsedMediaType = MediaType.parseMediaType(contentType)
 
-        // If thee body is given and the contentType is application/json just parse the body and execute the data.
+        // If the body is given and the contentType is application/json just parse the body and execute the data.
         if (body != null && parsedMediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
             val operation = parse<Operation>(body)
-                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
+                ?: throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to parse operation")
             return execute(operation, request)
         }
 
@@ -61,7 +61,7 @@ class PostController(
         if (query != null)
             return execute(Operation(query, null, null), request)
 
-        // Non of the conditions above matched, therefore an error will be thrown.ø
-        throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to process GraphQL request")
+        // None of the conditions above matched, therefore an error will be thrown.ø
+        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to process GraphQL request")
     }
 }
