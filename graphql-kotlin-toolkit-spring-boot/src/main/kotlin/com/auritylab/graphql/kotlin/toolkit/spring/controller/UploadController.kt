@@ -39,9 +39,9 @@ class UploadController(
         request: WebRequest
     ): CompletableFuture<out Any> {
         val parsedOperation = parse<Operation>(operations)
-            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse operation")
+            ?: throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to parse operation")
         val parsedMap = parse<Map<String, List<String>>>(map)
-            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to parse map")
+            ?: throw ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Unable to parse map")
 
         parsedMap.forEach { (mapKey, mapValue) ->
             // Check if the file exists.
