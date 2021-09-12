@@ -20,13 +20,13 @@ import org.springframework.stereotype.Component
 class AnnotationResolver(
     private val context: ApplicationContext
 ) {
-    private final val resolvers = fetchDataFetcherComponents()
-    final val directives = fetchDirectiveComponents()
-    private final val scalars = fetchScalarComponents()
+    private val resolvers = fetchDataFetcherComponents()
+    val directives = fetchDirectiveComponents()
+    private val scalars = fetchScalarComponents()
     private val typeResolvers = fetchTypeResolverComponents()
-    private final val interfaceTypeResolvers = typeResolvers
+    private val interfaceTypeResolvers = typeResolvers
         .filter { it.key.scope == GQLTypeResolver.Scope.INTERFACE }
-    private final val unionTypeResolvers = typeResolvers
+    private val unionTypeResolvers = typeResolvers
         .filter { it.key.scope == GQLTypeResolver.Scope.UNION }
 
     /**
