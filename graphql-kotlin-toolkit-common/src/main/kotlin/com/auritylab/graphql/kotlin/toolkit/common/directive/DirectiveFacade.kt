@@ -33,21 +33,12 @@ object DirectiveFacade {
 
     /**
      * Will check if the given [directive] exists on the given [schema] (using [Directive.name]).
-     * Additional it will return the [GraphQLDirective] if it available on the schema
+     * Additional it will return the [GraphQLDirective] if it's available on the schema
      *
      * @throws DirectiveValidationException If the directive is required but is not present on the [schema].
      */
     private fun getDirectiveDefinition(directive: Directive, schema: GraphQLSchema): GraphQLDirective? {
-        val schemaDirective = schema.getDirective(directive.name)
-
-        // Throw exception if the schema is required but not given on the schema.
-        if (schemaDirective == null && directive.required)
-            throw DirectiveValidationException(
-                directive,
-                "Not present on the schema, but is required. Consider adding it."
-            )
-
-        return schemaDirective
+        return schema.getDirective(directive.name)
     }
 
     /**

@@ -4,7 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.common.directive.AbstractDirective
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
 
-object DoubleNullDirective : AbstractDirective("kDoubleNull", false) {
+object DoubleNullDirective : AbstractDirective("kDoubleNull") {
     override val reference: GraphQLDirective =
         GraphQLDirective.newDirective()
             .name(name)

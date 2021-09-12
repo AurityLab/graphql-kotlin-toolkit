@@ -14,11 +14,6 @@ interface Directive {
     val name: String
 
     /**
-     * If the directive MUST be present on the schema.
-     */
-    val required: Boolean
-
-    /**
      * The reference [GraphQLDirective], which is represented here.
      */
     val reference: GraphQLDirective

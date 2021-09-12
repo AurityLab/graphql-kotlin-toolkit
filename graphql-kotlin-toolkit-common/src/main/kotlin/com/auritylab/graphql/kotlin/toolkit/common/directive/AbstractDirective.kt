@@ -9,7 +9,6 @@ import graphql.schema.GraphQLType
 
 abstract class AbstractDirective(
     override val name: String,
-    override val required: Boolean
 ) : Directive {
     /**
      * Will check if the given [directive] will match against the reference ([reference]).

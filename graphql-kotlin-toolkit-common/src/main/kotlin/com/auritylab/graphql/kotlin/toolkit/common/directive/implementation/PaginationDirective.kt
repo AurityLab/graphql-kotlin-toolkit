@@ -4,7 +4,7 @@ import com.auritylab.graphql.kotlin.toolkit.common.directive.AbstractDirective
 import graphql.introspection.Introspection
 import graphql.schema.GraphQLDirective
 
-object PaginationDirective : AbstractDirective("kPagination", false) {
+object PaginationDirective : AbstractDirective("kPagination") {
     override val reference: GraphQLDirective =
         GraphQLDirective.newDirective()
             .name(name)
