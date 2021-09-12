@@ -34,4 +34,30 @@ internal class UploadControllerTest : AbstractInvocationControllerTest() {
             any()
         )
     }
+
+    @Test
+    fun `(post multipart) should handle invalid operation properly`() {
+        val inputMap = objectMapper.writeValueAsString(mapOf(Pair("0", listOf("variables.upload"))))
+
+        mvc.multipart("/graphql") {
+            param("operations", "invalid...")
+            param("map", inputMap)
+            file("0", file())
+        }.andExpect {
+            status { isUnprocessableEntity }
+        }
+    }
+
+    @Test
+    fun `(post multipart) should handle invalid map properly`() {
+        val inputQuery = TestOperations.createUserMutation_withUpload
+        val inputOperation = body(inputQuery, null, mapOf(Pair("upload", null)))
+
+        mvc.multipart("/graphql") {
+            // Operations must be valid for this test case...
+            param("operations", inputOperation)
+            param("map", "invalid...")
+            file("0", file())
+        }.andExpect { status { isUnprocessableEntity } }
+    }
 }
