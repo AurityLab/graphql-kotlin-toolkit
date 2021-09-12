@@ -3,7 +3,7 @@ package com.auritylab.graphql.kotlin.toolkit.common.directive.exception
 import com.auritylab.graphql.kotlin.toolkit.common.directive.Directive
 
 /**
- * Represents a exception, which will be thrown if the directive validation was not successful
+ * Represents an exception, which will be thrown if the directive validation failed.
  *
  * @see Directive.validateDefinition
  */
