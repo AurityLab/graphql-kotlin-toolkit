@@ -60,4 +60,34 @@ internal class UploadControllerTest : AbstractInvocationControllerTest() {
             file("0", file())
         }.andExpect { status { isUnprocessableEntity } }
     }
+
+    @Test
+    fun `(post multipart) should handle non-existing file properly` () {
+        val inputQuery = TestOperations.createUserMutation_withUpload
+        val inputOperation = body(inputQuery, null, mapOf(Pair("upload", null)))
+        val inputMap = objectMapper.writeValueAsString(mapOf(Pair("0", listOf("variables.upload"))))
+
+        mvc.multipart("/graphql") {
+            param("operations", inputOperation)
+            param("map", inputMap)
+            // No file, because we expect it to fail...
+        }.andExpect {
+            status {isBadRequest}
+        }
+    }
+
+    @Test
+    fun `(post multipart) should handle invalid path properly` () {
+        val inputQuery = TestOperations.createUserMutation_withUpload
+        val inputOperation = body(inputQuery, null, mapOf(Pair("upload", null)))
+        val inputMap = objectMapper.writeValueAsString(mapOf(Pair("0", listOf("v.u"))))
+
+        mvc.multipart("/graphql") {
+            param("operations", inputOperation)
+            param("map", inputMap)
+            file("0", file())
+        }.andExpect {
+            status {isBadRequest}
+        }
+    }
 }
