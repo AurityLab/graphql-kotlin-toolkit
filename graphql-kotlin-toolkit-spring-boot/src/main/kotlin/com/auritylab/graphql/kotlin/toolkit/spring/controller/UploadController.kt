@@ -52,6 +52,10 @@ class UploadController(
                 try {
                     KObjectPath(parsedOperation).path(path).set(multipartRequest.fileMap[mapKey])
                 } catch (ex: Exception) {
+                    throw ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Path '$path' of key '$mapKey' could not be found"
+                    )
                 }
             }
         }
