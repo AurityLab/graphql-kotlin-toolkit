@@ -82,7 +82,7 @@ internal class ArgumentCodeBlockGenerator(
 
         val lastLayerIndex = currentIndex - 1
 
-        if (fieldDirectiveContainer != null && lastType.isNullable && DirectiveFacade.doubleNull[fieldDirectiveContainer])
+        if (fieldDirectiveContainer != null && lastType.isNullable && DirectiveFacade.Defaults.doubleNull[fieldDirectiveContainer])
             code.addStatement(
                 "return if (map.containsKey(\"%L\")) %T(layer%L(map[\"%L\"] as %T)) else null",
                 name,

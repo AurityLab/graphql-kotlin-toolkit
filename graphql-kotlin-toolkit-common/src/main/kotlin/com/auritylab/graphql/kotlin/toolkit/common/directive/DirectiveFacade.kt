@@ -10,14 +10,14 @@ import graphql.schema.GraphQLDirective
 import graphql.schema.GraphQLSchema
 
 object DirectiveFacade {
-    val generate = GenerateDirective()
-    val resolver = ResolverDirective()
-    val representation = RepresentationDirective()
-    val doubleNull = DoubleNullDirective()
-    val pagination = PaginationDirective()
-
-    // List of all CodegenDirectives
-    private val directivesList = listOf<Directive>(generate, resolver, representation, doubleNull, pagination)
+    // List of all available directives.
+    private val directivesList = listOf<Directive>(
+        Defaults.generate,
+        Defaults.resolver,
+        Defaults.representation,
+        Defaults.doubleNull,
+        Defaults.pagination
+    )
 
     /**
      * Will validate all existing [Directive]s on the given [schema].
@@ -48,5 +48,16 @@ object DirectiveFacade {
             )
 
         return schemaDirective
+    }
+
+    /**
+     * Object which contains all available default directives.
+     */
+    object Defaults {
+        val generate = GenerateDirective
+        val resolver = ResolverDirective
+        val representation = RepresentationDirective
+        val doubleNull = DoubleNullDirective
+        val pagination = PaginationDirective
     }
 }

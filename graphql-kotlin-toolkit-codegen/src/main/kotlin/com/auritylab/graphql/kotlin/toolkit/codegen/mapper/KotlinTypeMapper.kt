@@ -110,7 +110,7 @@ internal class KotlinTypeMapper(
         // If there is a directive container and contains the DoubleNull directive, the type will additionally
         // be wrapped into a ValueWrapper.
         return if (fieldDirectiveContainer != null &&
-            DirectiveFacade.doubleNull[fieldDirectiveContainer] &&
+            DirectiveFacade.Defaults.doubleNull[fieldDirectiveContainer] &&
             wrapped.isNullable
         )
             bindingMapper.valueType.parameterizedBy(wrapped).copy(true)
@@ -148,7 +148,7 @@ internal class KotlinTypeMapper(
         val defaultClass = getBuiltInScalarKotlinType(scalar)
 
         // Return the representation of the scalar or the default class for built-in scalars or any.
-        return DirectiveFacade.representation.getArguments(scalar)
+        return DirectiveFacade.Defaults.representation.getArguments(scalar)
             ?.className?.let { ClassName.bestGuess(it) }
             ?: defaultClass
             ?: ANY
@@ -218,7 +218,7 @@ internal class KotlinTypeMapper(
      */
     private fun resolveRepresentationClass(container: GraphQLDirectiveContainer): TypeName? {
         // Check if the representation directive is present on the container.
-        val arguments = DirectiveFacade.representation.getArguments(container)
+        val arguments = DirectiveFacade.Defaults.representation.getArguments(container)
             ?: return null
 
         val className = arguments.className
@@ -250,7 +250,7 @@ internal class KotlinTypeMapper(
      * is true or the type is annotated with the [DirectiveFacade.generate] directive.
      */
     private fun resolveGeneratedClass(type: GraphQLNamedType): ClassName =
-        if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.generate[type]))
+        if (options.generateAll || (type is GraphQLDirectiveContainer && DirectiveFacade.Defaults.generate[type]))
             generatedMapper.getGeneratedTypeClassName(type)
         else ANY
 

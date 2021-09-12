@@ -56,9 +56,9 @@ internal class CodegenController(
             .flatMap { objectType ->
                 val internalGenerators = mutableListOf<FileGenerator>()
 
-                val objectHasGenerate = DirectiveFacade.generate[objectType]
-                val objectHasRepresentation = DirectiveFacade.representation[objectType]
-                val objectHasResolver = DirectiveFacade.resolver[objectType]
+                val objectHasGenerate = DirectiveFacade.Defaults.generate[objectType]
+                val objectHasRepresentation = DirectiveFacade.Defaults.representation[objectType]
+                val objectHasResolver = DirectiveFacade.Defaults.resolver[objectType]
 
                 // Generate for object type if the directive is given and does not have a representation class.
                 if ((options.generateAll && !objectHasRepresentation) || (objectHasGenerate && !objectHasRepresentation))
@@ -67,7 +67,7 @@ internal class CodegenController(
                 objectType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         objectHasResolver ||
-                        DirectiveFacade.resolver[fieldDefinition]
+                        DirectiveFacade.Defaults.resolver[fieldDefinition]
                     ) internalGenerators.add(getSwitchedFieldResolverGenerator(objectType, fieldDefinition))
                 }
 
@@ -85,12 +85,12 @@ internal class CodegenController(
             .flatMap { interfaceType ->
                 val internalGenerators = mutableListOf<FileGenerator>()
 
-                val generatedForInterface = DirectiveFacade.resolver[interfaceType]
+                val generatedForInterface = DirectiveFacade.Defaults.resolver[interfaceType]
 
                 interfaceType.fieldDefinitions.forEach { fieldDefinition ->
                     if (options.generateAll ||
                         generatedForInterface ||
-                        DirectiveFacade.resolver[fieldDefinition]
+                        DirectiveFacade.Defaults.resolver[fieldDefinition]
                     ) internalGenerators.add(getSwitchedFieldResolverGenerator(interfaceType, fieldDefinition))
                 }
 
@@ -109,7 +109,7 @@ internal class CodegenController(
     private fun getSwitchedFieldResolverGenerator(
         container: GraphQLFieldsContainer,
         field: GraphQLFieldDefinition
-    ): FileGenerator = if (DirectiveFacade.pagination[field] && GraphQLTypeHelper.isList(field.type))
+    ): FileGenerator = if (DirectiveFacade.Defaults.pagination[field] && GraphQLTypeHelper.isList(field.type))
         generatorFactory.paginationFieldResolver(container, field)
     else
         generatorFactory.fieldResolver(container, field)

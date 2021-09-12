@@ -9,7 +9,7 @@ import graphql.schema.GraphQLDirectiveContainer
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLNonNull
 
-class RepresentationDirective :
+object RepresentationDirective :
     AbstractDirective("kRepresentation", false),
     HasArgumentsDirective<RepresentationDirective.Model> {
 

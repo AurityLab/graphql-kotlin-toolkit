@@ -52,7 +52,7 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
     private fun getMatchingFieldDefinitions(
         definitions: Collection<GraphQLFieldDefinition>
     ): Collection<GraphQLFieldDefinition> =
-        definitions.filter { DirectiveFacade.pagination[it] }
+        definitions.filter { DirectiveFacade.Defaults.pagination[it] }
 
     private fun getConnectionType(input: GraphQLType): GraphQLOutputType {
         if (input !is GraphQLNamedType)
@@ -66,7 +66,7 @@ class PaginationSchemaAugmentation : SchemaAugmentation {
         return Pair(
             type.transform { trans ->
                 val augmentedFields = type.fieldDefinitions.map { field ->
-                    if (!DirectiveFacade.pagination[field])
+                    if (!DirectiveFacade.Defaults.pagination[field])
                         field
                     else {
                         val unwrappedType = GraphQLTypeHelper.unwrapType(field.type)

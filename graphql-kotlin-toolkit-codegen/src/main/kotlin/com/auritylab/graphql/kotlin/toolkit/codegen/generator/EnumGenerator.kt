@@ -58,7 +58,7 @@ internal class EnumGenerator(
                 }
 
                 // If the "kRepresentation" directive is set on the enum, we have to add a parser/converter function
-                DirectiveFacade.representation.getArguments(enum)?.className
+                DirectiveFacade.Defaults.representation.getArguments(enum)?.className
                     ?.let {
                         // Add the output property/function.
                         builder.addProperty(buildParserProperty(it))

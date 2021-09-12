@@ -26,6 +26,7 @@ abstract class AbstractDirective(
                 throw buildInvalidArgumentTypeException(it.name, it.type)
         }
 
+        // Validate the locations of the directive.
         val locationsOfDirective = directive.validLocations()
         reference.validLocations().forEach {
             // Check if the location from the reference exists on the directive.
@@ -38,7 +39,7 @@ abstract class AbstractDirective(
      * Will build a [DirectiveValidationException] which tells that the argument with the given [name] could not be
      * found on the directive definition.
      */
-    protected fun buildArgumentNotFoundException(
+    private fun buildArgumentNotFoundException(
         name: String
     ): DirectiveValidationException =
         DirectiveValidationException(this, "Argument '$name' not found on directive")
@@ -47,7 +48,7 @@ abstract class AbstractDirective(
      * Will build a [DirectiveValidationException] which tells that the argument with the given [argumentName] was
      * defined with the wrong type. The [expectedType] tells the expected type for the argument.
      */
-    protected fun buildInvalidArgumentTypeException(
+    private fun buildInvalidArgumentTypeException(
         argumentName: String,
         expectedType: GraphQLType
     ): DirectiveValidationException =
@@ -59,7 +60,7 @@ abstract class AbstractDirective(
     /**
      * Will build a [DirectiveValidationException] which tells directive requires the given [requiredLocation].
      */
-    protected fun buildInvalidLocationException(
+    private fun buildInvalidLocationException(
         requiredLocation: Introspection.DirectiveLocation
     ): DirectiveValidationException =
         DirectiveValidationException(this, "Directive location '${requiredLocation.name}' not found on directive")
